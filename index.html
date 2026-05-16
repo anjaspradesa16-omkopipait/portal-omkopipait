@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal Area Omkopipait</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80');
+            background-size: cover; background-position: center; height: 100vh;
+            display: flex; align-items: center; justify-content: center; margin: 0; color: white; overflow: hidden;
+        }
+        .menu-box {
+            background: rgba(0,0,0,0.85); padding: 30px 20px; border-radius: 25px; 
+            border: 2px solid #f39c12; text-align: center; width: 90%; max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #clock-container {
+            margin-bottom: 20px; padding: 15px; background: rgba(243,156,18,0.1);
+            border-radius: 15px; border: 1px solid rgba(243,156,18,0.3);
+        }
+        #jam { font-size: 36px; font-weight: bold; color: #f39c12; display: block; }
+        #tanggal { font-size: 14px; color: #ecf0f1; margin-top: 5px; display: block; }
+        .motivation { font-size: 14px; color: #ffeb3b; margin: 20px 0; font-style: italic; font-weight: bold; }
+        
+        .btn-menu {
+            display: block; padding: 16px; margin: 12px 0; text-decoration: none; 
+            border-radius: 50px; font-weight: bold; color: white; font-size: 16px;
+            text-transform: uppercase; transition: all 0.3s ease;
+        }
+        .btn-pps { background: linear-gradient(45deg, #8e44ad, #9b59b6); border-bottom: 4px solid #5e2d72; }
+        .btn-sales { background: linear-gradient(45deg, #2980b9, #3498db); border-bottom: 4px solid #1c5a85; }
+        .btn-menu:active { transform: translateY(2px); border-bottom: 0; }
+        .copyright { font-size: 11px; margin-top: 25px; color: #bdc3c7; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+
+        .input-login { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:none; outline:none; font-size:16px; background: white; color: black; }
+        .btn-masuk { width:100%; padding:15px; background:#f39c12; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px; text-transform: uppercase; }
+    </style>
+</head>
+<body onclick="playMusic()">
+
+    <div id="music-container" style="display:none;"></div>
+
+    <div class="menu-box">
+        <div id="clock-container">
+            <span id="jam">00:00:00</span>
+            <span id="tanggal">Memuat Tanggal...</span>
+        </div>
+
+        <div id="auth-ui"></div>
+        <div id="menu-ui" style="display:none;"></div>
+
+        <div class="motivation">"Target hanyalah angka.<br>Tetapi harus tetap dikejar."</div>
+        
+        <div class="copyright">
+            Copyright &copy; 2026 <b>Omkopipait</b><br>
+            "Semua dibikin pake IA. Mending scrol Facebook & Tiktok."
+        </div>
+    </div>
+
+    <script>
+        // URL Apps Script Bapak yang sudah aktif
+        const urlAppsScript = "https://script.google.com/macros/s/AKfycbyMTQSyxHyRNqb0VaBT780GK67Lm-IS6QIXWl1AlC-BJi1vjxxenOSeYR0iQHUZAVJgVg/exec";
+        const PASS_VALIDASI = "targetharuskecapai"; 
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('jam').textContent = now.toLocaleTimeString('id-ID', {hour12:false});
+            document.getElementById('tanggal').textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        let musicStarted = false;
+        function playMusic() {
+            if (!musicStarted) {
+                const id = "S26idZ_Vv8I"; 
+                document.getElementById('music-container').innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}" frameborder="0" allow="autoplay"></iframe>`;
+                musicStarted = true;
+            }
+        }
+
+        function init() {
+            const user = JSON.parse(sessionStorage.getItem("userArea"));
+            if (user && localStorage.getItem("lastLoginDate") === new Date().toDateString()) {
+                showMenu(user);
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            const saved = JSON.parse(localStorage.getItem("permanentUser")) || {nama:'', toko:''};
+            document.getElementById('auth-ui').innerHTML = `
+                <h3 style="color:#f39c12; margin:0 0 10px 0; font-size:18px;">LOGIN AKSES AREA</h3>
+                <input type="text" id="regNama" value="${saved.nama}" placeholder="Nama Sesuai Database" class="input-login">
+                <input type="text" id="regToko" value="${saved.toko}" placeholder="Kode Toko (Contoh: CB09)" class="input-login">
+                <select id="regRole" class="input-login">
+                    <option value="locked">Crew Store (Laporan)</option>
+                    <option value="admin">Kepala Toko (Admin)</option>
+                </select>
+                <button id="btnAction" onclick="doLogin()" class="btn-masuk">CEK DATABASE KRU...</button>
+            `;
+            document.getElementById('menu-ui').style.display = 'none';
+        }
+
+        async function doLogin() {
+    const nama = document.getElementById('regNama').value.trim();
+    const toko = document.getElementById('regToko').value.toUpperCase().trim();
+    const roleInput = document.getElementById('regRole').value; // Membaca dropdown Kepala/Crew
+    const btn = document.getElementById('btnAction');
+
+    if(!nama || !toko) return alert("Isi Nama & Toko!");
+    btn.innerText = "MENGHUBUNGKAN..."; btn.disabled = true;
+
+    try {
+        // Cek Nama & Toko ke database Drive asli Bapak
+        const urlPasti = `${urlAppsScript}?kodeToko=${toko}&nama=${nama}`;
+        const response = await fetch(urlPasti);
+        const hasil = await response.text();
+
+        if (hasil === "OK") {
+            // --- SAKLAR PENGUNCI JABATAN (LOKAL) ---
+            if (roleInput === "admin") {
+                // Jika memilih Kepala Toko, CEGAT pakai Password Area
+                const pass = prompt("Akses Admin Terdeteksi! Masukkan Password Area:");
+                if (pass === PASS_VALIDASI) {
+                    sessionStorage.setItem("userArea", JSON.stringify({nama, toko, role: "admin"}));
+                    localStorage.setItem("permanentUser", JSON.stringify({nama, toko}));
+                    localStorage.setItem("lastLoginDate", new Date().toDateString());
+                    alert("Login Admin Berhasil! Selamat Bekerja Pak.");
+                    location.reload();
+                } else { 
+                    alert("⚠️ PASSWORD SALAH! Akses Admin Ditolak."); 
+                    location.reload(); 
+                }
+            } else {
+                // Jika memilih Crew Store, langsung lolos TANPA password (tapi digembok)
+                sessionStorage.setItem("userArea", JSON.stringify({nama, toko, role: "locked"}));
+                localStorage.setItem("permanentUser", JSON.stringify({nama, toko}));
+                localStorage.setItem("lastLoginDate", new Date().toDateString());
+                alert("Login Crew Berhasil! Tetap Semangat Kejar Target.");
+                location.reload();
+            }
+        } else {
+            alert("DITOLAK!\nNama '" + nama + "' tidak ada di Toko " + toko + ".\nPeriksa penulisan di Drive Bapak.");
+            location.reload();
+        }
+    } catch (e) {
+        alert("Gagal konek Drive! Pastikan Izin Akses Apps Script adalah 'Anyone'.");
+        location.reload();
+    }
+}
+
+        function showMenu(user) {
+    // 1. Bersihkan area login
+    document.getElementById('auth-ui').innerHTML = '';
+    document.getElementById('menu-ui').style.display = 'block';
+
+    // 2. Bikin tampilan Menu yang lebih Mewah (Desain Asli Bapak)
+    document.getElementById('menu-ui').innerHTML = `
+        <div style="background: linear-gradient(135deg, rgba(243,156,18,0.2), rgba(0,0,0,0.5)); 
+                    padding: 20px; border-radius: 20px; border: 1px solid #f39c12; margin-bottom: 25px;
+                    box-shadow: inset 0 0 15px rgba(243,156,18,0.2);">
+            
+            <div style="font-size: 12px; color: #bdc3c7; text-transform: uppercase; letter-spacing: 2px;">Selamat Datang</div>
+            <div style="font-size: 24px; font-weight: bold; color: #f39c12; margin: 5px 0;">Halo, ${user.nama.toUpperCase()} [${user.toko}]</div>
+            <div style="font-size: 14px; color: #ecf0f1; opacity: 0.8;">Jabatan: <b>${user.role === 'admin' ? 'Kepala Toko' : 'Crew Store'}</b></div>
+            
+            <button onclick="sessionStorage.clear();location.reload();" 
+                    style="background: transparent; border: 1px solid #e74c3c; color: #e74c3c; 
+                           padding: 5px 15px; border-radius: 50px; font-size: 10px; 
+                           cursor: pointer; margin-top: 15px; font-weight: bold; transition: 0.3s; width: auto;">
+                LOGOUT
+            </button>
+        </div>
+
+        <div style="display: grid; gap: 15px;">
+            <a href="MONITORING-PPS.html?mode=${user.role}" class="btn-menu btn-pps" 
+               style="margin:0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+               <span>📊</span> MONITORING PPS
+            </a>
+            
+            <a href="MONITORING-SALES.html?mode=${user.role}" class="btn-menu btn-sales" 
+               style="margin:0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+               <span>💰</span> MONITORING SALES
+            </a>
+        </div>
+    `;
+}
+        init();
+    </script>
+</body>
+</html>
