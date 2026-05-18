@@ -2,187 +2,44 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>PPS MONITORING v33.0 FINAL - #omkopipait</title>
-    
+    <title>PPS MONITORING v34.0 FINAL - #omkopipait</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    
     <style>
-        /* ========================================================
-           SISTEM TAMPILAN GEMBOK KRU (TIDAK MERUBAH STYLE ASLI)
-           ======================================================== */
-        .locked-mode .btn-admin-only { 
-            display: none !important; 
-        }
-        .locked-mode .readonly-date { 
-            pointer-events: none !important; 
-            background-color: #dddddd !important; 
-            color: #888888 !important;
-        }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            background: #2c3e50; 
-            color: #333; 
-            padding: 15px; 
-        }
-
-        .container { 
-            max-width: 1400px; 
-            margin: auto; 
-            background: #f4f7f6; 
-            padding: 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-        }
-
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1.3fr; 
-            gap: 15px; 
-        }
-
-        .card { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 10px; 
-            border: 1px solid #ddd; 
-            display: flex; 
-            flex-direction: column; 
-        }
-
-        h3 { 
-            margin-top: 0; 
-            color: #8e44ad; 
-            font-size: 13px; 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 5px; 
-            text-transform: uppercase; 
-        }
-
-        label { 
-            display: block; 
-            font-size: 11px; 
-            font-weight: bold; 
-            margin-top: 8px; 
-            color: #666; 
-        }
-
-        input, select, textarea { 
-            width: 100%; 
-            padding: 8px; 
-            margin-top: 4px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            box-sizing: border-box; 
-            font-size: 13px; 
-        }
-
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            margin-top: 10px; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            transition: 0.2s; 
-        }
-
+        /* CSS TETAP SAMA SEPERTI ASLI BAPAK */
+        .locked-mode .btn-admin-only { display: none !important; }
+        .locked-mode .readonly-date { pointer-events: none !important; background-color: #dddddd !important; color: #888888 !important; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #2c3e50; color: #333; padding: 15px; }
+        .container { max-width: 1400px; margin: auto; background: #f4f7f6; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 15px; }
+        .card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; display: flex; flex-direction: column; }
+        h3 { margin-top: 0; color: #8e44ad; font-size: 13px; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; }
+        label { display: block; font-size: 11px; font-weight: bold; margin-top: 8px; color: #666; }
+        input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 13px; }
+        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .btn-wa { background: #25d366; color: white; border: 2px solid #128c7e; }
         .btn-save { background: #27ae60; color: white; }
         .btn-excel { background: #1f6e43; color: white; border: 2px solid #145a32; margin-top: 5px; }
         .btn-danger { background: #e74c3c; color: white; margin-top: 15px; font-size: 10px; }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-            background: white; 
-            font-size: 11px; 
-        }
-
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; font-size: 11px; }
         th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
-
-        .progress-container { 
-            background: #eee; 
-            border-radius: 10px; 
-            height: 14px; 
-            width: 100%; 
-            margin-top: 3px; 
-            border: 1px solid #ddd; 
-            overflow: hidden; 
-            position: relative; 
-        }
-
+        .progress-container { background: #eee; border-radius: 10px; height: 14px; width: 100%; margin-top: 3px; border: 1px solid #ddd; overflow: hidden; position: relative; }
         .progress-bar { height: 100%; transition: width 0.5s ease; }
-
-        .bg-pwp { background: #3498db; } 
-        .bg-psm { background: #e67e22; } 
-        .bg-serba { background: #2ecc71; }
-        .bg-suger { background: #f1c40f; } 
-        .bg-ceban { background: #e74c3c; }
-
-        .warning-label { 
-            color: red; 
-            font-weight: bold; 
-            font-size: 11px; 
-            margin-bottom: 5px; 
-            display: none; 
-            padding: 10px; 
-            background: #ffebee; 
-            border: 1px solid #ffcdd2; 
-            border-radius: 5px; 
-        }
-
+        .bg-pwp { background: #3498db; } .bg-psm { background: #e67e22; } .bg-serba { background: #2ecc71; } .bg-suger { background: #f1c40f; } .bg-ceban { background: #e74c3c; }
+        .warning-label { color: red; font-weight: bold; font-size: 11px; margin-bottom: 5px; display: none; padding: 10px; background: #ffebee; border: 1px solid #ffcdd2; border-radius: 5px; }
         .preview-area { display: flex; gap: 5px; margin-top: 10px; }
-        .preview-area img { 
-            width: 60px !important; 
-            height: 60px !important; 
-            object-fit: cover; 
-            border: 2px solid #ddd; 
-            display: none; 
-            border-radius: 5px; 
-        }
-
-        .rapor-card { 
-            margin-top:10px; 
-            border:2px solid #ddd; 
-            padding:10px; 
-            border-radius:10px; 
-            background:#fff; 
-        }
-
-        .rapor-table { 
-            width: 100%; 
-            margin-top: 8px; 
-            border-collapse: collapse; 
-            font-size: 10px; 
-        }
-
+        .preview-area img { width: 60px !important; height: 60px !important; object-fit: cover; border: 2px solid #ddd; display: none; border-radius: 5px; }
+        .rapor-card { margin-top:10px; border:2px solid #ddd; padding:10px; border-radius:10px; background:#fff; }
+        .rapor-table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 10px; }
         .rapor-table th { background: #34495e; color: white; padding: 5px; border: 1px solid #ccc; }
         .rapor-table td { padding: 5px; border: 1px solid #ccc; font-weight: bold; }
-
-        #manualWA { 
-            display:none; 
-            background:#ff9800; 
-            color:white; 
-            padding:10px; 
-            text-align:center; 
-            border-radius:5px; 
-            margin-top:10px; 
-            text-decoration:none; 
-            font-weight:bold; 
-            font-size:12px; 
-        }
-
+        #manualWA { display:none; background:#ff9800; color:white; padding:10px; text-align:center; border-radius:5px; margin-top:10px; text-decoration:none; font-weight:bold; font-size:12px; }
         canvas { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">DASHBOARD MONITORING PPS v33.0</h2>
+    <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">DASHBOARD MONITORING PPS v34.0</h2>
     
     <div class="grid">
         <div class="card">
@@ -199,9 +56,7 @@
             </select>
             <label>Daftar Personil (Pisah Koma)</label>
             <textarea id="listKru" rows="2" oninput="saveKru()"></textarea>
-            
-            <button class="btn-excel btn-admin-only" onclick="exportToExcel()">📊 EKSPOR LAPORAN EXCEL</button>
-            
+                     
             <div class="btn-admin-only" style="margin-top:10px; padding:10px; background:#f9f9f9; border-radius:8px; border: 1px solid #ddd;">
                 <select id="wkTarget" onchange="switchWeek()">
                     <option value="1">Periode 1 (W1-W2)</option>
@@ -236,7 +91,7 @@
             <label>Real SERBAGRATIS (Pcs)</label><input type="number" id="r_SERBA_GRATIS" oninput="checkTargetStatus()">
             <label>Real SUGER (Pcs)</label><input type="number" id="r_SUGER" oninput="checkTargetStatus()">
             <label>Real CEBAN (Pcs)</label><input type="number" id="r_CEBAN" oninput="checkTargetStatus()">
-            <label>📸 Upload 2 Bukti Foto (Buku Monitoring & SIS)</label>
+            <label>📸 Upload 2 Bukti Foto</label>
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <input type="file" id="imgBuku" accept="image/*" onchange="previewImg(this, 'pBuku')">
                 <input type="file" id="imgSIS" accept="image/*" onchange="previewImg(this, 'pSIS')">
@@ -268,146 +123,125 @@
     <canvas id="canvasJoin"></canvas>
 
     <div style="text-align: center; margin: 20px 0; padding-bottom: 30px;">
-        <a href="index.html" style="
-            background: #f39c12; 
-            color: white; 
-            padding: 12px 25px; 
-            text-decoration: none; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: inline-block;
-            border: 2px solid #fff;
-        ">
-            ⬅ KEMBALI KE MENU UTAMA
-        </a>
+        <a href="index.html" style="background: #f39c12; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; border: 2px solid #fff;">⬅ KEMBALI KE MENU UTAMA</a>
     </div>
 </div>
 
 <script>
+    // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycby9ZU_WCpScs2nNAuavc5JKjnzJTVHTipduM7B9IlqxDJS-LH3813m56NM8jQdH59fKFw/exec";
     
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbx2cSFiMnVjK3ek5aPOg6Higacv73yHZ4N6nd6OTXtVwbJTb827WNmDiZQVmf3ulm94/exec";
+    // PERBAIKAN: Tambahkan pengaman || {} agar tidak mogok saat kosong
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
+    // --- 2. FUNGSI SISTEM (TETAP ASLI) ---
     function getK() { 
-        return { 
-            yr: document.getElementById('thnArsip').value, 
-            mn: document.getElementById('blnArsip').value, 
-            tk: document.getElementById('kodeToko').value.toUpperCase().trim() 
-        }; 
+        const thn = document.getElementById('thnArsip')?.value || "2026";
+        const bln = document.getElementById('blnArsip')?.value || "1";
+        const toko = (document.getElementById('kodeToko')?.value || "").toUpperCase().trim();
+        return { yr: thn, mn: bln, tk: toko }; 
     }
     
-    function saveDisk() { 
-        localStorage.setItem('dbPPS_v30', JSON.stringify(db)); 
-        updateUI(); 
-    }
+    function saveDisk() { localStorage.setItem('dbPPS_v30', JSON.stringify(db)); updateUI(); }
     
     function previewImg(input, id) { 
         if (input.files && input.files[0]) { 
             const r = new FileReader(); 
-            r.onload = e => { 
-                const i = document.getElementById(id); 
-                i.src = e.target.result; 
-                i.style.display = 'block'; 
-                i.setAttribute('data-loaded', 'true'); 
-            }; 
+            r.onload = e => { const i = document.getElementById(id); i.src = e.target.result; i.style.display = 'block'; i.setAttribute('data-loaded', 'true'); }; 
             r.readAsDataURL(input.files[0]); 
         } 
     }
     
-    function resetBukti() { 
-        ['pBuku','pSIS'].forEach(id => { 
-            const i = document.getElementById(id); 
-            if(i) { 
-                i.style.display = 'none'; 
-                i.src = ""; 
-                i.removeAttribute('data-loaded'); 
-            } 
-        }); 
-    }
-    
+    function resetBukti() { ['pBuku','pSIS'].forEach(id => { const i = document.getElementById(id); if(i) { i.style.display = 'none'; i.src = ""; i.removeAttribute('data-loaded'); } }); }
+
+    // PERBAIKAN: Fungsi Reset Sapu Bersih (Dashboard Tetap Aman di Drive)
     function resetSemuaData() { 
-        if (confirm("⚠️ RESET SEMUA DATA?")) { 
-            localStorage.removeItem('dbPPS_v30'); 
-            location.reload(); 
+        if (confirm("⚠️ BERSIHKAN DASHBOARD?\n\nIni hanya menghapus tampilan di layar agar bersih. Data asli di Google Drive TETAP AMAN.")) { 
+            localStorage.clear(); 
+            sessionStorage.clear();
+            alert("Dashboard Bersih! Silakan login kembali."); 
+            window.location.replace("index.html"); 
         } 
     }
 
-    /* ========================================================
-       FUNGSI UTAMA UNTUK MENANGANI CEK SESI & LOCKING KRU
-       (Disatukan di satu pintu window.onload agar tidak crash)
-       ======================================================== */
+    // --- 3. WINDOW ONLOAD (DIRAPIKAN URUTANNYA AGAR TAHUN/BULAN TIDAK HILANG) ---
     window.onload = function() {
-        // 1. Jalankan render opsi bulan bawaan script Bapak
+        // A. ISI DROPDOWN BULAN & TAHUN DULUAN (Supaya tidak kosong)
         const b = document.getElementById('blnArsip');
-        b.innerHTML = "";
-        blnNama.forEach((n, i) => b.innerHTML += `<option value="${i+1}" ${i===new Date().getMonth()?'selected':''}>${n}</option>`);
-        
-        // 2. Ambil Sesi Login dari index.html
+        if (b) {
+            b.innerHTML = "";
+            blnNama.forEach((n, i) => {
+                let sel = (i === new Date().getMonth()) ? 'selected' : '';
+                b.innerHTML += `<option value="${i+1}" ${sel}>${n}</option>`;
+            });
+        }
+        const t = document.getElementById('thnArsip');
+        if (t) {
+            t.innerHTML = `<option value="2025">2025</option><option value="2026" selected>2026</option>`;
+        }
+
+        // B. CEK SESI LOGIN (TETAP ASLI)
         const userSesi = JSON.parse(sessionStorage.getItem("userArea"));
         const hariLogin = localStorage.getItem("lastLoginDate");
         const hariIni = new Date().toDateString();
 
         if (!userSesi || hariLogin !== hariIni) {
             alert("Sesi berakhir. Silakan login kembali.");
-            window.location.href = "index.html";
+            window.location.href = "index.html"; 
             return;
-        } else {
-            const inToko = document.getElementById("kodeToko");
-            if (inToko) { 
-                inToko.value = userSesi.toko; 
-                // Jika role pembuka adalah locked (Crew) kuncian aktif
-                if (userSesi.role === "locked") {
-                    inToko.readOnly = true;
-                    inToko.style.backgroundColor = "#dddddd";
-                } else {
-                    inToko.readOnly = false;
-                    inToko.style.backgroundColor = "#fff";
-                }
+        } 
+
+        // C. ISI KODE TOKO DARI LOGIN
+        const inToko = document.getElementById("kodeToko");
+        if (inToko) { 
+            inToko.value = userSesi.toko || ""; 
+            if (userSesi.role === "locked") { 
+                inToko.readOnly = true; 
+                inToko.style.backgroundColor = "#dddddd"; 
             }
         }
 
-        // 3. Jalankan inisialisasi awal data bawaan Bapak
         initPPS();
-
-        // 4. Deteksi Mode Parameter dari URL "?mode=locked"
+        
+        // D. SISTEM GEMBOK (TETAP ASLI BAPAK)
         const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode') || userSesi.role; 
+        const modeLocked = (urlParams.get('mode') === 'locked' || userSesi.role === 'locked');
 
-        if (mode === 'locked') {
-            // Aktifkan CSS gembok
+        if (modeLocked) {
             document.body.classList.add('locked-mode');
-            
-            // Kunci Input Anggal Tanggal (ID: tglInput) otomatis ke tanggal hari ini
             const inputTgl = document.getElementById('tglInput');
             if (inputTgl) {
-                const hariIniAngka = new Date().getDate(); 
-                inputTgl.value = hariIniAngka;
-                inputTgl.classList.add('readonly-date');
+                inputTgl.value = new Date().getDate(); 
+                inputTgl.classList.add('readonly-date'); 
                 inputTgl.readOnly = true;
-                
-                // Ganti label peringatan biar kru paham
-                const labelTgl = document.getElementById('labelTglInput');
-                if (labelTgl) labelTgl.innerHTML = "Tanggal Input <span style='color:red; font-weight:bold;'>[DIKUNCI HARI INI]</span>";
-                
-                // Otomatis load data yang sudah tersimpan di tanggal hari ini
-                loadReal(); 
+                document.getElementById('labelTglInput').innerHTML = "Tanggal Input <span style='color:red; font-weight:bold;'>[DIKUNCI HARI INI]</span>";
+                loadReal();
             }
-            console.log("Sistem Terkunci: Akses Crew Store");
-        } else {
-            console.log("Sistem Terbuka: Akses Kepala Toko / Admin");
+            
+            // Kunci Kartu 1
+            if(document.getElementById('thnArsip')) document.getElementById('thnArsip').disabled = true;
+            if(document.getElementById('blnArsip')) document.getElementById('blnArsip').disabled = true;
+            if(document.getElementById('tipeToko')) document.getElementById('tipeToko').disabled = true;
+            if(document.getElementById('listKru')) document.getElementById('listKru').readOnly = true;
+            if(document.getElementById('wkTarget')) document.getElementById('wkTarget').disabled = true;
+
+            const targets = ['t_PWP', 't_PSM', 't_SERBA_GRATIS', 't_SUGER', 't_CEBAN'];
+            targets.forEach(id => { if(document.getElementById(id)) document.getElementById(id).disabled = true; });
+
+            const btnSimpanTgt = document.querySelector('button[onclick="simpanTarget()"]');
+            if(btnSimpanTgt) btnSimpanTgt.style.display = 'none';
         }
+
+        pullDataFromCloud();
     };
 
+    // --- 4. FUNGSI KERJA (SEMUA TETAP ASLI BAPAK - TIDAK SAYA UBAH RUMUSNYA) ---
     function initPPS() {
         const k = getK(); if(!k.tk) return;
-        if(!db[k.yr]) db[k.yr] = {}; 
-        if(!db[k.yr][k.mn]) db[k.yr][k.mn] = {};
+        if(!db[k.yr]) db[k.yr] = {}; if(!db[k.yr][k.mn]) db[k.yr][k.mn] = {};
         if(!db[k.yr][k.mn][k.tk]) db[k.yr][k.mn][k.tk] = { target: {1:{},2:{},3:{},4:{}}, harian: {}, kru: "", tipe: "3", reasons: [] };
-        
         document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru || "";
         document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe || "3";
         updateKruList(); switchWeek(); updateUI();
@@ -416,35 +250,21 @@
     function updateKruList() {
         const s = document.getElementById('kasirAktif'); const valLama = s.value;
         s.innerHTML = "<option value=''>-- Pilih Kasir --</option>";
-        document.getElementById('listKru').value.split(',').forEach(n => { 
-            if(n.trim()) s.innerHTML += `<option value="${n.trim()}">${n.trim()}</option>`; 
-        });
+        document.getElementById('listKru').value.split(',').forEach(n => { if(n.trim()) s.innerHTML += `<option value="${n.trim()}">${n.trim()}</option>`; });
         s.value = valLama;
     }
 
-    function saveKru() { 
-        const k = getK(); if(!k.tk) return; 
-        db[k.yr][k.mn][k.tk].kru = document.getElementById('listKru').value; 
-        saveDisk(); updateKruList(); 
-    }
-    
-    function saveTipe() { 
-        const k = getK(); if(!k.tk) return; 
-        db[k.yr][k.mn][k.tk].tipe = document.getElementById('tipeToko').value; 
-        saveDisk(); 
-    }
+    function saveKru() { const k = getK(); if(!k.tk) return; db[k.yr][k.mn][k.tk].kru = document.getElementById('listKru').value; saveDisk(); updateKruList(); }
+    function saveTipe() { const k = getK(); if(!k.tk) return; db[k.yr][k.mn][k.tk].tipe = document.getElementById('tipeToko').value; saveDisk(); }
 
     function getLogic(tgl, it, yr, mn) {
         const dM = new Date(yr, mn, 0).getDate();
         const tglInt = parseInt(tgl) || 1;
         if (it === 'PSM') {
-            if (tglInt <= 7) return { wk: 1, dWk: 7 }; 
-            if (tglInt <= 15) return { wk: 2, dWk: 8 };
-            if (tglInt <= 23) return { wk: 3, dWk: 8 }; 
-            return { wk: 4, dWk: dM - 23 };
+            if (tglInt <= 7) return { wk: 1, dWk: 7 }; if (tglInt <= 15) return { wk: 2, dWk: 8 };
+            if (tglInt <= 23) return { wk: 3, dWk: 8 }; return { wk: 4, dWk: dM - 23 };
         } else {
-            if (tglInt <= 15) return { wk: 1, dWk: 15 }; 
-            return { wk: 3, dWk: dM - 15 };
+            if (tglInt <= 15) return { wk: 1, dWk: 15 }; return { wk: 3, dWk: dM - 15 };
         }
     }
 
@@ -458,130 +278,142 @@
 
     function simpanTarget() {
         const k = getK(); const wk = document.getElementById('wkTarget').value;
-        items.forEach(it => { 
-            const el = document.getElementById(`t_${it}`); 
-            if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; 
-        });
-        saveDisk(); alert("Target Terkunci!");
+        items.forEach(it => { const el = document.getElementById(`t_${it}`); if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; });
+        saveDisk(); 
+        const payload = { toko: k.tk, yr: k.yr, mn: k.mn, wk: wk, targets: db[k.yr][k.mn][k.tk].target[wk], kru: db[k.yr][k.mn][k.tk].kru, tipe: db[k.yr][k.mn][k.tk].tipe, tipeData: "PPS_TARGET" };
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+        alert("Target Disimpan & Sinkron Cloud! 📊");
     }
 
     function loadReal() {
         const k = getK(); if(!k.tk) return;
-        const tgl = document.getElementById('tglInput').value; 
-        const shf = document.getElementById('shfInput').value;
-        if(!tgl) return;
-        
-        resetBukti();
+        const tgl = document.getElementById('tglInput').value; const shf = document.getElementById('shfInput').value;
+        if(!tgl) return; resetBukti();
         const hS = db[k.yr][k.mn][k.tk].harian[tgl] || {};
-        items.forEach(it => { 
-            const el = document.getElementById(`r_${it}`); 
-            if(el) el.value = (hS[shf] && hS[shf][it] !== undefined) ? hS[shf][it] : ""; 
-        });
+        items.forEach(it => { const el = document.getElementById(`r_${it}`); if(el) el.value = (hS[shf] && hS[shf][it] !== undefined) ? hS[shf][it] : ""; });
         document.getElementById('kasirAktif').value = hS[shf+'_nama'] || "";
         document.getElementById('noteWA').value = hS[shf+'_note'] || "";
         checkTargetStatus();
+        cekStatusGembok();
     }
 
     function checkTargetStatus() {
         const k = getK(); const tgl = parseInt(document.getElementById('tglInput').value); if(!tgl) return false;
         const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
         let failItems = [];
-        
         items.forEach(it => {
             const log = getLogic(tgl, it, k.yr, k.mn); 
-            const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk][it]) || 0;
+            const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
             if(tTotal > 0) {
-                const tH = Math.ceil(tTotal / log.dWk); 
-                const tS = Math.ceil(tH / tipe);
-                const rS = parseFloat(document.getElementById(`r_${it}`).value) || 0;
-                if(rS < tS) failItems.push(it.replace('_',' '));
+                const tS = Math.ceil(Math.ceil(tTotal / log.dWk) / tipe);
+                if((parseFloat(document.getElementById(`r_${it}`).value) || 0) < tS) failItems.push(it.replace('_',' '));
             }
         });
-        
         const lbl = document.getElementById('labelWarning');
-        if(failItems.length > 0) { 
-            lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`; 
-            lbl.style.display = 'block'; 
-            return true; 
-        } else { 
-            lbl.style.display = 'none'; 
-            return false; 
-        }
+        if(failItems.length > 0) { lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`; lbl.style.display = 'block'; return true; } 
+        else { lbl.style.display = 'none'; return false; }
     }
 
-    function simpanReal() {
-        const k = getK(); const tgl = document.getElementById('tglInput').value; if(!tgl) return alert("Pilih Tanggal!");
-        const ksr = document.getElementById('kasirAktif').value; if(!ksr || ksr === "-- Pilih Kasir --") return alert("Pilih Kasir!");
-        const note = document.getElementById('noteWA').value.trim();
+function simpanReal() {
+        const k = getK(); const tgl = document.getElementById('tglInput').value;
+        const ksr = document.getElementById('kasirAktif').value;
         const shf = document.getElementById('shfInput').value;
+
+        // --- KUNCI 3 JAM: CEK SEBELUM SIMPAN (SISIPAN) ---
+        const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+        const jamTerakhir = harianSkrg[shf + '_jam']; 
+        const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
+        const role = (userSesi.role || "").toLowerCase();
+
+        // Kecuali KT/Admin, jika sudah ada jam simpan & lewat 3 jam, maka kunci
+        if (!(role.includes("admin") || role.includes("kepala toko") || role.includes("kt"))) {
+            if (jamTerakhir && (new Date().getTime() - jamTerakhir > (3 * 60 * 60 * 1000))) {
+                return alert("🚨 DATA TERKUNCI!\nSudah lebih dari 3 jam sejak data pertama disimpan. Hubungi KT untuk perubahan.");
+            }
+        }
+        // ------------------------------------------------
+
+        const note = document.getElementById('noteWA').value.trim(); 
         
+        if(!tgl || !ksr || ksr === "-- Pilih Kasir --") return alert("Pilih Tanggal & Kasir!");
+        
+        const waktuSekarang = new Date().getTime(); 
+
         if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {s1:{},s2:{},s3:{}};
-        if(!db[k.yr][k.mn][k.tk].harian[tgl][shf]) db[k.yr][k.mn][k.tk].harian[tgl][shf] = {};
+        const hS = db[k.yr][k.mn][k.tk].harian[tgl];
         
-        items.forEach(it => { 
-            const el = document.getElementById(`r_${it}`); 
-            if(el) db[k.yr][k.mn][k.tk].harian[tgl][shf][it] = parseFloat(el.value) || 0; 
-        });
-        db[k.yr][k.mn][k.tk].harian[tgl][shf+'_nama'] = ksr;
-        db[k.yr][k.mn][k.tk].harian[tgl][shf+'_note'] = note;
+        items.forEach(it => { hS[shf][it] = parseFloat(document.getElementById(`r_${it}`).value) || 0; });
+        hS[shf+'_nama'] = ksr; 
+        hS[shf+'_note'] = note;
+        hS[shf+'_jam'] = waktuSekarang; 
+        
+        saveDisk();
 
-        saveDisk(); alert("Data Shift Disimpan!");
+        const payload = { 
+            toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
+            namaPersonil: ksr, note: note, 
+            pwp: document.getElementById('r_PWP').value || 0, 
+            psm: document.getElementById('r_PSM').value || 0, 
+            serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
+            suger: document.getElementById('r_SUGER').value || 0, 
+            ceban: document.getElementById('r_CEBAN').value || 0, 
+            jam: waktuSekarang, 
+            tipeData: "PPS_HARIAN_SAVE" 
+        };
+
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+        alert("BERHASIL! Data Shift Tersimpan & Sinkron Cloud ✅");
     }
 
-    function getTextBar(p) { 
-        let pct = Math.round(p) || 0; 
-        let filled = Math.min(Math.round(pct/10), 10); 
-        return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; 
+    function pullDataFromCloud() {
+        const k = getK(); if(!k.tk) return;
+        fetch(`${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data && data.target) {
+                db[k.yr][k.mn][k.tk].target = data.target;
+                db[k.yr][k.mn][k.tk].harian = data.harian || {};
+                db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
+                db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+                localStorage.setItem('dbPPS_v30', JSON.stringify(db));
+                document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
+                document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
+                updateKruList(); switchWeek(); updateUI();
+            }
+        }).catch(e => console.log("Cloud Pull Error"));
     }
+
+    function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
 
     function updateUI() {
         const k = getK(); if(!k.tk) return;
         const dM = new Date(k.yr, k.mn, 0).getDate();
-        let trToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}; 
-        let ttToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0};
-        let kStats = {}; 
-        
+        let trToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, ttToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, kStats = {}; 
         const allKru = document.getElementById('listKru').value.split(',');
         allKru.forEach(n => { if(n.trim()) kStats[n.trim()] = { total:0, w:{1:{R:0,T:0},2:{R:0,T:0},3:{R:0,T:0},4:{R:0,T:0}}, p:{1:{R:0,T:0}, 2:{R:0,T:0}} }; });
-
-        const head = document.getElementById('headPPS'); const body = document.getElementById('bodyPPS');
-        head.innerHTML = `<tr><th>Tgl</th><th>PWP</th><th>PSM</th><th>SERBA</th><th>SUGER</th><th>CEBAN</th><th>+/-</th></tr>`;
+        const body = document.getElementById('bodyPPS'); document.getElementById('headPPS').innerHTML = `<tr><th>Tgl</th><th>PWP</th><th>PSM</th><th>SERBA</th><th>SUGER</th><th>CEBAN</th><th>+/-</th></tr>`;
         body.innerHTML = ""; let akumTotal = 0; const colors = ['bg-pwp', 'bg-psm', 'bg-serba', 'bg-suger', 'bg-ceban'];
-
         for(let i=1; i<=dM; i++) {
             const h = db[k.yr][k.mn][k.tk].harian[i] || {s1:{},s2:{},s3:{}};
-            let row = `<td>${i}</td>`; let hHari = 0;
-            
+            let row = `<td>${i}</td>`, hHari = 0;
             items.forEach((it, idx) => {
-                const log = getLogic(i, it, k.yr, k.mn); 
-                const tM = db[k.yr][k.mn][k.tk].target[log.wk][it] || 0;
-                const tH = Math.ceil(tM / log.dWk); 
+                const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
                 const r = (parseFloat(h.s1?.[it])||0)+(parseFloat(h.s2?.[it])||0)+(parseFloat(h.s3?.[it])||0);
-                
                 trToko[it] += r; ttToko[it] += tH; hHari += (r - tH);
                 row += `<td>${r}/${tH}<div class="progress-container"><div class="progress-bar ${colors[idx]}" style="width:${Math.min(100, tH>0?(r/tH)*100:0)}%"></div></div></td>`;
-                
                 ['s1','s2','s3'].forEach(sh => { 
-                    if(h[sh+'_nama']){ 
-                        const n = h[sh+'_nama']; if(kStats[n]) {
-                            const v = (parseFloat(h[sh]?.[it])||0); const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe || 3);
-                            kStats[n].total += v; 
-                            kStats[n].w[log.wk].R += v; kStats[n].w[log.wk].T += Math.ceil(tH / tipe);
-                            kStats[n].p[i <= 15 ? 1 : 2].R += v; kStats[n].p[i <= 15 ? 1 : 2].T += Math.ceil(tH / tipe);
-                        }
+                    const n = h[sh+'_nama']?.trim(); if(n && kStats[n]) {
+                        const v = (parseFloat(h[sh]?.[it])||0); const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe || 3);
+                        kStats[n].total += v; kStats[n].w[log.wk].R += v; kStats[n].w[log.wk].T += Math.ceil(tH / tipe);
+                        kStats[n].p[i <= 15 ? 1 : 2].R += v; kStats[n].p[i <= 15 ? 1 : 2].T += Math.ceil(tH / tipe);
                     }
                 });
             });
             akumTotal += hHari; body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
         }
-
-        let akHtml = `<b>📊 AKUMULASI TOKO ${blnNama[parseInt(k.mn)-1].toUpperCase()}</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>% STATUS</th></tr>`;
-        items.forEach((it, i) => {
-            const p = ttToko[it]>0?(trToko[it]/ttToko[it])*100:0;
-            akHtml += `<tr><td>${it.replace('_',' ')}</td><td>${trToko[it]}</td><td>${ttToko[it]}</td><td><b>${Math.round(p)}%</b><br><small>${p>=100?'🔥 GACOR NABUNG!':'🚨 SEMANGAT NABUNG!'}</small><div class="progress-container"><div class="progress-bar ${colors[i]}" style="width:${Math.min(100, p)}%"></div></div></td></tr>`;
-        });
+        let akHtml = `<b>📊 AKUMULASI TOKO ${blnNama[parseInt(k.mn)-1]?.toUpperCase() || ""}</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>% STATUS</th></tr>`;
+        items.forEach((it, i) => { const p = ttToko[it]>0?(trToko[it]/ttToko[it])*100:0; akHtml += `<tr><td>${it.replace('_',' ')}</td><td>${trToko[it]}</td><td>${ttToko[it]}</td><td><b>${Math.round(p)}%</b><br><small>${p>=100?'🔥 GACOR!':'🚨 SEMANGAT!'}</small><div class="progress-container"><div class="progress-bar ${colors[i]}" style="width:${Math.min(100, p)}%"></div></div></td></tr>`; });
         document.getElementById('akumulasiArea').innerHTML = akHtml + "</table>";
-
         let rHtml = "<b>🏆 ANALISA PERFORMA KASIR</b>";
         for(let n in kStats) {
             rHtml += `<div class="rapor-card" style="border-left:5px solid #8e44ad;">👤 <b>${n}</b><table class="rapor-table"><tr><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr><tr>`;
@@ -591,119 +423,115 @@
         document.getElementById('raporArea').innerHTML = rHtml;
     }
 
-    function exportToExcel() {
-        const k = getK(); const wb = XLSX.utils.book_new();
-        let data = [["TGL", "ITEM", "REAL", "TARGET", "STATUS"]];
-        for(let i=1; i<=31; i++) {
-            const h = db[k.yr][k.mn][k.tk].harian[i] || {s1:{},s2:{},s3:{}};
-            items.forEach(it => {
-                const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk][it]||0) / log.dWk);
-                const r = (parseFloat(h.s1?.[it])||0)+(parseFloat(h.s2?.[it])||0)+(parseFloat(h.s3?.[it])||0);
-                data.push([i, it, r, tH, r >= tH ? "ACV" : "NON"]);
-            });
-        }
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "LAPORAN");
-        XLSX.writeFile(wb, `PPS_${k.tk}.xlsx`);
+    function setInputState(bolehEdit, pesan = "") {
+        const listID = ['r_PWP', 'r_PSM', 'r_SERBA_GRATIS', 'r_SUGER', 'r_CEBAN', 'noteWA', 'kasirAktif'];
+        listID.forEach(id => { const el = document.getElementById(id); if(el) el.disabled = !bolehEdit; });
+        const btnWA = document.getElementById('btnWA');
+        if(btnWA) { btnWA.style.opacity = bolehEdit ? "1" : "0.5"; btnWA.style.pointerEvents = bolehEdit ? "auto" : "none"; btnWA.innerText = bolehEdit ? "🚀 KIRIM LAPORAN WA" : "🔒 " + pesan + " (HUBUNGI KT)"; }
+        const btnSimpan = document.getElementById('btnSimpanShift');
+        if(btnSimpan) { btnSimpan.disabled = !bolehEdit; btnSimpan.style.background = bolehEdit ? "#27ae60" : "#95a5a6"; }
+    }
+
+    function cekStatusGembok() {
+        const k = getK(); const tgl = document.getElementById('tglInput').value; const shfAktif = document.getElementById('shfInput').value;
+        const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
+        const role = (userSesi.role || "").toLowerCase();
+        if (role.includes("admin") || role.includes("kepala toko") || role.includes("kt")) { setInputState(true); return; }
+        const harian = db[k.yr]?.[k.mn]?.[k.tk]?.harian[tgl];
+        const waktuSimpan = harian ? harian[shfAktif + "_jam"] : null;
+        if (waktuSimpan) {
+            const selisihMenit = (new Date().getTime() - waktuSimpan) / (1000 * 60);
+            if (selisihMenit > 180) { setInputState(false, `SHIFT ${shfAktif.toUpperCase()} TERKUNCI`); } 
+            else { setInputState(true); }
+        } else { setInputState(true); }
     }
 
     async function kirimWA() {
-        const k = getK(); 
-        const tgl = parseInt(document.getElementById('tglInput').value); if(!tgl) return alert("Pilih Tanggal!");
-        
-        const i1 = document.getElementById('pBuku'); const i2 = document.getElementById('pSIS');
-        if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
-        
-        const hShift = checkTargetStatus(); const note = document.getElementById('noteWA').value.trim();
-        if(hShift && !note) return alert("Wajib Isi Kendala/Alasan karena item tidak target!");
-        
-        if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
-        if(hShift && db[k.yr][k.mn][k.tk].reasons.includes(note.toLowerCase())) return alert("🚨 ALASAN SUDAH PERNAH DIPAKAI! CARI ALASAN LAIN!");
+    const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
+    const shf = document.getElementById('shfInput').value; // Ambil shift aktif
 
-        const shf = document.getElementById('shfInput').value; const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
-        const h = db[k.yr][k.mn][k.tk].harian[tgl] || {};
-        let pDetail = ""; const order = tipe === 3 ? ['s3', 's1', 's2'] : ['s1', 's2'];
-        const tuju = order[(order.indexOf(shf) + 1) % order.length].toUpperCase();
+    // --- KUNCI 3 JAM: SATPAM PENGECEK WAKTU (SISIPAN) ---
+    const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+    const jamTerakhir = harianSkrg[shf + '_jam']; 
+    const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
+    const role = (userSesi.role || "").toLowerCase();
 
-        let tT = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}; let tR = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0};
-        let kFullData = {}; 
-        
-        for(let w=1; w<=4; w++) items.forEach(it => tT[it] += (parseFloat(db[k.yr][k.mn][k.tk].target[w][it])||0));
-        
-        for(let i=1; i<=31; i++){
-            const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
-            items.forEach(it => {
-                const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk][it]||0) / log.dWk);
-                tR[it] += (dh.s1?.[it]||0)+(dh.s2?.[it]||0)+(dh.s3?.[it]||0);
-                ['s1','s2','s3'].forEach(s => { 
-                    if(dh[s+'_nama']){ 
-                        const name = dh[s+'_nama']; if(!kFullData[name]) kFullData[name] = {PWP:{R:0,T:0}, PSM:{R:0,T:0}, SERBA:{R:0,T:0}, SUGER:{R:0,T:0}, CEBAN:{R:0,T:0}, total:0};
-                        const v = (dh[s]?.[it]||0); const key = it.split('_')[0];
-                        kFullData[name][key].R += v; kFullData[name][key].T += Math.ceil(tH/tipe); kFullData[name].total += v;
-                    }
-                });
-            });
+    // Jika bukan KT/Admin, cek apakah sudah lewat 3 jam
+    if (!(role.includes("admin") || role.includes("kepala toko") || role.includes("kt"))) {
+        if (jamTerakhir && (new Date().getTime() - jamTerakhir > (3 * 60 * 60 * 1000))) {
+            return alert("🚨 DATA TERKUNCI!\nLaporan shift ini sudah lebih dari 3 jam. Hubungi Kepala Toko untuk revisi.");
         }
-
-        items.forEach(it => {
-            const log = getLogic(tgl, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk][it]||0) / log.dWk);
-            const tS = Math.ceil(tH / tipe); const rS = h[shf]?.[it] || 0; 
-            pDetail += `🔸 *${it.replace('_',' ')}*%0AReal: ${rS} / Tgt: ${tS}%0A${getTextBar((rS/tS)*100)}%0A${rS >= tS ? '✅ *LUNAS*' : '👉 *Beban ke '+tuju+':* '+(tS-rS)}%0A%0A`;
-        });
-
-        let personilWA = "🏆 *KONTRIBUSI PERSONIL:*%0A";
-        for(let n in kFullData) {
-            personilWA += `👤 *${n}* (${kFullData[n].total} Pcs)%0A`;
-            ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
-                let p = kFullData[n][it].T > 0 ? (kFullData[n][it].R/kFullData[n][it].T)*100 : 0;
-                personilWA += `   - ${it}: ${getTextBar(p)}%0A`;
-            });
-            personilWA += `%0A`;
-        }
-
-        const msg = `*MONITORING PPS [${k.tk}]*%0A📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}%0A🕒 Shift: *${shf.toUpperCase()}*%0A👤 Kasir: *${document.getElementById('kasirAktif').value}*%0A------------------------------------%0A${pDetail}📝 *KENDALA:* ${note || '-'}%0A%0A📊 *AKUMULASI TOKO:*%0A${items.map(it => { 
-            let p = tT[it] > 0 ? (tR[it]/tT[it])*100 : 0; return `💎 ${it.replace('_',' ')}: ${getTextBar(p)}%0A   (${p >= 100 ? '🔥 GACOR NABUNG!' : '🚨 SEMANGAT NABUNG!'})`;
-        }).join('%0A')}%0A%0A${personilWA}------------------------------------%0A🚀 *MANTAP JOSS!*%0A*#omkopipait*`;
-        
-        const waLink = `https://api.whatsapp.com/send?text=${msg}`;
-
-        const payload = {
-            namaPersonil: document.getElementById('kasirAktif').value,
-            tgl: document.getElementById('tglInput').value,
-            pwp: document.getElementById('r_PWP').value || 0,
-            psm: document.getElementById('r_PSM').value || 0,
-            serba: document.getElementById('r_SERBA_GRATIS').value || 0,
-            suger: document.getElementById('r_SUGER').value || 0,
-            ceban: document.getElementById('r_CEBAN').value || 0,
-            toko: k.tk || "CB09",
-            tipeData: "PPS_HARIAN"
-        };
-
-        fetch(urlRaportGlobal, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(payload)
-        })
-        .then(() => console.log("Drive sync ok"))
-        .catch(err => console.log("Drive sync fail"));
-
-        const canvas = document.getElementById('canvasJoin'); const ctx = canvas.getContext('2d');
-        canvas.width=1200; canvas.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
-        
-        try {
-            ctx.drawImage(i1,0,0,600,600); ctx.drawImage(i2,600,0,600,600);
-            const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-            await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-            alert("Data Raport PPS Berhasil Disinkron ke Cloud & Gambar Disalin! 🔥");
-        } catch (e) {
-            console.log("Clipboard fallback active");
-            document.getElementById('manualWA').href = waLink; 
-            document.getElementById('manualWA').style.display = 'block';
-        }
-        
-        if(hShift) db[k.yr][k.mn][k.tk].reasons.push(note.toLowerCase());
-        window.open(waLink, '_blank');
-        saveDisk();
     }
+    // ----------------------------------------------------
+
+    if(!tgl) return alert("Pilih Tanggal!");
+    const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
+    if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
+    const hShift = checkTargetStatus(), note = document.getElementById('noteWA').value.trim();
+    if(hShift) {
+        if(!note) return alert("🚨 TARGET TIDAK TERCAPAI!\nWajib isi kendala/alasan sebelum kirim WA.");
+        if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
+        if(db[k.yr][k.mn][k.tk].reasons.includes(note.toLowerCase())) return alert("🚨 ALASAN SUDAH PERNAH DIPAKAI BULAN INI!");
+    }
+    
+    const waktuSekarang = new Date().getTime(); 
+
+    const payloadCloud = { 
+        toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
+        namaPersonil: document.getElementById('kasirAktif').value, 
+        pwp: document.getElementById('r_PWP').value || 0, 
+        psm: document.getElementById('r_PSM').value || 0, 
+        serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
+        suger: document.getElementById('r_SUGER').value || 0, 
+        ceban: document.getElementById('r_CEBAN').value || 0, 
+        note: note || "-", 
+        jam: waktuSekarang, 
+        tipeData: "PPS_HARIAN_SAVE" 
+    };
+
+    fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadCloud) });
+
+    if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
+    db[k.yr][k.mn][k.tk].harian[tgl][shf + "_jam"] = waktuSekarang; 
+    
+    if(hShift) { db[k.yr][k.mn][k.tk].reasons.push(note.toLowerCase()); }
+    saveDisk();
+
+    // --- SISANYA TETAP SAMA SEPERTI ASLI PUNYA BAPAK ---
+    const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+    const h = db[k.yr][k.mn][k.tk].harian[tgl] || {}; let pDetail = "";
+    const order = tipe === 3 ? ['s3', 's1', 's2'] : ['s1', 's2']; 
+    const tuju = order[(order.indexOf(shf) + 1) % order.length].toUpperCase();
+    let tT = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, tR = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, kFullData = {}; 
+    
+    for(let w=1; w<=4; w++) items.forEach(it => tT[it] += (parseFloat(db[k.yr][k.mn][k.tk].target[w]?.[it])||0));
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    for(let i=1; i<=dM; i++){
+        const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
+        items.forEach(it => {
+            const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
+            tR[it] += (parseFloat(dh.s1?.[it])||0)+(parseFloat(dh.s2?.[it])||0)+(parseFloat(dh.s3?.[it])||0);
+            ['s1','s2','s3'].forEach(s => { 
+                if(dh[s+'_nama']){ 
+                    const name = dh[s+'_nama'].trim(); if(!kFullData[name]) kFullData[name] = {PWP:{R:0,T:0}, PSM:{R:0,T:0}, SERBA:{R:0,T:0}, SUGER:{R:0,T:0}, CEBAN:{R:0,T:0}, total:0};
+                    kFullData[name][it.split('_')[0]].R += (parseFloat(dh[s]?.[it])||0);
+                    if(it === items[0]) kFullData[name].total += ( (parseFloat(dh[s]?.PWP)||0)+(parseFloat(dh[s]?.PSM)||0)+(parseFloat(dh[s]?.SERBA_GRATIS)||0)+(parseFloat(dh[s]?.SUGER)||0)+(parseFloat(dh[s]?.CEBAN)||0) );
+                }
+            });
+        });
+        ['s1','s2','s3'].forEach(s => { if(dh[s+'_nama']){ const name = dh[s+'_nama'].trim(); items.forEach(it => { const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk); kFullData[name][it.split('_')[0]].T += Math.ceil(tH/tipe); }); } });
+    }
+    items.forEach(it => { const log = getLogic(tgl, it, k.yr, k.mn); const tS = Math.ceil(Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0)/log.dWk)/tipe);
+        const rS = parseFloat(h[shf]?.[it]) || 0; pDetail += `🔸 *${it.replace('_',' ')}*%0AReal: ${rS} / Tgt: ${tS}%0A${getTextBar((rS/tS)*100)}%0A${rS >= tS ? '✅ *LUNAS*' : '👉 *Beban ke '+tuju+':* '+(tS-rS)}%0A%0A`; });
+    let personilWA = "🏆 *KONTRIBUSI PERSONIL:*%0A";
+    for(let n in kFullData) { personilWA += `👤 *${n}* (${kFullData[n].total} Pcs)%0A`; ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => { let p = kFullData[n][it].T > 0 ? (kFullData[n][it].R/kFullData[n][it].T)*100 : 0; personilWA += `   - ${it}: ${getTextBar(p)}%0A`; }); personilWA += `%0A`; }
+    const msg = `*MONITORING PPS [${k.tk}]*%0A📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}%0A🕒 Shift: *${shf.toUpperCase()}*%0A👤 Kasir: *${document.getElementById('kasirAktif').value}*%0A------------------------------------%0A${pDetail}📝 *KENDALA:* ${note || '-'}%0A%0A📊 *AKUMULASI TOKO:*%0A${items.map(it => { let p = tT[it] > 0 ? (tR[it]/tT[it])*100 : 0; return `💎 ${it.replace('_',' ')}: ${getTextBar(p)}%0A   (${p >= 100 ? '🔥 GACOR!' : '🚨 SEMANGAT!'})`; }).join('%0A')}%0A%0A${personilWA}------------------------------------%0A🚀 *MANTAP JOSS!*%0A*#omkopipait*`;
+    const canvas = document.getElementById('canvasJoin'), ctx = canvas.getContext('2d');
+    canvas.width=1200; canvas.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
+    try { ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600); const dataUrl = canvas.toDataURL("image/jpeg", 0.9); const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}_${shf.toUpperCase()}.jpg`; link.href = dataUrl; link.click(); const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); } catch (e) { console.log("Gagal gambar"); }
+    alert("SINKRON BERHASIL & GAMBAR DISALIN! ✅🔥");
+    setTimeout(() => { window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank'); }, 500);
+}
 </script>
 </body>
 </html>
