@@ -131,9 +131,8 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycby9ZU_WCpScs2nNAuavc5JKjnzJTVHTipduM7B9IlqxDJS-LH3813m56NM8jQdH59fKFw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbx-SbUWJNnopMWqThRUGLgS1w2RvVG4LyQsTn-bYoWskEmrPvax6qGHhD4bjy9-WFUUIg/exec";
     
-    // PERBAIKAN: Tambahkan pengaman || {} agar tidak mogok saat kosong
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
     // --- 2. FUNGSI SISTEM (TETAP ASLI) ---
@@ -156,19 +155,18 @@
     
     function resetBukti() { ['pBuku','pSIS'].forEach(id => { const i = document.getElementById(id); if(i) { i.style.display = 'none'; i.src = ""; i.removeAttribute('data-loaded'); } }); }
 
-    // PERBAIKAN: Fungsi Reset Sapu Bersih (Dashboard Tetap Aman di Drive)
     function resetSemuaData() { 
         if (confirm("⚠️ BERSIHKAN DASHBOARD?\n\nIni hanya menghapus tampilan di layar agar bersih. Data asli di Google Drive TETAP AMAN.")) { 
             localStorage.clear(); 
             sessionStorage.clear();
             alert("Dashboard Bersih! Silakan login kembali."); 
             window.location.replace("index.html"); 
+            return;
         } 
     }
 
-    // --- 3. WINDOW ONLOAD (DIRAPIKAN URUTANNYA AGAR TAHUN/BULAN TIDAK HILANG) ---
+    // --- 3. WINDOW ONLOAD (TETAP ASLI) ---
     window.onload = function() {
-        // A. ISI DROPDOWN BULAN & TAHUN DULUAN (Supaya tidak kosong)
         const b = document.getElementById('blnArsip');
         if (b) {
             b.innerHTML = "";
@@ -182,7 +180,6 @@
             t.innerHTML = `<option value="2025">2025</option><option value="2026" selected>2026</option>`;
         }
 
-        // B. CEK SESI LOGIN (TETAP ASLI)
         const userSesi = JSON.parse(sessionStorage.getItem("userArea"));
         const hariLogin = localStorage.getItem("lastLoginDate");
         const hariIni = new Date().toDateString();
@@ -193,7 +190,6 @@
             return;
         } 
 
-        // C. ISI KODE TOKO DARI LOGIN
         const inToko = document.getElementById("kodeToko");
         if (inToko) { 
             inToko.value = userSesi.toko || ""; 
@@ -205,7 +201,6 @@
 
         initPPS();
         
-        // D. SISTEM GEMBOK (TETAP ASLI BAPAK)
         const urlParams = new URLSearchParams(window.location.search);
         const modeLocked = (urlParams.get('mode') === 'locked' || userSesi.role === 'locked');
 
@@ -220,7 +215,6 @@
                 loadReal();
             }
             
-            // Kunci Kartu 1
             if(document.getElementById('thnArsip')) document.getElementById('thnArsip').disabled = true;
             if(document.getElementById('blnArsip')) document.getElementById('blnArsip').disabled = true;
             if(document.getElementById('tipeToko')) document.getElementById('tipeToko').disabled = true;
@@ -237,7 +231,7 @@
         pullDataFromCloud();
     };
 
-    // --- 4. FUNGSI KERJA (SEMUA TETAP ASLI BAPAK - TIDAK SAYA UBAH RUMUSNYA) ---
+    // --- 4. FUNGSI KERJA (TETAP ASLI BAPAK) ---
     function initPPS() {
         const k = getK(); if(!k.tk) return;
         if(!db[k.yr]) db[k.yr] = {}; if(!db[k.yr][k.mn]) db[k.yr][k.mn] = {};
@@ -278,6 +272,7 @@
 
     function simpanTarget() {
         const k = getK(); const wk = document.getElementById('wkTarget').value;
+        if(!k.tk) return alert("Kode Toko Kosong!");
         items.forEach(it => { const el = document.getElementById(`t_${it}`); if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; });
         saveDisk(); 
         const payload = { toko: k.tk, yr: k.yr, mn: k.mn, wk: wk, targets: db[k.yr][k.mn][k.tk].target[wk], kru: db[k.yr][k.mn][k.tk].kru, tipe: db[k.yr][k.mn][k.tk].tipe, tipeData: "PPS_TARGET" };
@@ -287,12 +282,20 @@
 
     function loadReal() {
         const k = getK(); if(!k.tk) return;
-        const tgl = document.getElementById('tglInput').value; const shf = document.getElementById('shfInput').value;
+        const tgl = document.getElementById('tglInput').value; 
+        const shf = document.getElementById('shfInput').value;
+        const ksr = document.getElementById('kasirAktif').value;
         if(!tgl) return; resetBukti();
+
+        const shfKey = shf + "_" + ksr.replace(/\s+/g, '_');
         const hS = db[k.yr][k.mn][k.tk].harian[tgl] || {};
-        items.forEach(it => { const el = document.getElementById(`r_${it}`); if(el) el.value = (hS[shf] && hS[shf][it] !== undefined) ? hS[shf][it] : ""; });
-        document.getElementById('kasirAktif').value = hS[shf+'_nama'] || "";
-        document.getElementById('noteWA').value = hS[shf+'_note'] || "";
+        
+        items.forEach(it => { 
+            const el = document.getElementById(`r_${it}`); 
+            if(el) el.value = (hS[shfKey] && hS[shfKey][it] !== undefined) ? hS[shfKey][it] : ""; 
+        });
+        
+        document.getElementById('noteWA').value = hS[shfKey+'_note'] || "";
         checkTargetStatus();
         cekStatusGembok();
     }
@@ -314,38 +317,42 @@
         else { lbl.style.display = 'none'; return false; }
     }
 
-function simpanReal() {
+    function simpanReal() {
         const k = getK(); const tgl = document.getElementById('tglInput').value;
         const ksr = document.getElementById('kasirAktif').value;
         const shf = document.getElementById('shfInput').value;
 
-        // --- KUNCI 3 JAM: CEK SEBELUM SIMPAN (SISIPAN) ---
+        if(!tgl || !ksr || ksr === "-- Pilih Kasir --") return alert("Pilih Tanggal & Kasir!");
+
+        const shfKey = shf + "_" + ksr.replace(/\s+/g, '_'); 
+
+        // --- KUNCI 3 JAM ---
         const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
-        const jamTerakhir = harianSkrg[shf + '_jam']; 
+        const jamTerakhir = harianSkrg[shfKey + '_jam']; 
         const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
         const role = (userSesi.role || "").toLowerCase();
 
-        // Kecuali KT/Admin, jika sudah ada jam simpan & lewat 3 jam, maka kunci
         if (!(role.includes("admin") || role.includes("kepala toko") || role.includes("kt"))) {
             if (jamTerakhir && (new Date().getTime() - jamTerakhir > (3 * 60 * 60 * 1000))) {
                 return alert("🚨 DATA TERKUNCI!\nSudah lebih dari 3 jam sejak data pertama disimpan. Hubungi KT untuk perubahan.");
             }
         }
-        // ------------------------------------------------
 
         const note = document.getElementById('noteWA').value.trim(); 
-        
-        if(!tgl || !ksr || ksr === "-- Pilih Kasir --") return alert("Pilih Tanggal & Kasir!");
-        
         const waktuSekarang = new Date().getTime(); 
 
-        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {s1:{},s2:{},s3:{}};
+        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
         const hS = db[k.yr][k.mn][k.tk].harian[tgl];
         
-        items.forEach(it => { hS[shf][it] = parseFloat(document.getElementById(`r_${it}`).value) || 0; });
-        hS[shf+'_nama'] = ksr; 
-        hS[shf+'_note'] = note;
-        hS[shf+'_jam'] = waktuSekarang; 
+        if(!hS[shfKey]) hS[shfKey] = {};
+        
+        items.forEach(it => { 
+            hS[shfKey][it] = parseFloat(document.getElementById(`r_${it}`).value) || 0; 
+        });
+        
+        hS[shfKey+'_nama'] = ksr; 
+        hS[shfKey+'_note'] = note;
+        hS[shfKey+'_jam'] = waktuSekarang; 
         
         saveDisk();
 
@@ -358,11 +365,11 @@ function simpanReal() {
             suger: document.getElementById('r_SUGER').value || 0, 
             ceban: document.getElementById('r_CEBAN').value || 0, 
             jam: waktuSekarang, 
-            tipeData: "PPS_HARIAN_SAVE" 
+            tipeData: "PPS_HARIAN_SAVE_V2" 
         };
 
         fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-        alert("BERHASIL! Data Shift Tersimpan & Sinkron Cloud ✅");
+        alert("BERHASIL! Data Tersimpan & Sinkron Cloud ✅");
     }
 
     function pullDataFromCloud() {
@@ -389,38 +396,80 @@ function simpanReal() {
         const k = getK(); if(!k.tk) return;
         const dM = new Date(k.yr, k.mn, 0).getDate();
         let trToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, ttToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, kStats = {}; 
-        const allKru = document.getElementById('listKru').value.split(',');
-        allKru.forEach(n => { if(n.trim()) kStats[n.trim()] = { total:0, w:{1:{R:0,T:0},2:{R:0,T:0},3:{R:0,T:0},4:{R:0,T:0}}, p:{1:{R:0,T:0}, 2:{R:0,T:0}} }; });
-        const body = document.getElementById('bodyPPS'); document.getElementById('headPPS').innerHTML = `<tr><th>Tgl</th><th>PWP</th><th>PSM</th><th>SERBA</th><th>SUGER</th><th>CEBAN</th><th>+/-</th></tr>`;
+        
+        const listKruRaw = document.getElementById('listKru').value.split(',');
+        listKruRaw.forEach(n => { 
+            if(n.trim()) kStats[n.trim()] = { total:0, w:{1:{R:0,T:0},2:{R:0,T:0},3:{R:0,T:0},4:{R:0,T:0}}, p:{1:{R:0,T:0}, 2:{R:0,T:0}}, items: {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0} }; 
+        });
+        
+        const body = document.getElementById('bodyPPS'); 
+        if(document.getElementById('headPPS')) document.getElementById('headPPS').innerHTML = `<tr><th>Tgl</th><th>PWP</th><th>PSM</th><th>SERBA</th><th>SUGER</th><th>CEBAN</th><th>+/-</th></tr>`;
+        if(!body) return;
         body.innerHTML = ""; let akumTotal = 0; const colors = ['bg-pwp', 'bg-psm', 'bg-serba', 'bg-suger', 'bg-ceban'];
+
+        const harianData = db[k.yr][k.mn][k.tk].harian || {};
+
         for(let i=1; i<=dM; i++) {
-            const h = db[k.yr][k.mn][k.tk].harian[i] || {s1:{},s2:{},s3:{}};
+            const h = harianData[i] || {};
             let row = `<td>${i}</td>`, hHari = 0;
+            
             items.forEach((it, idx) => {
-                const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
-                const r = (parseFloat(h.s1?.[it])||0)+(parseFloat(h.s2?.[it])||0)+(parseFloat(h.s3?.[it])||0);
-                trToko[it] += r; ttToko[it] += tH; hHari += (r - tH);
-                row += `<td>${r}/${tH}<div class="progress-container"><div class="progress-bar ${colors[idx]}" style="width:${Math.min(100, tH>0?(r/tH)*100:0)}%"></div></div></td>`;
-                ['s1','s2','s3'].forEach(sh => { 
-                    const n = h[sh+'_nama']?.trim(); if(n && kStats[n]) {
-                        const v = (parseFloat(h[sh]?.[it])||0); const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe || 3);
-                        kStats[n].total += v; kStats[n].w[log.wk].R += v; kStats[n].w[log.wk].T += Math.ceil(tH / tipe);
-                        kStats[n].p[i <= 15 ? 1 : 2].R += v; kStats[n].p[i <= 15 ? 1 : 2].T += Math.ceil(tH / tipe);
+                const log = getLogic(i, it, k.yr, k.mn); 
+                const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
+                
+                const listKeys = Object.keys(h).filter(key => key.startsWith('s1_') || key.startsWith('s2_') || key.startsWith('s3_'));
+                let r = 0;
+                listKeys.forEach(key => {
+                    if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key]) {
+                        r += parseFloat(h[key][it]) || 0;
                     }
                 });
+                
+                trToko[it] += r; ttToko[it] += tH; hHari += (r - tH);
+                row += `<td>${r}/${tH}<div class="progress-container"><div class="progress-bar ${colors[idx]}" style="width:${Math.min(100, tH>0?(r/tH)*100:0)}%"></div></div></td>`;
             });
-            akumTotal += hHari; body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
+
+            for(let personil in kStats) {
+                ['s1','s2','s3'].forEach(sh => {
+                    const listKeysKru = Object.keys(h).filter(key => key.startsWith(sh + '_') && key.endsWith('_nama'));
+                    listKeysKru.forEach(keyNama => {
+                        if (h[keyNama] === personil) {
+                            const actualKey = keyNama.replace('_nama', '');
+                            items.forEach(it => {
+                                const val = parseFloat(h[actualKey]?.[it]) || 0;
+                                const log = getLogic(i, it, k.yr, k.mn);
+                                const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
+                                const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe || 3);
+
+                                kStats[personil].total += val;
+                                kStats[personil].w[log.wk].R += val;
+                                kStats[personil].w[log.wk].T += Math.ceil(tH / tipe);
+                                kStats[personil].p[i <= 15 ? 1 : 2].R += val;
+                                kStats[personil].p[i <= 15 ? 1 : 2].T += Math.ceil(tH / tipe);
+                            });
+                        }
+                    });
+                });
+            }
+
+            akumTotal += hHari; 
+            body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
         }
-        let akHtml = `<b>📊 AKUMULASI TOKO ${blnNama[parseInt(k.mn)-1]?.toUpperCase() || ""}</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>% STATUS</th></tr>`;
-        items.forEach((it, i) => { const p = ttToko[it]>0?(trToko[it]/ttToko[it])*100:0; akHtml += `<tr><td>${it.replace('_',' ')}</td><td>${trToko[it]}</td><td>${ttToko[it]}</td><td><b>${Math.round(p)}%</b><br><small>${p>=100?'🔥 GACOR!':'🚨 SEMANGAT!'}</small><div class="progress-container"><div class="progress-bar ${colors[i]}" style="width:${Math.min(100, p)}%"></div></div></td></tr>`; });
-        document.getElementById('akumulasiArea').innerHTML = akHtml + "</table>";
+
+        let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
+        items.forEach((it, i) => { 
+            const p = ttToko[it]>0?(trToko[it]/ttToko[it])*100:0; 
+            akHtml += `<tr><td>${it.replace('_',' ')}</td><td>${trToko[it]}</td><td>${ttToko[it]}</td><td><b>${Math.round(p)}%</b><div class="progress-container"><div class="progress-bar ${colors[i]}" style="width:${Math.min(100, p)}%"></div></div></td></tr>`; 
+        });
+        if(document.getElementById('akumulasiArea')) document.getElementById('akumulasiArea').innerHTML = akHtml + "</table>";
+
         let rHtml = "<b>🏆 ANALISA PERFORMA KASIR</b>";
         for(let n in kStats) {
             rHtml += `<div class="rapor-card" style="border-left:5px solid #8e44ad;">👤 <b>${n}</b><table class="rapor-table"><tr><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr><tr>`;
             for(let w=1; w<=4; w++) rHtml += `<td>${kStats[n].w[w].R}/${kStats[n].w[w].T}<br>${Math.round(kStats[n].w[w].T>0?(kStats[n].w[w].R/kStats[n].w[w].T)*100:0)}%</td>`;
             rHtml += `</tr><tr><th colspan="2">P1 (01-15)</th><th colspan="2">P2 (16-AKHIR)</th></tr><tr><td colspan="2">${kStats[n].p[1].R}/${kStats[n].p[1].T}<br>${Math.round(kStats[n].p[1].T>0?(kStats[n].p[1].R/kStats[n].p[1].T)*100:0)}%</td><td colspan="2">${kStats[n].p[2].R}/${kStats[n].p[2].T}<br>${Math.round(kStats[n].p[2].T>0?(kStats[n].p[2].R/kStats[n].p[2].T)*100:0)}%</td></tr></table></div>`;
         }
-        document.getElementById('raporArea').innerHTML = rHtml;
+        if(document.getElementById('raporArea')) document.getElementById('raporArea').innerHTML = rHtml;
     }
 
     function setInputState(bolehEdit, pesan = "") {
@@ -447,91 +496,108 @@ function simpanReal() {
     }
 
     async function kirimWA() {
-    const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
-    const shf = document.getElementById('shfInput').value; // Ambil shift aktif
+        const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
+        const shf = document.getElementById('shfInput').value; 
+        const ksr = document.getElementById('kasirAktif').value;
+        const shfKey = shf + "_" + ksr.replace(/\s+/g, '_');
 
-    // --- KUNCI 3 JAM: SATPAM PENGECEK WAKTU (SISIPAN) ---
-    const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
-    const jamTerakhir = harianSkrg[shf + '_jam']; 
-    const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
-    const role = (userSesi.role || "").toLowerCase();
+        const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+        const jamTerakhir = harianSkrg[shfKey + '_jam']; 
+        const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
+        const role = (userSesi.role || "").toLowerCase();
 
-    // Jika bukan KT/Admin, cek apakah sudah lewat 3 jam
-    if (!(role.includes("admin") || role.includes("kepala toko") || role.includes("kt"))) {
-        if (jamTerakhir && (new Date().getTime() - jamTerakhir > (3 * 60 * 60 * 1000))) {
-            return alert("🚨 DATA TERKUNCI!\nLaporan shift ini sudah lebih dari 3 jam. Hubungi Kepala Toko untuk revisi.");
+        if (!(role.includes("admin") || role.includes("kepala toko") || role.includes("kt"))) {
+            if (jamTerakhir && (new Date().getTime() - jamTerakhir > (3 * 60 * 60 * 1000))) {
+                return alert("🚨 DATA TERKUNCI!\nLaporan shift ini sudah lebih dari 3 jam. Hubungi Kepala Toko untuk revisi.");
+            }
         }
-    }
-    // ----------------------------------------------------
 
-    if(!tgl) return alert("Pilih Tanggal!");
-    const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
-    if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
-    const hShift = checkTargetStatus(), note = document.getElementById('noteWA').value.trim();
-    if(hShift) {
-        if(!note) return alert("🚨 TARGET TIDAK TERCAPAI!\nWajib isi kendala/alasan sebelum kirim WA.");
-        if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
-        if(db[k.yr][k.mn][k.tk].reasons.includes(note.toLowerCase())) return alert("🚨 ALASAN SUDAH PERNAH DIPAKAI BULAN INI!");
-    }
-    
-    const waktuSekarang = new Date().getTime(); 
+        if(!tgl) return alert("Pilih Tanggal!");
+        const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
+        if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
+        const hShift = checkTargetStatus(), note = document.getElementById('noteWA').value.trim();
+        if(hShift) {
+            if(!note) return alert("🚨 TARGET TIDAK TERCAPAI!\nWajib isi kendala/alasan sebelum kirim WA.");
+            if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
+            if(db[k.yr][k.mn][k.tk].reasons.includes(note.toLowerCase())) return alert("🚨 ALASAN SUDAH PERNAH DIPAKAI BULAN INI!");
+        }
+        
+        const waktuSekarang = new Date().getTime(); 
 
-    const payloadCloud = { 
-        toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
-        namaPersonil: document.getElementById('kasirAktif').value, 
-        pwp: document.getElementById('r_PWP').value || 0, 
-        psm: document.getElementById('r_PSM').value || 0, 
-        serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
-        suger: document.getElementById('r_SUGER').value || 0, 
-        ceban: document.getElementById('r_CEBAN').value || 0, 
-        note: note || "-", 
-        jam: waktuSekarang, 
-        tipeData: "PPS_HARIAN_SAVE" 
-    };
+        const payloadCloud = { 
+            toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
+            namaPersonil: ksr, 
+            pwp: document.getElementById('r_PWP').value || 0, 
+            psm: document.getElementById('r_PSM').value || 0, 
+            serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
+            suger: document.getElementById('r_SUGER').value || 0, 
+            ceban: document.getElementById('r_CEBAN').value || 0, 
+            note: note || "-", 
+            jam: waktuSekarang, 
+            tipeData: "PPS_HARIAN_SAVE_V2" 
+        };
 
-    fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadCloud) });
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadCloud) });
 
-    if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
-    db[k.yr][k.mn][k.tk].harian[tgl][shf + "_jam"] = waktuSekarang; 
-    
-    if(hShift) { db[k.yr][k.mn][k.tk].reasons.push(note.toLowerCase()); }
-    saveDisk();
+        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
+        db[k.yr][k.mn][k.tk].harian[tgl][shfKey + "_jam"] = waktuSekarang; 
+        
+        if(hShift) { db[k.yr][k.mn][k.tk].reasons.push(note.toLowerCase()); }
+        saveDisk();
 
-    // --- SISANYA TETAP SAMA SEPERTI ASLI PUNYA BAPAK ---
-    const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
-    const h = db[k.yr][k.mn][k.tk].harian[tgl] || {}; let pDetail = "";
-    const order = tipe === 3 ? ['s3', 's1', 's2'] : ['s1', 's2']; 
-    const tuju = order[(order.indexOf(shf) + 1) % order.length].toUpperCase();
-    let tT = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, tR = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, kFullData = {}; 
-    
-    for(let w=1; w<=4; w++) items.forEach(it => tT[it] += (parseFloat(db[k.yr][k.mn][k.tk].target[w]?.[it])||0));
-    const dM = new Date(k.yr, k.mn, 0).getDate();
-    for(let i=1; i<=dM; i++){
-        const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
-        items.forEach(it => {
-            const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
-            tR[it] += (parseFloat(dh.s1?.[it])||0)+(parseFloat(dh.s2?.[it])||0)+(parseFloat(dh.s3?.[it])||0);
-            ['s1','s2','s3'].forEach(s => { 
-                if(dh[s+'_nama']){ 
-                    const name = dh[s+'_nama'].trim(); if(!kFullData[name]) kFullData[name] = {PWP:{R:0,T:0}, PSM:{R:0,T:0}, SERBA:{R:0,T:0}, SUGER:{R:0,T:0}, CEBAN:{R:0,T:0}, total:0};
-                    kFullData[name][it.split('_')[0]].R += (parseFloat(dh[s]?.[it])||0);
-                    if(it === items[0]) kFullData[name].total += ( (parseFloat(dh[s]?.PWP)||0)+(parseFloat(dh[s]?.PSM)||0)+(parseFloat(dh[s]?.SERBA_GRATIS)||0)+(parseFloat(dh[s]?.SUGER)||0)+(parseFloat(dh[s]?.CEBAN)||0) );
-                }
+        const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+        const h = db[k.yr][k.mn][k.tk].harian[tgl] || {}; let pDetail = "";
+        const order = tipe === 3 ? ['s3', 's1', 's2'] : ['s1', 's2']; 
+        const tuju = order[(order.indexOf(shf) + 1) % order.length].toUpperCase();
+        let tT = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, tR = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, kFullData = {}; 
+        
+        for(let w=1; w<=4; w++) items.forEach(it => tT[it] += (parseFloat(db[k.yr][k.mn][k.tk].target[w]?.[it])||0));
+        const dM = new Date(k.yr, k.mn, 0).getDate();
+        for(let i=1; i<=dM; i++){
+            const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
+            items.forEach(it => {
+                const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
+                
+                const listKeys = Object.keys(dh).filter(key => key.startsWith('s1_') || key.startsWith('s2_') || key.startsWith('s3_'));
+                let totalItemHariIni = 0;
+                listKeys.forEach(key => {
+                    if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && dh[key]) {
+                        totalItemHariIni += parseFloat(dh[key][it]) || 0;
+                    }
+                });
+                tR[it] += totalItemHariIni;
+
+                ['s1','s2','s3'].forEach(s => { 
+                    const listKeysKru = Object.keys(dh).filter(key => key.startsWith(s + '_') && key.endsWith('_nama'));
+                    listKeysKru.forEach(keyNama => {
+                        const name = dh[keyNama].trim();
+                        const actualKey = keyNama.replace('_nama', '');
+                        if(!kFullData[name]) kFullData[name] = {PWP:{R:0,T:0}, PSM:{R:0,T:0}, SERBA:{R:0,T:0}, SUGER:{R:0,T:0}, CEBAN:{R:0,T:0}, total:0};
+                        kFullData[name][it.split('_')[0]].R += (parseFloat(dh[actualKey]?.[it])||0);
+                        if(it === items[0]) kFullData[name].total += ( (parseFloat(dh[actualKey]?.PWP)||0)+(parseFloat(dh[actualKey]?.PSM)||0)+(parseFloat(dh[actualKey]?.SERBA_GRATIS)||0)+(parseFloat(dh[actualKey]?.SUGER)||0)+(parseFloat(dh[actualKey]?.CEBAN)||0) );
+                    });
+                });
             });
-        });
-        ['s1','s2','s3'].forEach(s => { if(dh[s+'_nama']){ const name = dh[s+'_nama'].trim(); items.forEach(it => { const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk); kFullData[name][it.split('_')[0]].T += Math.ceil(tH/tipe); }); } });
+            
+            ['s1','s2','s3'].forEach(s => { 
+                const listKeysKru = Object.keys(dh).filter(key => key.startsWith(s + '_') && key.endsWith('_nama'));
+                listKeysKru.forEach(keyNama => {
+                    const name = dh[keyNama].trim();
+                    items.forEach(it => { const log = getLogic(i, it, k.yr, k.mn); const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk); kFullData[name][it.split('_')[0]].T += Math.ceil(tH/tipe); });
+                });
+            });
+        }
+        items.forEach(it => { const log = getLogic(tgl, it, k.yr, k.mn); const tS = Math.ceil(Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0)/log.dWk)/tipe);
+            const rS = parseFloat(h[shfKey]?.[it]) || 0; pDetail += `🔸 *${it.replace('_',' ')}*%0AReal: ${rS} / Tgt: ${tS}%0A${getTextBar((rS/tS)*100)}%0A${rS >= tS ? '✅ *LUNAS*' : '👉 *Beban ke '+tuju+':* '+(tS-rS)}%0A%0A`; });
+        let personilWA = "🏆 *KONTRIBUSI PERSONIL:*%0A";
+        for(let n in kFullData) { personilWA += `👤 *${n}* (${kFullData[n].total} Pcs)%0A`; ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => { let p = kFullData[n][it].T > 0 ? (kFullData[n][it].R/kFullData[n][it].T)*100 : 0; personilWA += `   - ${it}: ${getTextBar(p)}%0A`; }); personilWA += `%0A`; }
+        const msg = `*MONITORING PPS [${k.tk}]*%0A📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}%0A🕒 Shift: *${shf.toUpperCase()}*%0A👤 Kasir: *${ksr}*%0A------------------------------------%0A${pDetail}📝 *KENDALA:* ${note || '-'}%0A%0A📊 *AKUMULASI TOKO:*%0A${items.map(it => { let p = tT[it] > 0 ? (tR[it]/tT[it])*100 : 0; return `💎 ${it.replace('_',' ')}: ${getTextBar(p)}%0A   (${p >= 100 ? '🔥 GACOR!' : '🚨 SEMANGAT!'})`; }).join('%0A')}%0A%0A${personilWA}------------------------------------%0A🚀 *MANTAP JOSS!*%0A*#omkopipait*`;
+        const canvas = document.getElementById('canvasJoin'), ctx = canvas.getContext('2d');
+        canvas.width=1200; canvas.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
+        try { ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600); const dataUrl = canvas.toDataURL("image/jpeg", 0.9); const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}_${shf.toUpperCase()}.jpg`; link.href = dataUrl; link.click(); const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); } catch (e) { console.log("Gagal gambar"); }
+        alert("SINKRON BERHASIL & GAMBAR DISALIN! ✅🔥");
+        setTimeout(() => { window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank'); }, 500);
     }
-    items.forEach(it => { const log = getLogic(tgl, it, k.yr, k.mn); const tS = Math.ceil(Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0)/log.dWk)/tipe);
-        const rS = parseFloat(h[shf]?.[it]) || 0; pDetail += `🔸 *${it.replace('_',' ')}*%0AReal: ${rS} / Tgt: ${tS}%0A${getTextBar((rS/tS)*100)}%0A${rS >= tS ? '✅ *LUNAS*' : '👉 *Beban ke '+tuju+':* '+(tS-rS)}%0A%0A`; });
-    let personilWA = "🏆 *KONTRIBUSI PERSONIL:*%0A";
-    for(let n in kFullData) { personilWA += `👤 *${n}* (${kFullData[n].total} Pcs)%0A`; ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => { let p = kFullData[n][it].T > 0 ? (kFullData[n][it].R/kFullData[n][it].T)*100 : 0; personilWA += `   - ${it}: ${getTextBar(p)}%0A`; }); personilWA += `%0A`; }
-    const msg = `*MONITORING PPS [${k.tk}]*%0A📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}%0A🕒 Shift: *${shf.toUpperCase()}*%0A👤 Kasir: *${document.getElementById('kasirAktif').value}*%0A------------------------------------%0A${pDetail}📝 *KENDALA:* ${note || '-'}%0A%0A📊 *AKUMULASI TOKO:*%0A${items.map(it => { let p = tT[it] > 0 ? (tR[it]/tT[it])*100 : 0; return `💎 ${it.replace('_',' ')}: ${getTextBar(p)}%0A   (${p >= 100 ? '🔥 GACOR!' : '🚨 SEMANGAT!'})`; }).join('%0A')}%0A%0A${personilWA}------------------------------------%0A🚀 *MANTAP JOSS!*%0A*#omkopipait*`;
-    const canvas = document.getElementById('canvasJoin'), ctx = canvas.getContext('2d');
-    canvas.width=1200; canvas.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
-    try { ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600); const dataUrl = canvas.toDataURL("image/jpeg", 0.9); const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}_${shf.toUpperCase()}.jpg`; link.href = dataUrl; link.click(); const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); } catch (e) { console.log("Gagal gambar"); }
-    alert("SINKRON BERHASIL & GAMBAR DISALIN! ✅🔥");
-    setTimeout(() => { window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank'); }, 500);
-}
 </script>
 </body>
 </html>
