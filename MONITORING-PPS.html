@@ -429,23 +429,40 @@
                 row += `<td>${r}/${tH}<div class="progress-container"><div class="progress-bar ${colors[idx]}" style="width:${Math.min(100, tH>0?(r/tH)*100:0)}%"></div></div></td>`;
             });
 
-            for(let personil in kStats) {
-                ['s1','s2','s3'].forEach(sh => {
+            // 2. HITUNG KONTRIBUSI PERSONIL (TARGET BULAT TOKO)
+            for (let personil in kStats) {
+                ['s1', 's2', 's3'].forEach(sh => {
+                    // Cari data kasir berdasarkan nama di tiap shift
                     const listKeysKru = Object.keys(h).filter(key => key.startsWith(sh + '_') && key.endsWith('_nama'));
+                    
                     listKeysKru.forEach(keyNama => {
                         if (h[keyNama] === personil) {
                             const actualKey = keyNama.replace('_nama', '');
                             items.forEach(it => {
                                 const val = parseFloat(h[actualKey]?.[it]) || 0;
                                 const log = getLogic(i, it, k.yr, k.mn);
-                                const tH = Math.ceil((db[k.yr][k.mn][k.tk].target[log.wk]?.[it]||0) / log.dWk);
-                                const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe || 3);
-
+                                
+                                // HASIL REAL: Tetap dijumlahkan apa adanya
                                 kStats[personil].total += val;
                                 kStats[personil].w[log.wk].R += val;
-                                kStats[personil].w[log.wk].T += Math.ceil(tH / tipe);
                                 kStats[personil].p[i <= 15 ? 1 : 2].R += val;
-                                kStats[personil].p[i <= 15 ? 1 : 2].T += Math.ceil(tH / tipe);
+
+                                // --- TARGET BULAT: Mengambil Target Utuh Toko dari Database ---
+                                // 1. Target Mingguan (W1-W4)
+                                kStats[personil].w[log.wk].T = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
+                                
+                                // 2. Target Periode (P1/P2)
+                                if (i <= 15) {
+                                    // P1 = Gabungan Target W1 + W2
+                                    let tW1 = parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it]) || 0;
+                                    let tW2 = parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it]) || 0;
+                                    kStats[personil].p[1].T = tW1 + tW2;
+                                } else {
+                                    // P2 = Gabungan Target W3 + W4
+                                    let tW3 = parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it]) || 0;
+                                    let tW4 = parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it]) || 0;
+                                    kStats[personil].p[2].T = tW3 + tW4;
+                                }
                             });
                         }
                     });
@@ -596,7 +613,12 @@
         canvas.width=1200; canvas.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
         try { ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600); const dataUrl = canvas.toDataURL("image/jpeg", 0.9); const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}_${shf.toUpperCase()}.jpg`; link.href = dataUrl; link.click(); const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); } catch (e) { console.log("Gagal gambar"); }
         alert("SINKRON BERHASIL & GAMBAR DISALIN! ✅🔥");
-        setTimeout(() => { window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank'); }, 500);
+        // Ganti baris paling bawah kirimWA dengan ini:
+setTimeout(() => { 
+    // Kita bungkus ulang 'msg' bapak supaya aman lewat sensor iPhone
+    const urlWA = `https://wa.me/?text=${encodeURIComponent(msg.replace(/%0A/g, '\n'))}`;
+    window.open(urlWA, '_blank'); 
+}, 1000);
     }
 </script>
 </body>

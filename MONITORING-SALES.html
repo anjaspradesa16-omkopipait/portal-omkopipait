@@ -516,23 +516,41 @@ window.onload = async function() {
 
     async function simpanKini() {
     const btn = document.getElementById('btnSave'); 
-    btn.disabled = true; // MATIKAN TOMBOL AGAR TIDAK DOBEL INPUT
+    btn.disabled = true; 
     btn.innerText = "⌛ Mengirim..."; 
 
     let t = document.getElementById('kodeToko').value.toUpperCase();
     let tgl = document.getElementById('inTgl').value;
-    let s1 = parseFloat(document.getElementById('s1').value) || 0;
-    let s2 = parseFloat(document.getElementById('s2').value) || 0;
-    let s3 = parseFloat(document.getElementById('s3').value) || 0;
     let target = parseFloat(document.getElementById('targetKini').value) || 0;
-    
-    let payload = { s1, s2, s3, total: (s1 + s2 + s3) };
     let yK = document.getElementById('thnKini').value;
     let mK = document.getElementById('blnKini').value;
 
+    // Ambil input dari form
+    let inS1 = parseFloat(document.getElementById('s1').value) || 0;
+    let inS2 = parseFloat(document.getElementById('s2').value) || 0;
+    let inS3 = parseFloat(document.getElementById('s3').value) || 0;
+
+    // Pastikan struktur database lokal ada
     if (!db[t]) db[t] = {};
     if (!db[t][yK]) db[t][yK] = {};
     if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {} };
+
+    // --- LOGIKA ANTI TIMPA (JOSS) ---
+    // Cek data lama yang sudah ada di Drive/Lokal
+    let dataLama = db[t][yK][mK].harianKini[tgl] || { s1: 0, s2: 0, s3: 0 };
+
+    // Gunakan data baru JIKA input tidak kosong, jika kosong tetap pakai data lama
+    let s1Final = inS1 !== 0 ? inS1 : dataLama.s1;
+    let s2Final = inS2 !== 0 ? inS2 : dataLama.s2;
+    let s3Final = inS3 !== 0 ? inS3 : dataLama.s3;
+
+    let payload = { 
+        s1: s1Final, 
+        s2: s2Final, 
+        s3: s3Final, 
+        total: (s1Final + s2Final + s3Final) 
+    };
+    // --------------------------------
 
     db[t][yK][mK].harianKini[tgl] = payload;
     db[t][yK][mK].target = target;
@@ -542,7 +560,7 @@ window.onload = async function() {
     
     save();
 
-    // --- HITUNG GAP ULANG DISINI AGAR MASUK DRIVE ---
+    // HITUNG GAP ULANG
     let yL = document.getElementById('thnLalu').value;
     let mL = document.getElementById('blnLalu').value;
     let dL = db[t][yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
@@ -554,7 +572,6 @@ window.onload = async function() {
         let tH = Math.round(pL * target);
         if (rK.total > 0) accumGap += (rK.total - tH);
     }
-    // ----------------------------------------------
 
     try {
         await fetch(scriptURL, {
@@ -567,14 +584,14 @@ window.onload = async function() {
                 key: tgl,
                 payload: payload,
                 target: target,
-                gap: accumGap // GAP DIKIRIM KE DRIVE
+                gap: accumGap 
             })
         });
-        alert("✅ DATA KINI & GAP MASUK KE DRIVE!");
+        alert("✅ DATA SHIFT GABUNGAN BERHASIL MASUK DRIVE!");
     } catch (e) {
         alert("⚠️ Gagal ke Drive!");
     } finally {
-        btn.disabled = false; // HIDUPKAN LAGI TOMBOLNYA
+        btn.disabled = false; 
         btn.innerText = "UPDATE & SIMPAN";
         cekKunci();
     }
