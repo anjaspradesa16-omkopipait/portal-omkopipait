@@ -35,6 +35,20 @@
         #manualWA { display:none; background:#ff9800; color:white; padding:10px; text-align:center; border-radius:5px; margin-top:10px; text-decoration:none; font-weight:bold; font-size:12px; }
         canvas { display: none; }
     </style>
+    <style>
+.modal-rapor {
+    display: none; position: fixed; z-index: 9999; 
+    left: 0; top: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.8); overflow-y: auto;
+}
+.modal-content {
+    background-color: #fff; margin: 5% auto; padding: 20px;
+    border-radius: 15px; width: 90%; max-width: 800px;
+    animation: zoomIn 0.3s; color: #333;
+}
+@keyframes zoomIn { from {transform: scale(0.5); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+.btn-tutup { float: right; font-size: 30px; font-weight: bold; cursor: pointer; }
+</style>
 </head>
 <body>
 
@@ -101,6 +115,9 @@
                 <img id="pSIS" src="" alt="SIS">
             </div>
             <button id="btnSimpanShift" class="btn-save" onclick="simpanReal()">✅ SIMPAN DATA SHIFT</button>
+            <button onclick="bukaRapor()" style="width:100%; background:#8e44ad; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+            🔍 PERBESAR ANALISA KASIR
+            </button>
         </div>
 
         <div class="card">
@@ -446,22 +463,33 @@
                                 kStats[personil].total += val;
                                 kStats[personil].w[log.wk].R += val;
                                 kStats[personil].p[i <= 15 ? 1 : 2].R += val;
+                                // --- TAMBAHKAN DI SINI (BARIS 449) ---
+                                if(!kStats[personil].p[i<=15?1:2].items) kStats[personil].p[i<=15?1:2].items = {};
+                                if(!kStats[personil].w[log.wk].items) kStats[personil].w[log.wk].items = {};
+                                kStats[personil].p[i<=15?1:2].items[it] = (kStats[personil].p[i<=15?1:2].items[it] || 0) + val;
+                                kStats[personil].w[log.wk].items[it] = (kStats[personil].w[log.wk].items[it] || 0) + val;
 
-                                // --- TARGET BULAT: Mengambil Target Utuh Toko dari Database ---
-                                // 1. Target Mingguan (W1-W4)
+                               // --- TARGET BULAT KHUSUS (PSM MINGGUAN, LAINNYA PERIODE) ---
+                                
+                                // 1. Target Mingguan (W1-W4) -> Selalu Bulat Mingguan buat semua item
                                 kStats[personil].w[log.wk].T = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
                                 
                                 // 2. Target Periode (P1/P2)
-                                if (i <= 15) {
-                                    // P1 = Gabungan Target W1 + W2
-                                    let tW1 = parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it]) || 0;
-                                    let tW2 = parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it]) || 0;
-                                    kStats[personil].p[1].T = tW1 + tW2;
+                                if (it === 'PSM') {
+                                    // KHUSUS PSM: Target Periode adalah target mingguan murni (W1/W2/W3/W4)
+                                    // Supaya kasir nggak shock lihat target PSM sebulan numpuk jadi satu
+                                    kStats[personil].p[i <= 15 ? 1 : 2].T = kStats[personil].w[log.wk].T;
                                 } else {
-                                    // P2 = Gabungan Target W3 + W4
-                                    let tW3 = parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it]) || 0;
-                                    let tW4 = parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it]) || 0;
-                                    kStats[personil].p[2].T = tW3 + tW4;
+                                    // ITEM LAIN (PWP, SERBA, dll): Tetap Gabungan Mingguan dalam satu Periode
+                                    if (i <= 15) {
+                                        let tW1 = parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it]) || 0;
+                                        let tW2 = parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it]) || 0;
+                                        kStats[personil].p[1].T = tW1 + tW2;
+                                    } else {
+                                        let tW3 = parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it]) || 0;
+                                        let tW4 = parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it]) || 0;
+                                        kStats[personil].p[2].T = tW3 + tW4;
+                                    }
                                 }
                             });
                         }
@@ -480,13 +508,80 @@
         });
         if(document.getElementById('akumulasiArea')) document.getElementById('akumulasiArea').innerHTML = akHtml + "</table>";
 
-        let rHtml = "<b>🏆 ANALISA PERFORMA KASIR</b>";
+        // --- AWAL BAGIAN COPY-PASTE ---
+        let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
+
         for(let n in kStats) {
-            rHtml += `<div class="rapor-card" style="border-left:5px solid #8e44ad;">👤 <b>${n}</b><table class="rapor-table"><tr><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr><tr>`;
-            for(let w=1; w<=4; w++) rHtml += `<td>${kStats[n].w[w].R}/${kStats[n].w[w].T}<br>${Math.round(kStats[n].w[w].T>0?(kStats[n].w[w].R/kStats[n].w[w].T)*100:0)}%</td>`;
-            rHtml += `</tr><tr><th colspan="2">P1 (01-15)</th><th colspan="2">P2 (16-AKHIR)</th></tr><tr><td colspan="2">${kStats[n].p[1].R}/${kStats[n].p[1].T}<br>${Math.round(kStats[n].p[1].T>0?(kStats[n].p[1].R/kStats[n].p[1].T)*100:0)}%</td><td colspan="2">${kStats[n].p[2].R}/${kStats[n].p[2].T}<br>${Math.round(kStats[n].p[2].T>0?(kStats[n].p[2].R/kStats[n].p[2].T)*100:0)}%</td></tr></table></div>`;
-        }
-        if(document.getElementById('raporArea')) document.getElementById('raporArea').innerHTML = rHtml;
+            rHtml += `
+            <div class="rapor-card" style="border-left:8px solid #8e44ad; margin-bottom:20px; padding:15px; background:white; border-radius:10px;">
+                <div style="font-size:18px; border-bottom:2px solid #eee; padding-bottom:5px; margin-bottom:10px;">👤 <b>${n}</b></div>
+                <table class="rapor-table" style="width:100%; border-collapse:collapse;">
+                    <tr style="background:#f8f9fa;">
+                        <th style="text-align:left; padding:8px; border:1px solid #ddd;">ITEM & PERIODE</th>
+                        <th style="text-align:center; padding:8px; border:1px solid #ddd;">REAL/TGT</th>
+                        <th style="text-align:center; padding:8px; border:1px solid #ddd;">PROGRESS</th>
+                    </tr>`;
+
+            // FUNGSI HELPER UNTUK BAR DIAGRAM
+            const buatBar = (label, real, target, colorClass) => {
+                let pct = target > 0 ? Math.min(100, Math.round((real / target) * 100)) : 0;
+                return `
+                <tr>
+                    <td style="text-align:left; padding:8px; border:1px solid #ddd;"><b>${label}</b></td>
+                    <td style="text-align:center; padding:8px; border:1px solid #ddd;"><b>${real}/${target}</b></td>
+                    <td style="padding:8px; border:1px solid #ddd;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="progress-container" style="flex:1; height:14px; background:#eee; border-radius:10px; overflow:hidden; border:1px solid #ccc;">
+                                <div class="progress-bar ${colorClass}" style="width:${pct}%; height:100%;"></div>
+                            </div>
+                            <span style="font-weight:bold; min-width:35px;">${pct}%</span>
+                        </div>
+                    </td>
+                </tr>`;
+            };
+
+            // 1. TAMPILKAN PWP, SERBA, SUGER, CEBAN (P1 & P2)
+            const listUtama = [
+                {k: 'PWP', l: 'PWP', c: 'bg-pwp'},
+                {k: 'SERBA_GRATIS', l: 'SERBA', c: 'bg-serba'},
+                {k: 'SUGER', l: 'SUGER', c: 'bg-suger'},
+                {k: 'CEBAN', l: 'CEBAN', c: 'bg-ceban'}
+            ];
+
+            // 1. TAMPILKAN PWP, SERBA, SUGER, CEBAN (P1 & P2) - TARGET PER ITEM
+            listUtama.forEach(it => {
+                // Ambil target spesifik item ini dari database toko
+                let t1 = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it.k])||0);
+                let t2 = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it.k])||0);
+                
+                // Ambil hasil jualan real khusus item ini
+                let r1 = kStats[n].p[1].items?.[it.k] || 0;
+                let r2 = kStats[n].p[2].items?.[it.k] || 0;
+
+                rHtml += buatBar(`${it.l} (01-15)`, r1, t1, it.c);
+                rHtml += buatBar(`${it.l} (16-AKHIR)`, r2, t2, it.c);
+            });
+
+            // 2. TAMPILKAN PSM (WEEKLY - TARGET MINGGUAN)
+            for(let w=1; w<=4; w++) {
+                let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
+                let rW = kStats[n].w[w].items?.['PSM'] || 0;
+                
+                if(tW > 0 || rW > 0) {
+                    rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
+                }
+
+        // Tampilkan hasil gabungan ke area rapor
+        const rArea = document.getElementById('raporArea');
+        if (rArea) rArea.innerHTML = rHtml;
+    } // Tutup fungsi updateUI
+        
+        // Update tampilan ke area Rapor
+        const rArea = document.getElementById('raporArea');
+        if(rArea) rArea.innerHTML = rHtml;
+        // --- AKHIR BAGIAN COPY-PASTE ---
+         rHtml += `</table></div>`; // Tutup Card tiap orang
+        } // Tutup perulangan kasir (for let n in kStats)
     }
 
     function setInputState(bolehEdit, pesan = "") {
@@ -620,6 +715,54 @@ setTimeout(() => {
     window.open(urlWA, '_blank'); 
 }, 1000);
     }
+</script>
+<script>
+// FUNGSI TUTUP (Taruh di atas biar siap dipanggil)
+function tutupRapor() {
+    const modal = document.getElementById('modalRapor');
+    if (modal) {
+        modal.style.display = "none";
+        // Supaya layar bisa di-scroll lagi pas modal tutup
+        document.body.style.overflow = "auto";
+    }
+}
+
+// FUNGSI BUKA
+function bukaRapor() {
+    const areaAsli = document.getElementById('raporArea');
+    if (!areaAsli) return;
+
+    let modal = document.getElementById('modalRapor');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalRapor';
+        modal.className = 'modal-rapor';
+        document.body.appendChild(modal);
+    }
+    
+    // Kita paksa modal muncul di paling depan (z-index tinggi)
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden"; // Kunci scroll layar belakang
+
+    modal.innerHTML = `
+        <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:white; padding:10px; border-bottom:3px solid #8e44ad; z-index:10;">
+                <b style="font-size:18px; color:#333;">📊 ANALISA KASIR (TARGET BULAT)</b>
+                <span onclick="tutupRapor()" style="font-size:35px; cursor:pointer; color:#e74c3c; line-height:30px;">&times;</span>
+            </div>
+            
+            <div style="padding:15px; background:#f4f4f4;">
+                ${areaAsli.innerHTML}
+            </div>
+
+            <div style="position:sticky; bottom:0; background:white; padding:10px; border-top:1px solid #ddd;">
+                <button onclick="tutupRapor()" style="width:100%; padding:15px; background:#e74c3c; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:16px;">
+                    TUTUP ANALISA
+                </button>
+            </div>
+        </div>
+    `;
+}
 </script>
 </body>
 </html>
