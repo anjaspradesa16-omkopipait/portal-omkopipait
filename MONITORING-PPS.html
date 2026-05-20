@@ -608,163 +608,142 @@
     }
 
     async function kirimWA() {
-    const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
-    const shf = document.getElementById('shfInput').value; 
-    const ksr = document.getElementById('kasirAktif').value;
-    const shfKey = shf + "_" + ksr.replace(/\s+/g, '_');
+    try {
+        const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
+        const shf = document.getElementById('shfInput').value; 
+        const ksr = document.getElementById('kasirAktif').value;
+        const shfKey = shf + "_" + ksr.replace(/\s+/g, '_');
+        const note = document.getElementById('noteWA').value.trim();
 
-    const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
-    const jamTerakhir = harianSkrg[shfKey + '_jam']; 
-    const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
-    const role = (userSesi.role || "").toLowerCase();
+        if(!tgl) return alert("Pilih Tanggal!");
+        const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
+        if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
 
-    if (!(role.includes("admin") || role.includes("kepala toko") || role.includes("kt"))) {
-        if (jamTerakhir && (new Date().getTime() - jamTerakhir > (3 * 60 * 60 * 1000))) {
-            return alert("🚨 DATA TERKUNCI!\nLaporan shift ini sudah lebih dari 3 jam. Hubungi Kepala Toko untuk revisi.");
+        // --- 1. RUMUS TARGET & PERIODE ---
+        const p = tgl <= 15 ? 1 : 2;
+        const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+        let tTokoBulat = {};
+        const itm = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
+        const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+
+        let pDetail = "📊 *HASIL SHIFT INI:*\n";
+        let adaBebanShift = false;
+
+        itm.forEach(it => {
+            tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it])||0);
+            const logPSM = getLogic(tgl, it, k.yr, k.mn);
+            if(it === 'PSM') tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.[it]) || 0;
+
+            const tS = Math.ceil(tTokoBulat[it] / (tipe * (tgl <= 15 ? 15 : (new Date(k.yr, k.mn, 0).getDate()-15))));
+            const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
+            const pct = tS > 0 ? (rS/tS)*100 : 0;
+            if(rS < tS) adaBebanShift = true;
+
+            pDetail += `🔸 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt Shift: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n${rS >= tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* ' + (tS-rS) + ' Pcs'}\n\n`;
+        });
+
+        // --- 2. KUNCI ALASAN BERULANG (1 BULAN) ---
+        if(adaBebanShift) {
+            if(!note) return alert("🚨 TARGET SHIFT TIDAK CAPAI!\nWajib isi kendala/alasan di kolom catatan.");
+            
+            // Inisialisasi daftar alasan jika belum ada
+            if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
+            
+            // Cek apakah alasan sudah pernah ada (case insensitive)
+            let alasanBaru = note.toLowerCase().replace(/\s+/g, ' ');
+            if(db[k.yr][k.mn][k.tk].reasons.includes(alasanBaru)) {
+                return alert("🚨 ALASAN DITOLAK!\nAlasan '" + note + "' sudah pernah digunakan bulan ini. Cari alasan lain yang lebih jujur/spesifik!");
+            }
+            
+            // Simpan alasan ke database toko bulan ini
+            db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
         }
-    }
 
-    if(!tgl) return alert("Pilih Tanggal!");
-    const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
-    if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
-    const hShift = checkTargetStatus(), note = document.getElementById('noteWA').value.trim();
-    if(hShift && !note) return alert("🚨 TARGET TIDAK TERCAPAI!\nWajib isi kendala/alasan sebelum kirim WA.");
-    
-    const waktuSekarang = new Date().getTime(); 
-    const payloadCloud = { 
-        toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, namaPersonil: ksr, 
-        pwp: document.getElementById('r_PWP').value || 0, 
-        psm: document.getElementById('r_PSM').value || 0, 
-        serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
-        suger: document.getElementById('r_SUGER').value || 0, 
-        ceban: document.getElementById('r_CEBAN').value || 0, 
-        note: note || "-", jam: waktuSekarang, tipeData: "PPS_HARIAN_SAVE_V2" 
-    };
+        saveDisk(); // Simpan alasan dan data jualan
 
-    fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadCloud) });
-    if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
-    db[k.yr][k.mn][k.tk].harian[tgl][shfKey + "_jam"] = waktuSekarang; 
-    saveDisk();
-
-    // --- 1. RUMUS TARGET TOKO (TIDAK BAGI RATA) ---
-    const p = tgl <= 15 ? 1 : 2; 
-    let pDetail = "";
-    let tT = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, tR = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0};
-    
-    // Ambil Target Toko (W1+W2 atau W3+W4)
-    items.forEach(it => {
-        tT[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it])||0);
-        if(it === 'PSM') {
-            const logWk = getLogic(tgl, it, k.yr, k.mn);
-            tT[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logWk.wk]?.[it]) || 0;
-        }
-    });
-
-    // Hitung Akumulasi Real Toko
-    for(let i=1; i<=new Date(k.yr, k.mn, 0).getDate(); i++){
-        const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
-        items.forEach(it => {
+        // --- 3. HITUNG REKAP ---
+        let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0}; 
+        const dM = new Date(k.yr, k.mn, 0).getDate();
+        for(let i=1; i<=dM; i++){
+            const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
             Object.keys(dh).forEach(key => {
-                if(key.includes('s') && !key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam')) {
-                    tR[it] += parseFloat(dh[key][it]) || 0;
+                if(key.includes('_nama')){
+                    const namaK = dh[key].trim().toUpperCase();
+                    const kUtama = key.replace('_nama', '');
+                    if(!rekapIndiv[namaK]) rekapIndiv[namaK] = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
+                    let rPWP = parseFloat(dh[kUtama]?.PWP || 0), rPSM = parseFloat(dh[kUtama]?.PSM || 0), rSERBA = parseFloat(dh[kUtama]?.SERBA_GRATIS || 0), rSUGER = parseFloat(dh[kUtama]?.SUGER || 0), rCEBAN = parseFloat(dh[kUtama]?.CEBAN || 0);
+                    rekapIndiv[namaK].PWP += rPWP; rekapIndiv[namaK].PSM += rPSM; rekapIndiv[namaK].SERBA += rSERBA; rekapIndiv[namaK].SUGER += rSUGER; rekapIndiv[namaK].CEBAN += rCEBAN;
+                    if((p === 1 && i <= 15) || (p === 2 && i > 15)){
+                        akumulasiToko.PWP += rPWP; akumulasiToko.PSM += rPSM; akumulasiToko.SERBA += rSERBA; akumulasiToko.SUGER += rSUGER; akumulasiToko.CEBAN += rCEBAN;
+                    }
                 }
             });
-        });
-    }
+        }
 
-    // --- 2. DETAIL PER ITEM ---
-    items.forEach(it => {
-        const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
-        const tS = tT[it]; // Target Toko Bulat
-        const pct = tS > 0 ? (rS/tS)*100 : 0;
-        pDetail += `🔸 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n${rS >= tS ? '✅ *LUNAS*' : '🚨 *BEBAN TOKO*'}\n\n`;
-    });
-
-    // --- 3. KONTRIBUSI PERSONIL (WARNA-WARNI) ---
-    let personilWA = "🏆 *KONTRIBUSI PERSONIL:* \n";
-    for(let n in kFullData) {
-        personilWA += `👤 *${n.toUpperCase()}*\n`;
+        // --- 4. DASHBOARD TOKO (FULL WARNA) ---
+        let dashToko = "🏪 *DASHBOARD TOKO (AKUMULASI):*\n";
         ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
-            let rI = kFullData[n][it].R || 0;
-            let itK = it === 'SERBA' ? 'SERBA_GRATIS' : it;
-            let tI = tT[itK] || 0;
-            let pctI = tI > 0 ? (rI/tI)*100 : 0;
-            let emo = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
-            personilWA += `  ${emo} ${it}: ${rI}/${tI} (${Math.round(pctI)}%)\n`;
+            let keyRekap = it === 'SERBA' ? 'SERBA' : it;
+            let keyTgt = it === 'SERBA' ? 'SERBA_GRATIS' : it;
+            let rT = akumulasiToko[keyRekap];
+            let tT = tTokoBulat[keyTgt];
+            let pctT = tT > 0 ? (rT/tT)*100 : 0;
+            let emoT = pctT < 50 ? "🔴" : (pctT < 100 ? "🟡" : "🟢");
+            dashToko += `${emoT} ${it}: ${getTextBar(pctT)} ${rT}/${tT} (${Math.round(pctT)}%)\n`;
         });
-        personilWA += `\n`;
+
+        // --- 5. KONTRIBUSI PERSONIL (FULL WARNA) ---
+        let personilWA = "🏆 *KONTRIBUSI PERSONIL (PERIODE):*\n";
+        for (let n in rekapIndiv) {
+            personilWA += `👤 *${n}*\n`;
+            ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
+                let rI = rekapIndiv[n][it] || 0;
+                let tI = tTokoBulat[it === 'SERBA' ? 'SERBA_GRATIS' : it] || 0;
+                let pctI = tI > 0 ? (rI/tI)*100 : 0;
+                let emoI = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
+                personilWA += `  ${emoI} ${it}: ${getTextBar(pctI)} ${rI}/${tI}\n`;
+            });
+            personilWA += `\n`;
+        }
+
+        const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA/ALASAN:* ${note || '-'}\n\n${dashToko}\n${personilWA}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
+
+        // --- 6. GAMBAR ---
+        const cnv = document.getElementById('canvasJoin');
+        if (cnv) {
+            const ctx = cnv.getContext('2d');
+            cnv.width=1200; cnv.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
+            ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600);
+            const link = document.createElement('a'); 
+            link.download = `LAPORAN_${k.tk}_TGL${tgl}.jpg`; 
+            link.href = cnv.toDataURL("image/jpeg", 0.8);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        alert("SINKRON BERHASIL! ✅🔥");
+        setTimeout(() => { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank'); }, 1000);
+
+    } catch (err) {
+        alert("🚨 ERROR: " + err.message);
     }
-
-    const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA:* ${note || '-'}\n\n📊 *AKUMULASI TOKO:* \n${items.map(it => { 
-        let pT = tT[it] > 0 ? (tR[it]/tT[it])*100 : 0;
-        return `${pT < 100 ? '🔴' : '🟢'} ${it.replace('_',' ')}: ${tR[it]}/${tT[it]} (${Math.round(pT)}%)`; 
-    }).join('\n')}\n\n${personilWA}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
-
-    // --- 4. PROSES GAMBAR ---
-    const canvas = document.getElementById('canvasJoin'), ctx = canvas.getContext('2d');
-    canvas.width=1200; canvas.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
-    try { 
-        ctx.drawImage(i1, 0, 0, 600, 600); 
-        ctx.drawImage(i2, 600, 0, 600, 600); 
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.9); 
-        const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}.jpg`; link.href = dataUrl; 
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); 
-        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); 
-    } catch (e) { console.log("Gagal gambar"); }
-
-    alert("SINKRON BERHASIL! ✅🔥");
-    setTimeout(() => { 
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank'); 
-    }, 1000);
 }
-</script>
-<script>
-// FUNGSI TUTUP (Taruh di atas biar siap dipanggil)
+
 function tutupRapor() {
-    const modal = document.getElementById('modalRapor');
-    if (modal) {
-        modal.style.display = "none";
-        // Supaya layar bisa di-scroll lagi pas modal tutup
-        document.body.style.overflow = "auto";
-    }
+    const m = document.getElementById('modalRapor');
+    if(m) m.style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
-// FUNGSI BUKA
 function bukaRapor() {
-    const areaAsli = document.getElementById('raporArea');
-    if (!areaAsli) return;
-
-    let modal = document.getElementById('modalRapor');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'modalRapor';
-        modal.className = 'modal-rapor';
-        document.body.appendChild(modal);
-    }
-    
-    // Kita paksa modal muncul di paling depan (z-index tinggi)
-    modal.style.display = "block";
-    document.body.style.overflow = "hidden"; // Kunci scroll layar belakang
-
-    modal.innerHTML = `
-        <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:white; padding:10px; border-bottom:3px solid #8e44ad; z-index:10;">
-                <b style="font-size:18px; color:#333;">📊 ANALISA KASIR (TARGET BULAT)</b>
-                <span onclick="tutupRapor()" style="font-size:35px; cursor:pointer; color:#e74c3c; line-height:30px;">&times;</span>
-            </div>
-            
-            <div style="padding:15px; background:#f4f4f4;">
-                ${areaAsli.innerHTML}
-            </div>
-
-            <div style="position:sticky; bottom:0; background:white; padding:10px; border-top:1px solid #ddd;">
-                <button onclick="tutupRapor()" style="width:100%; padding:15px; background:#e74c3c; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:16px;">
-                    TUTUP ANALISA
-                </button>
-            </div>
-        </div>
-    `;
+    const area = document.getElementById('raporArea');
+    let m = document.getElementById('modalRapor');
+    if(!m) { m = document.createElement('div'); m.id = 'modalRapor'; document.body.appendChild(m); }
+    m.style.display = 'block';
+    m.innerHTML = `<div style="background:white; padding:20px; max-height:80vh; overflow-y:auto;">
+        <h3>📊 ANALISA KASIR (TARGET TOKO)</h3>
+        ${area.innerHTML}
+        <button onclick="tutupRapor()" style="width:100%; padding:10px; background:red; color:white;">TUTUP</button>
+    </div>`;
 }
 </script>
 </body>
