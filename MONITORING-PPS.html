@@ -73,9 +73,9 @@
                      
             <div class="btn-admin-only" style="margin-top:10px; padding:10px; background:#f9f9f9; border-radius:8px; border: 1px solid #ddd;">
                 <select id="wkTarget" onchange="switchWeek()">
-                    <option value="1">Periode 1 (W1-W2)</option>
+                    <option value="1">Periode 1 (PWP/PSM/SERBA/SUGER/CEBAN)</option>
                     <option value="2">PSM ONLY (W2)</option>
-                    <option value="3">Periode 2 (W3-W4)</option>
+                    <option value="3">Periode 2 (PWP/PSM/SERBA/SUGER/CEBAN)</option>
                     <option value="4">PSM ONLY (W4)</option>
                 </select>
                 <div id="boxPWP"><label>Target PWP (Pcs)</label><input type="number" id="t_PWP"></div>
@@ -105,7 +105,7 @@
             <label>Real SERBAGRATIS (Pcs)</label><input type="number" id="r_SERBA_GRATIS" oninput="checkTargetStatus()">
             <label>Real SUGER (Pcs)</label><input type="number" id="r_SUGER" oninput="checkTargetStatus()">
             <label>Real CEBAN (Pcs)</label><input type="number" id="r_CEBAN" oninput="checkTargetStatus()">
-            <label>📸 Upload 2 Bukti Foto</label>
+            <label>📸 Upload 2 Bukti Foto (REPORT PPS&BUKU MONITORING PPS)</label>
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <input type="file" id="imgBuku" accept="image/*" onchange="previewImg(this, 'pBuku')">
                 <input type="file" id="imgSIS" accept="image/*" onchange="previewImg(this, 'pSIS')">
@@ -619,7 +619,7 @@
         const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
         if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
 
-        // --- 1. RUMUS TARGET & PERIODE ---
+        // --- 1. RUMUS TARGET ---
         const p = tgl <= 15 ? 1 : 2;
         const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
         let tTokoBulat = {};
@@ -639,27 +639,21 @@
             const pct = tS > 0 ? (rS/tS)*100 : 0;
             if(rS < tS) adaBebanShift = true;
 
-            pDetail += `🔸 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt Shift: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n${rS >= tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* ' + (tS-rS) + ' Pcs'}\n\n`;
+            pDetail += `🔹 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt Shift: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n${rS >= tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* ' + (tS-rS) + ' Pcs'}\n\n`;
         });
 
-        // --- 2. KUNCI ALASAN BERULANG (1 BULAN) ---
+        // --- 2. KUNCI ALASAN BERULANG ---
         if(adaBebanShift) {
-            if(!note) return alert("🚨 TARGET SHIFT TIDAK CAPAI!\nWajib isi kendala/alasan di kolom catatan.");
-            
-            // Inisialisasi daftar alasan jika belum ada
+            if(!note) return alert("🚨 TARGET SHIFT TIDAK CAPAI!\nWajib isi kendala/alasan.");
             if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
-            
-            // Cek apakah alasan sudah pernah ada (case insensitive)
             let alasanBaru = note.toLowerCase().replace(/\s+/g, ' ');
             if(db[k.yr][k.mn][k.tk].reasons.includes(alasanBaru)) {
-                return alert("🚨 ALASAN DITOLAK!\nAlasan '" + note + "' sudah pernah digunakan bulan ini. Cari alasan lain yang lebih jujur/spesifik!");
+                return alert("🚨 ALASAN DITOLAK!\nAlasan '" + note + "' sudah pernah digunakan bulan ini.");
             }
-            
-            // Simpan alasan ke database toko bulan ini
             db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
         }
 
-        saveDisk(); // Simpan alasan dan data jualan
+        saveDisk();
 
         // --- 3. HITUNG REKAP ---
         let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0}; 
@@ -680,19 +674,17 @@
             });
         }
 
-        // --- 4. DASHBOARD TOKO (FULL WARNA) ---
+        // --- 4. DASHBOARD TOKO (WARNA) ---
         let dashToko = "🏪 *DASHBOARD TOKO (AKUMULASI):*\n";
         ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
-            let keyRekap = it === 'SERBA' ? 'SERBA' : it;
-            let keyTgt = it === 'SERBA' ? 'SERBA_GRATIS' : it;
-            let rT = akumulasiToko[keyRekap];
-            let tT = tTokoBulat[keyTgt];
-            let pctT = tT > 0 ? (rT/tT)*100 : 0;
-            let emoT = pctT < 50 ? "🔴" : (pctT < 100 ? "🟡" : "🟢");
-            dashToko += `${emoT} ${it}: ${getTextBar(pctT)} ${rT}/${tT} (${Math.round(pctT)}%)\n`;
+            let kR = it === 'SERBA' ? 'SERBA' : it;
+            let kT = it === 'SERBA' ? 'SERBA_GRATIS' : it;
+            let pctT = tTokoBulat[kT] > 0 ? (akumulasiToko[kR]/tTokoBulat[kT])*100 : 0;
+            let emo = pctT < 50 ? "🔴" : (pctT < 100 ? "🟡" : "🟢");
+            dashToko += `${emo} ${it}: ${getTextBar(pctT)} ${akumulasiToko[kR]}/${tTokoBulat[kT]} (${Math.round(pctT)}%)\n`;
         });
 
-        // --- 5. KONTRIBUSI PERSONIL (FULL WARNA) ---
+        // --- 5. KONTRIBUSI PERSONIL (WARNA) ---
         let personilWA = "🏆 *KONTRIBUSI PERSONIL (PERIODE):*\n";
         for (let n in rekapIndiv) {
             personilWA += `👤 *${n}*\n`;
@@ -700,8 +692,8 @@
                 let rI = rekapIndiv[n][it] || 0;
                 let tI = tTokoBulat[it === 'SERBA' ? 'SERBA_GRATIS' : it] || 0;
                 let pctI = tI > 0 ? (rI/tI)*100 : 0;
-                let emoI = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
-                personilWA += `  ${emoI} ${it}: ${getTextBar(pctI)} ${rI}/${tI}\n`;
+                let emo = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
+                personilWA += `  ${emo} ${it}: ${getTextBar(pctI)} ${rI}/${tI}\n`;
             });
             personilWA += `\n`;
         }
@@ -714,36 +706,45 @@
             const ctx = cnv.getContext('2d');
             cnv.width=1200; cnv.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
             ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600);
-            const link = document.createElement('a'); 
-            link.download = `LAPORAN_${k.tk}_TGL${tgl}.jpg`; 
-            link.href = cnv.toDataURL("image/jpeg", 0.8);
+            const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}.jpg`; link.href = cnv.toDataURL("image/jpeg", 0.8);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         alert("SINKRON BERHASIL! ✅🔥");
         setTimeout(() => { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank'); }, 1000);
 
-    } catch (err) {
-        alert("🚨 ERROR: " + err.message);
-    }
+    } catch (err) { alert("🚨 ERROR: " + err.message); }
 }
 
+// --- FUNGSI MODAL (BIAR BISA DIKLIK LAGI) ---
 function tutupRapor() {
-    const m = document.getElementById('modalRapor');
-    if(m) m.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    const modal = document.getElementById('modalRapor');
+    if (modal) { modal.style.display = "none"; document.body.style.overflow = "auto"; }
 }
 
 function bukaRapor() {
-    const area = document.getElementById('raporArea');
-    let m = document.getElementById('modalRapor');
-    if(!m) { m = document.createElement('div'); m.id = 'modalRapor'; document.body.appendChild(m); }
-    m.style.display = 'block';
-    m.innerHTML = `<div style="background:white; padding:20px; max-height:80vh; overflow-y:auto;">
-        <h3>📊 ANALISA KASIR (TARGET TOKO)</h3>
-        ${area.innerHTML}
-        <button onclick="tutupRapor()" style="width:100%; padding:10px; background:red; color:white;">TUTUP</button>
-    </div>`;
+    const areaAsli = document.getElementById('raporArea');
+    if (!areaAsli) return;
+    let modal = document.getElementById('modalRapor');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalRapor';
+        document.body.appendChild(modal);
+    }
+    modal.className = 'modal-rapor';
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    modal.innerHTML = `
+        <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
+                <b style="font-size:18px;">📊 ANALISA KASIR (TARGET BULAT)</b>
+                <span onclick="tutupRapor()" style="font-size:30px; cursor:pointer;">&times;</span>
+            </div>
+            <div style="padding:15px;">${areaAsli.innerHTML}</div>
+            <div style="padding:15px; border-top:1px solid #ddd; text-align:center;">
+                <button onclick="tutupRapor()" style="width:100%; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">TUTUP</button>
+            </div>
+        </div>`;
 }
 </script>
 </body>
