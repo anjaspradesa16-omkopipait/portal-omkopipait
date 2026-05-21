@@ -6,37 +6,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* ========================================================
-           SISTEM TAMPILAN GEMBOK KRU (TIDAK MERUBAH STYLE ASLI)
+           SISTEM TAMPILAN GEMBOK KRU (ASLI - TIDAK DIRUBAH)
            ======================================================== */
-        .locked-mode .btn-admin-only { 
-            display: none !important; 
+        .locked-mode .btn-admin-only { display: none !important; }
+        .locked-mode .readonly-date { pointer-events: none !important; background-color: #dddddd !important; color: #888888 !important; }
+        .locked-mode input:disabled, .locked-mode select:disabled {
+            background-color: #dddddd !important; color: #888888 !important; cursor: not-allowed; border: 1px solid #bbbbbb !important; pointer-events: none;
         }
-
-        /* Gembok tanggal agar abu-abu dan tidak bisa diklik */
-        .locked-mode .readonly-date { 
-            pointer-events: none !important; 
-            background-color: #dddddd !important; 
-            color: #888888 !important;
-        }
-
-        /* Menambah efek abu-abu pekat agar crew tahu input ini dikunci mati */
-.locked-mode input:disabled, 
-.locked-mode select:disabled {
-    background-color: #dddddd !important; /* Warna abu-abu sesuai foto Anda */
-    color: #888888 !important;
-    cursor: not-allowed;
-    border: 1px solid #bbbbbb !important;
-    pointer-events: none; /* Supaya tidak bisa diklik sama sekali */
-}
-
-/* Tambahan visual untuk pesan kunci agar lebih mencolok jika waktu habis */
-#lockMsg {
-    font-weight: bold;
-    font-size: 12px;
-    margin-bottom: 5px;
-    display: block;
-}
-
+        #lockMsg { font-weight: bold; font-size: 12px; margin-bottom: 5px; display: block; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070') no-repeat center center fixed; background-size: cover; color: #333; }
         .container { max-width: 1400px; margin: auto; background: rgba(255, 255, 255, 0.98); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 5px solid #f1c40f; }
         .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
@@ -44,34 +21,22 @@
         h3 { margin-top: 0; color: #2980b9; font-size: 14px; border-bottom: 2px solid #eee; padding-bottom: 5px; display: flex; justify-content: space-between; }
         label { display: block; font-size: 11px; font-weight: bold; margin-top: 10px; color: #666; }
         input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
-        
-        /* Tombol Warna-Warni */
         button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; }
         .btn-blue { background: #3498db; color: white; box-shadow: 0 4px #2980b9; }
         .btn-green { background: #27ae60; color: white; box-shadow: 0 4px #1e8449; }
         .btn-wa { background: #25d366; color: white; border: 2px solid #fff; box-shadow: 0 4px #128c7e; }
         button:active { transform: translateY(4px); box-shadow: 0 0px; }
-
-        /* Progress & Shift Bars */
-        .progress-container { background: #ecf0f1; border-radius: 10px; height: 22px; width: 100%; margin: 8px 0; overflow: hidden; position: relative; border: 1px solid #bdc3c7; }
-        .progress-bar { background: linear-gradient(90deg, #f1c40f, #2ecc71); height: 100%; width: 0%; transition: 0.8s; }
-        .shift-mini-bar { height: 12px; background: #3498db; border-radius: 4px; transition: 0.5s; }
-        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 10px; font-weight: bold; line-height: 22px; color: #2c3e50; }
-
-        /* Badge & Tags */
-        .tag-jsm { font-size: 9px; background: #e74c3c; color: white; padding: 2px 6px; border-radius: 10px; animation: pulse 1s infinite; }
-        .tag-jsm-lalu { font-size: 9px; background: #9b59b6; color: white; padding: 2px 6px; border-radius: 10px; }
         .badge-s1 { background: #e67e22; color: white; padding: 2px 5px; border-radius: 4px; }
         .badge-s2 { background: #9b59b6; color: white; padding: 2px 5px; border-radius: 4px; }
         .badge-s3 { background: #2c3e50; color: white; padding: 2px 5px; border-radius: 4px; }
-
+        .tag-jsm { font-size: 9px; background: #e74c3c; color: white; padding: 2px 6px; border-radius: 10px; animation: pulse 1s infinite; }
+        .tag-jsm-lalu { font-size: 9px; background: #9b59b6; color: white; padding: 2px 6px; border-radius: 10px; }
         .table-box { margin-top: 25px; background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th, td { border: 1px solid #eee; padding: 10px; text-align: center; font-size: 11px; }
         th { background: #2c3e50; color: white; }
         tr:nth-child(even) { background-color: #f9f9f9; }
         .jsm-row { background: #fff5f5 !important; }
-
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         .quote-box { background: #fdf9e7; border-left: 5px solid #f1c40f; padding: 10px; margin-top: 15px; font-style: italic; font-size: 11px; color: #7f8c8d; }
     </style>
@@ -117,9 +82,13 @@
             <input type="number" id="inTgl" oninput="cekKunci()">
             <div id="lockMsg" style="font-size:10px; font-weight:bold;"></div>
             <div id="areaShift">
-                <input type="number" id="s1" placeholder="Sales S1" style="border-left: 5px solid #e67e22;">
-                <input type="number" id="s2" placeholder="Sales S2" style="margin-top:5px; border-left: 5px solid #9b59b6;">
-                <input type="number" id="s3" placeholder="Sales S3" style="margin-top:5px; border-left: 5px solid #2c3e50;">
+                <div id="rowS3"><label style="font-size:10px;">Sales S3 (Malam)</label><input type="number" id="s3" placeholder="Sales S3" style="border-left: 5px solid #2c3e50;"></div>               
+                <div id="rowS1"><label style="font-size:10px; margin-top:5px; display:block;">Sales S1 (Pagi)</label><input type="number" id="s1" placeholder="Sales S1" style="border-left: 5px solid #e67e22;"></div>              
+                <div id="rowS2"><label style="font-size:10px; margin-top:5px; display:block;">Sales S2 (Siang)</label><input type="number" id="s2" placeholder="Sales S2" style="border-left: 5px solid #9b59b6;"></div>             
+                <label style="color: #27ae60; margin-top: 15px; font-weight:bold;">Target GM % Bulan Ini</label>
+                <input type="number" id="tgtGM" placeholder="Target GM %">
+                <label style="color: #1e8449; font-weight:bold;">Realisasi GM % Hari Ini</label>
+                <input type="number" id="realGM" placeholder="Real GM %">
             </div>
             <button id="btnSave" class="btn-green" onclick="simpanKini()">UPDATE & SIMPAN</button>
             <button class="btn-wa" onclick="kirimWA()">📲 KIRIM LAPORAN WA</button>
@@ -130,7 +99,7 @@
             <div id="summaryDashboard"></div>
             <div id="shiftVisual" style="margin-top:15px;"></div>
             <div id="quoteDisplay" class="quote-box"></div>
-            <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none;">RESET DATA</button>
+            <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none; margin-top:10px;">RESET DATA</button>
         </div>
     </div>
 
@@ -157,647 +126,332 @@
     </div>
 
     <div style="text-align: center; margin: 20px 0; padding-bottom: 30px;">
-        <a href="index.html" style="
-            background: #f39c12; 
-            color: white; 
-            padding: 12px 25px; 
-            text-decoration: none; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: inline-block;
-            border: 2px solid #fff;
-        ">
-            ⬅ KEMBALI KE MENU UTAMA
-        </a>
+        <a href="index.html" style="background: #f39c12; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; border: 2px solid #fff;">⬅ KEMBALI KE MENU UTAMA</a>
     </div>
 </div>
 
 <script>
     let db = JSON.parse(localStorage.getItem('alfaSalesPaten_v10')) || {};
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzYHhYeXFYIpMCTwNaMF0cOZUZZ2EleDSHi6P5uOOsCM-Z59A6l_0nS-0VvHgBh600/exec";
-    let chart; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyb_Bq7X70e29P6PhbtW3Cyc_rsQiauVW9hpgsGCoOuFpEk3Tpu51k5V-DcF9Ct6i4/exec";
     const tglSkrg = new Date().getDate();
     document.getElementById('tglOto').innerText = tglSkrg;
 
-    const qList = [
-        "🔥 Kopi pait, jualan manis! Semangat kejar target!",
-        "🚀 Pelayanan maksimal adalah kunci struk gacor!",
-        "💪 Hutang hari ini adalah tantangan besok. Gaspol!",
-        "🎯 Jangan biarkan konsumen pulang tanpa belanja tambahan!",
-        "🔥 Tim yang solid membuat target sesulit apapun jadi enteng!",
-        "💰 Satu penawaran tebus murah sangat berarti buat achievement!",
-        "🌟 Awali shift dengan doa, akhiri dengan laporan bahagia!"
-    ];
+    const qList = ["🔥 Semangat kejar target!", "🚀 Penawaran kunci gacor!", "💪 Tantangan adalah peluang!", "🎯 Tebus murah jos!", "🌟 Awali doa, akhiri bahagia!"];
 
     const blnNama = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    
     ['blnLalu','blnKini'].forEach(id => blnNama.forEach((n,i) => { 
         let s = (id==='blnLalu'&&i===(new Date().getMonth()-1))||(id==='blnKini'&&i===new Date().getMonth());
         document.getElementById(id).innerHTML += `<option value="${i+1}" ${s?'selected':''}>${n}</option>`;
     }));
     ['thnLalu','thnKini'].forEach(id => { for(let y=2025;y<=2027;y++) document.getElementById(id).innerHTML += `<option value="${y}" ${y==2026?'selected':''}>${y}</option>`; });
 
-    // 1. FUNGSI CEK KUNCI - Menangani Hak Akses Crew & Batas Revisi 3 Jam
-function cekKunci() {
-    let v = parseInt(document.getElementById('inTgl').value);
-    let b = document.getElementById('btnSave');
-    let m = document.getElementById('lockMsg');
-    
-    const userSesi = JSON.parse(sessionStorage.getItem("userArea"));
-    const userRole = (userSesi && userSesi.role) ? userSesi.role : "locked";
-    const t = document.getElementById('kodeToko').value.toUpperCase();
-    const yK = document.getElementById('thnKini').value;
-    const mK = document.getElementById('blnKini').value;
-
-    // A. CEK APAKAH TANGGAL SESUAI (Crew cuma boleh hari ini)
-    const isToday = (v === tglSkrg && mK == (new Date().getMonth() + 1));
-    
-    if(userRole !== "locked" || isToday) {
-        
-        // B. LOGIKA PROTEKSI REVISI 3 JAM (KHUSUS CREW)
-        if(userRole === "locked" && db[t] && db[t][yK] && db[t][yK][mK] && db[t][yK][mK].lastUpdate && db[t][yK][mK].lastUpdate[v]) {
-            let waktuSimpanTerakhir = new Date(db[t][yK][mK].lastUpdate[v]);
-            let waktuSekarang = new Date();
-            let selisihJam = (waktuSekarang - waktuSimpanTerakhir) / (1000 * 60 * 60);
-
-            if(selisihJam > 3) {
-                b.disabled = true;
-                b.style.opacity = "0.3";
-                b.style.cursor = "not-allowed";
-                m.innerHTML = "❌ BATAS REVISI HABIS (Sudah > 3 Jam). HUBUNGI KEPALA TOKO!";
-                m.style.color = "red";
-                return;
+    function cekKunci() {
+        let v = parseInt(document.getElementById('inTgl').value);
+        let b = document.getElementById('btnSave');
+        let m = document.getElementById('lockMsg');
+        const userSesi = JSON.parse(sessionStorage.getItem("userArea"));
+        const role = userSesi?.role || "locked";
+        const t = document.getElementById('kodeToko').value.toUpperCase();
+        const yK = document.getElementById('thnKini').value;
+        const mK = document.getElementById('blnKini').value;
+        const isToday = (v === tglSkrg && mK == (new Date().getMonth() + 1));
+        if(role !== "locked" || isToday) {
+            if(role === "locked" && db[t]?.[yK]?.[mK]?.lastUpdate?.[v]) {
+                let diff = (new Date() - new Date(db[t][yK][mK].lastUpdate[v])) / (1000 * 60 * 60);
+                if(diff > 3) { b.disabled = true; b.style.opacity = "0.3"; m.innerHTML = "❌ LOCK (3 JAM)!"; return; }
             }
-        }
-
-        b.disabled = false; b.style.opacity = "1"; b.style.cursor = "pointer";
-        m.innerText = "✅ AKSES TERBUKA"; m.style.color = "green";
-    } else {
-        b.disabled = true; b.style.opacity = "0.3";
-        m.innerText = "⚠️ TERKUNCI (CREW HANYA BISA TGL HARI INI)"; m.style.color = "red";
+            b.disabled = false; b.style.opacity = "1"; m.innerText = "✅ OPEN"; m.style.color = "green";
+        } else { b.disabled = true; b.style.opacity = "0.3"; m.innerText = "⚠️ LOCK (TGL INI)"; m.style.color = "red"; }
     }
-}
-
-// 3. UPDATE SIMPAN KINI - Agar mencatat waktu input untuk Crew
-// ==========================================
-// 1. FUNGSI SIMPAN KINI (SUDAH TERHUBUNG KE DRIVE & AMAN DARI CRASH)
-// ==========================================
-async function simpanKini() {
-    let t = document.getElementById('kodeToko').value.toUpperCase();
-    let tgl = document.getElementById('inTgl').value;
-    let s1 = parseFloat(document.getElementById('s1').value) || 0;
-    let s2 = parseFloat(document.getElementById('s2').value) || 0;
-    let s3 = parseFloat(document.getElementById('s3').value) || 0;
-    let target = parseFloat(document.getElementById('targetKini').value) || 0;
-    
-    let payload = { s1, s2, s3, total: (s1 + s2 + s3) };
-
-    let yK = document.getElementById('thnKini').value;
-    let mK = document.getElementById('blnKini').value;
-    
-    // PENGAMAN: Pastikan struktur database lokal terbentuk dulu agar tidak crash
-    if (!db[t]) db[t] = {};
-    if (!db[t][yK]) db[t][yK] = {};
-    if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {} };
-    
-    // Simpan data utama & target ke lokal
-    db[t][yK][mK].harianKini[tgl] = payload;
-    db[t][yK][mK].target = target;
-
-    // Simpan Timestamp (Waktu saat ini) untuk proteksi revisi crew 3 jam
-    if (!db[t][yK][mK].lastUpdate) db[t][yK][mK].lastUpdate = {};
-    db[t][yK][mK].lastUpdate[tgl] = new Date().toISOString();
-    
-    save(); // Fungsi save & render bawaan asli Anda
-
-    // HITUNG GAP ACCUM SECARA BERJALAN DARI TANGGAL 1
-    let yL = document.getElementById('thnLalu').value;
-    let mL = document.getElementById('blnLalu').value;
-    let dL = db[t][yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
-    let dK = db[t][yK][mK];
-    let accumGap = 0;
-
-    for (let i = 1; i <= tgl; i++) {
-        let vL = dL.harianLalu[i] || 0;
-        let rK = dK.harianKini[i] || { total: 0 };
-        let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0;
-        let tH = Math.round(pL * dK.target);
-        accumGap += (rK.total > 0 ? (rK.total - tH) : 0);
-    }
-
-    // KIRIM DATA KE GOOGLE DRIVE (SINKRONISASI OTOMATIS)
-    try {
-        await fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "save",
-                toko: t,
-                type: "KINI",
-                key: tgl,
-                payload: payload,
-                target: target,
-                gap: accumGap
-            })
-        });
-        alert("✅ SHIFT TERKIRIM! Data & GAP sudah meluncur ke Drive.");
-    } catch (e) {
-        alert("⚠️ Tersimpan di HP, tapi gagal ke Drive. Cek Sinyal!");
-    }
-    
-    cekKunci(); // Cek ulang tombol setelah simpan selesai
-}
-
-// ==========================================
-// 2. SATU FUNGSI WINDOW.ONLOAD (GABUNGAN SEMUA LOGIKA & AMAN)
-// ==========================================
-window.onload = async function() {
-    // A. Jalankan visibilitas shift default (Toko 24 jam / Non-24 jam)
-    updateShiftVisibility();
-    
-    // B. Proteksi Sesi Login & Masa Berlaku Login Hari Ini
-    const userSesi = JSON.parse(sessionStorage.getItem("userArea"));
-    const hariLogin = localStorage.getItem("lastLoginDate");
-    const hariIni = new Date().toDateString();
-
-    if (!userSesi || hariLogin !== hariIni) {
-        alert("Sesi berakhir atau tidak valid. Silakan login kembali.");
-        window.location.href = "index.html";
-        return;
-    }
-
-    // C. Set Nilai Kode Toko Berdasarkan User yang Login
-    const inToko = document.getElementById("kodeToko");
-    if (inToko) { 
-        inToko.value = userSesi.toko; 
-        // Jika crew (locked), kode toko tidak boleh diotak-atik
-        if (userSesi.role === "locked") {
-            inToko.style.pointerEvents = "none";
-            inToko.style.backgroundColor = "#dddddd";
-            inToko.setAttribute("tabindex", "-1");
-        } else {
-            inToko.style.pointerEvents = "auto";
-            inToko.style.backgroundColor = "#fff";
-        }
-    }
-
-    // D. Tarik data dari Cloud & render visual dashboard awal
-    await loadData(); 
-
-    // E. Handle Kunci Tampilan Jika yang Masuk Adalah Akses Crew (Locked Mode)
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode') || userSesi.role; 
-
-    if (mode === 'locked') {
-        document.body.classList.add('locked-mode');
-        
-        // Kunci tanggal input agar otomatis stay di hari ini
-        const inputTgl = document.getElementById('inTgl');
-        if (inputTgl) {
-            inputTgl.value = tglSkrg; 
-            inputTgl.style.pointerEvents = "none";
-            inputTgl.style.backgroundColor = "#eeeeee";
-            
-            const labelTgl = document.getElementById('labelTglInput');
-            if (labelTgl) labelTgl.innerHTML = "Tanggal Input <span style='color:red; font-weight:bold;'>[DIKUNCI HARI INI]</span>";
-        }
-        
-        // Kunci kolom target bulanan dan total bulan lalu agar crew tidak bisa edit angka acuan
-        const elementDikunci = ['targetKini', 'totalLalu', 'tipeToko', 'thnLalu', 'blnLalu', 'thnKini', 'blnKini'];
-        elementDikunci.forEach(id => {
-            let el = document.getElementById(id);
-            if (el) {
-                el.style.pointerEvents = "none";
-                el.style.backgroundColor = "#eeeeee";
-                el.style.color = "#444";
-                el.setAttribute("tabindex", "-1");
-            }
-        });
-        
-        console.log("🔒 Sistem Terkunci: Akses Crew Store Terproteksi");
-    } else {
-        console.log("🔓 Sistem Terbuka: Akses Kepala Toko / Admin");
-    }
-
-    // F. Jalankan hitungan akhir & cek tombol simpan
-    if (typeof renderAll === "function") renderAll(); 
-    cekKunci();
-};
-
-    function loadData() {
-        let t = document.getElementById('kodeToko').value.toUpperCase(); 
-        
-        if(!t) {
-            document.getElementById('totalLalu').value = "";
-            document.getElementById('targetKini').value = "";
-            document.getElementById('s1').value = "";
-            document.getElementById('s2').value = "";
-            if(document.getElementById('s3')) document.getElementById('s3').value = "";
-            renderAll(); 
-            return; 
-        }
-
-        let yL=document.getElementById('thnLalu').value, mL=document.getElementById('blnLalu').value, yK=document.getElementById('thnKini').value, mK=document.getElementById('blnKini').value;
-        if(!db[t]) db[t]={};
-        if(!db[t][yL]) db[t][yL]={}; if(!db[t][yL][mL]) db[t][yL][mL]={totalLalu:0,harianLalu:{}};
-        if(!db[t][yK]) db[t][yK]={}; if(!db[t][yK][mK]) db[t][yK][mK]={target:0,harianKini:{}};
-        
-        document.getElementById('totalLalu').value=db[t][yL][mL].totalLalu||"";
-        document.getElementById('targetKini').value=db[t][yK][mK].target||"";
-        
-        renderAll();
-        tarikDataCloud(); 
-    }
-
-    /* ========================================================
-       TAMBAHAN BARU: FUNGSI TARIK DATA CLOUD YANG HILANG
-       ======================================================== */
-    async function tarikDataCloud() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        if(!t) return;
-        
-        let yL = document.getElementById('thnLalu').value;
-        let mL = document.getElementById('blnLalu').value;
-        let yK = document.getElementById('thnKini').value;
-        let mK = document.getElementById('blnKini').value;
-
-        try {
-            // Memanggil Apps Script dengan parameter GET untuk menarik data toko tertentu
-            let response = await fetch(`${scriptURL}?action=get&toko=${t}`);
-            let cloudData = await response.json();
-            
-            if (cloudData && cloudData.status === "success" && cloudData.data) {
-                // Integrasikan data dari cloud ke local database (db)
-                if(!db[t]) db[t] = {};
-                if(!db[t][yL]) db[t][yL] = {}; if(!db[t][yL][mL]) db[t][yL][mL] = {totalLalu:0,harianLalu:{}};
-                if(!db[t][yK]) db[t][yK] = {}; if(!db[t][yK][mK]) db[t][yK][mK] = {target:0,harianKini:{}};
-
-                // Overwrite atau gabungkan jika data dari cloud tersedia
-                if(cloudData.data.totalLalu) db[t][yL][mL].totalLalu = cloudData.data.totalLalu;
-                if(cloudData.data.target) db[t][yK][mK].target = cloudData.data.target;
-                if(cloudData.data.harianLalu) db[t][yL][mL].harianLalu = Object.assign(db[t][yL][mL].harianLalu, cloudData.data.harianLalu);
-                if(cloudData.data.harianKini) db[t][yK][mK].harianKini = Object.assign(db[t][yK][mK].harianKini, cloudData.data.harianKini);
-                
-                // Simpan hasil sinkronisasi ke localStorage & Render Ulang visualnya
-                localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
-                
-                // Update kembali nilai input form di layar agar sinkron dengan data cloud terbaru
-                document.getElementById('totalLalu').value = db[t][yL][mL].totalLalu || "";
-                document.getElementById('targetKini').value = db[t][yK][mK].target || "";
-                
-                renderAll();
-                console.log("☁️ Sinkronisasi Cloud sukses!");
-            }
-        } catch (e) {
-            console.warn("⚠️ Gagal sinkronisasi data dari Cloud. Menggunakan data offline HP.", e);
-        }
-    }
-
-    function updateShiftVisibility() {
-        const tipe = document.getElementById('tipeToko').value;
-        const s3 = document.getElementById('s3');
-        if(tipe === 'non24') {
-            s3.style.display = 'none';
-            s3.value = 0; 
-        } else {
-            s3.style.display = 'block';
-        }
-    }
-
-    document.getElementById('tipeToko').addEventListener('change', updateShiftVisibility);
-
-    async function simpanLalu() {
-    const btn = document.querySelector(".btn-blue");
-    const originalText = btn.innerText;
-
-    let t = document.getElementById('kodeToko').value.toUpperCase();
-    let tgl = document.getElementById('tglHistori').value;
-    let val = parseFloat(document.getElementById('valHistori').value) || 0;
-    let totalL = parseFloat(document.getElementById('totalLalu').value) || 0;
-    let yL = document.getElementById('thnLalu').value;
-    let mL = document.getElementById('blnLalu').value;
-
-    if (!t || !tgl || !val || !totalL) return alert("⚠️ Data Acuan Belum Lengkap!");
-
-    // LOCK TOMBOL (Anti Double Input)
-    btn.disabled = true;
-    btn.innerText = "⌛ Proses Simpan...";
-
-    if(!db[t]) db[t]={};
-    if(!db[t][yL]) db[t][yL]={};
-    if(!db[t][yL][mL]) db[t][yL][mL]={totalLalu:0, harianLalu:{}};
-    
-    db[t][yL][mL].harianLalu[tgl] = val;
-    db[t][yL][mL].totalLalu = totalL;
-    save();
-
-    try {
-        await fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "save",
-                toko: t,
-                type: "LALU",
-                key: tgl,
-                payload: { val: val, totalLalu: totalL }
-            })
-        });
-        alert("✅ DATA ACUAN MASUK KE DRIVE!");
-    } catch (e) {
-        alert("⚠️ Gagal ke Drive, tersimpan lokal.");
-    } finally {
-        btn.disabled = false;
-        btn.innerText = originalText;
-    }
-}
 
     async function simpanKini() {
-    const btn = document.getElementById('btnSave'); 
-    btn.disabled = true; 
-    btn.innerText = "⌛ Mengirim..."; 
+    let btn = document.getElementById('btnSave'); 
+    btn.disabled = true; btn.innerText = "⌛ SINKRON DRIVE...";
 
     let t = document.getElementById('kodeToko').value.toUpperCase();
     let tgl = document.getElementById('inTgl').value;
-    let target = parseFloat(document.getElementById('targetKini').value) || 0;
     let yK = document.getElementById('thnKini').value;
     let mK = document.getElementById('blnKini').value;
-
-    // Ambil input dari form
-    let inS1 = parseFloat(document.getElementById('s1').value) || 0;
-    let inS2 = parseFloat(document.getElementById('s2').value) || 0;
-    let inS3 = parseFloat(document.getElementById('s3').value) || 0;
-
-    // Pastikan struktur database lokal ada
-    if (!db[t]) db[t] = {};
-    if (!db[t][yK]) db[t][yK] = {};
-    if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {} };
-
-    // --- LOGIKA ANTI TIMPA (JOSS) ---
-    // Cek data lama yang sudah ada di Drive/Lokal
-    let dataLama = db[t][yK][mK].harianKini[tgl] || { s1: 0, s2: 0, s3: 0 };
-
-    // Gunakan data baru JIKA input tidak kosong, jika kosong tetap pakai data lama
-    let s1Final = inS1 !== 0 ? inS1 : dataLama.s1;
-    let s2Final = inS2 !== 0 ? inS2 : dataLama.s2;
-    let s3Final = inS3 !== 0 ? inS3 : dataLama.s3;
-
-    let payload = { 
-        s1: s1Final, 
-        s2: s2Final, 
-        s3: s3Final, 
-        total: (s1Final + s2Final + s3Final) 
-    };
-    // --------------------------------
-
-    db[t][yK][mK].harianKini[tgl] = payload;
-    db[t][yK][mK].target = target;
-    
-    if (!db[t][yK][mK].lastUpdate) db[t][yK][mK].lastUpdate = {};
-    db[t][yK][mK].lastUpdate[tgl] = new Date().toISOString();
-    
-    save();
-
-    // HITUNG GAP ULANG
     let yL = document.getElementById('thnLalu').value;
     let mL = document.getElementById('blnLalu').value;
+    
+    let targetBulanan = parseFloat(document.getElementById('targetKini').value) || 0;
+    let tGM = parseFloat(document.getElementById('tgtGM').value) || 0;
+    let rGM = parseFloat(document.getElementById('realGM').value) || 0;
+
+    // Ambil Data Shift
+    let inS1 = parseFloat(document.getElementById('s1').value) || 0;
+    let inS2 = parseFloat(document.getElementById('s2').value) || 0;
+    let inS3 = (document.getElementById('tipeToko').value === "24jam") ? (parseFloat(document.getElementById('s3').value) || 0) : 0;
+    let totalHariIni = inS1 + inS2 + inS3;
+
+    // 1. UPDATE DATABASE LOKAL DULU
+    if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {}; 
+    if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
+    
+    db[t][yK][mK].harianKini[tgl] = { s1: inS1, s2: inS2, s3: inS3, total: totalHariIni, gm_persen: rGM };
+    db[t][yK][mK].target = targetBulanan;
+    db[t][yK][mK].targetGM = tGM;
+
+    // 2. HITUNG ULANG AKUMULASI GAP (MTD) DARI TANGGAL 1 s/d HARI INI
     let dL = db[t][yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
-    let accumGap = 0;
+    let accumGapMTD = 0;
     for (let i = 1; i <= tgl; i++) {
         let vL = dL.harianLalu[i] || 0;
         let rK = db[t][yK][mK].harianKini[i] || { total: 0 };
         let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0;
-        let tH = Math.round(pL * target);
-        if (rK.total > 0) accumGap += (rK.total - tH);
+        let tH = Math.round(pL * targetBulanan); // Target Harian
+        
+        if (rK.total > 0 || i == tgl) {
+            accumGapMTD += (rK.total - tH);
+        }
     }
+
+    // 3. KIRIM PAYLOAD LENGKAP KE DRIVE (Apps Script)
+    let payload = {
+        action: "save",
+        toko: t,
+        type: "KINI",
+        key: tgl,
+        target: targetBulanan,
+        gap: accumGapMTD, // <-- INI ANGKA -5 JUTA TADI, KITA KIRIM HASIL HITUNGAN MTD
+        payload: {
+            s1: inS1, s2: inS2, s3: inS3,
+            total: totalHariIni,
+            gm_persen: rGM,
+            target_gm: tGM
+        }
+    };
 
     try {
-        await fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "save",
-                toko: t,
-                type: "KINI",
-                key: tgl,
-                payload: payload,
-                target: target,
-                gap: accumGap 
-            })
+        await fetch(scriptURL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(payload) 
         });
-        alert("✅ DATA SHIFT GABUNGAN BERHASIL MASUK DRIVE!");
+        localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
+        renderAll();
+        alert("✅ DISIMPAN! Akumulasi MTD: " + accumGapMTD.toLocaleString());
     } catch (e) {
-        alert("⚠️ Gagal ke Drive!");
-    } finally {
-        btn.disabled = false; 
-        btn.innerText = "UPDATE & SIMPAN";
-        cekKunci();
+        alert("⚠️ Gagal ke Drive, tapi masuk Web.");
     }
+    btn.disabled = false; btn.innerText = "UPDATE & SIMPAN";
 }
 
-    function save() { localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); renderAll(); }
-
     function renderAll() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        let tb = document.querySelector("#mainTable tbody"); 
-        tb.innerHTML = ""; 
-        if (!t || !db[t]) return;
-
-        let yL = document.getElementById('thnLalu').value, mL = document.getElementById('blnLalu').value, 
-            yK = document.getElementById('thnKini').value, mK = document.getElementById('blnKini').value;
-        let dL = db[t][yL][mL], dK = db[t][yK][mK];
-        let ak = 0, tk = 0, ths = 0, rhs = 0, rS = {s1:0, s2:0, s3:0};
+        let t = document.getElementById('kodeToko').value.toUpperCase(), tb = document.querySelector("#mainTable tbody");
+        tb.innerHTML = ""; if (!t || !db[t]) return;
+        let yK = document.getElementById('thnKini').value, mK = document.getElementById('blnKini').value, yL = document.getElementById('thnLalu').value, mL = document.getElementById('blnLalu').value;
+        let dL = db[t][yL]?.[mL] || {totalLalu:0, harianLalu:{}}, dK = db[t][yK][mK] || {target:0, harianKini:{}};
+        let ak = 0, tk = 0, tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
         
-        let tglInputUser = parseInt(document.getElementById('inTgl').value) || tglSkrg;
-
-        for (let i = 1; i <= 31; i++) {
-            let vL = dL.harianLalu[i] || 0, rK = dK.harianKini[i] || {s1:0, s2:0, s3:0, total:0};
-            let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0, tH = Math.round(pL * dK.target);
-            let dtL = new Date(yL, mL - 1, i), dtK = new Date(yK, mK - 1, i); 
-            if (dtK.getMonth() !== mK - 1) continue;
-
-            let hL = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtL.getDay()], 
-                hK = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtK.getDay()], 
-                jK = [0, 5, 6].includes(dtK.getDay()), jL = [0, 5, 6].includes(dtL.getDay());
-
-            ak += (rK.total > 0 ? (rK.total - tH) : 0); 
-            tk += rK.total;
-            
-            if (i == tglInputUser) { ths = tH; rhs = rK.total; rS = rK; }
-
-            tb.innerHTML += `<tr class="${jK ? 'jsm-row' : ''}">
-                <td>${i}</td>
-                <td>${hL} ${jL ? '<span class="tag-jsm-lalu">JSM</span>' : ''}</td>
-                <td>${hK} ${jK ? '<span class="tag-jsm">JSM</span>' : ''}</td>
-                <td>${vL.toLocaleString()}</td>
-                <td class="kontribusi-col">${(pL * 100).toFixed(2)}%</td>
-                <td style="color:#2980b9;font-weight:bold">${tH.toLocaleString()}</td>
-                <td><span class="badge-s1">${rK.s1.toLocaleString()}</span> <span class="badge-s2">${rK.s2.toLocaleString()}</span> <span class="badge-s3">${rK.s3.toLocaleString()}</span></td>
-                <td style="background:#e8f8f5;font-weight:bold">${rK.total.toLocaleString()}</td>
-                <td style="color:${ak >= 0 ? 'green' : 'red'};font-weight:bold">${ak.toLocaleString()}</td>
-            </tr>`;
+        // --- TANDAI: LOGIKA GEMBOK SHIFT 3 ---
+        let tipe = document.getElementById('tipeToko').value;
+        if (tipe === "non24") {
+            document.getElementById('rowS3').style.display = "none";
+            document.getElementById('s3').value = 0; // Paksa nol jika bukan 24 jam
+        } else {
+            document.getElementById('rowS3').style.display = "block";
         }
 
-        let aB = dK.target > 0 ? ((tk / dK.target) * 100).toFixed(2) : 0, 
-            aH = ths > 0 ? ((rhs / ths) * 100).toFixed(2) : 0;
-        let sisaTarget = dK.target - tk;
-        let sisaText = sisaTarget > 0 ? `Sisa: Rp ${sisaTarget.toLocaleString()}` : "🔥 TARGET TEMBUS!";
-        let dashColor = ak >= 0 ? '#27ae60' : '#e74c3c';
+        // VARIABEL BARU UNTUK HITUNG AKUMULASI GM (MTD)
+        let totalSalesMTD = 0;
+        let totalGMRpMTD = 0;
+
+        for (let i = 1; i <= 31; i++) {
+            let vL = dL.harianLalu[i] || 0, rK = dK.harianKini[i] || {s1:0,s2:0,s3:0,total:0,gm_persen:0};
+            let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0, tH = Math.round(pL * dK.target), dtK = new Date(yK, mK - 1, i), dtL = new Date(yL, mL - 1, i);
+            if (dtK.getMonth() !== mK - 1) continue;
+            
+            let hL = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtL.getDay()], hK = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtK.getDay()], jK = [0, 5, 6].includes(dtK.getDay()), jL = [0, 5, 6].includes(dtL.getDay());
+            
+            // Logika Sales (Tetap)
+            ak += (rK.total > 0 ? (rK.total - tH) : 0); 
+            tk += rK.total;
+
+            // --- KUNCI: HITUNG SEMUA DATA YANG SUDAH ADA (TGL 1 S/D TERAKHIR INPUT) ---
+            if (rK.total > 0) {
+                totalSalesMTD += rK.total;
+                totalGMRpMTD += (rK.total * (rK.gm_persen / 100));
+            }
+
+            tb.innerHTML += `<tr class="${jK ? 'jsm-row' : ''}"><td>${i}</td><td>${hL} ${jL?'<span class="tag-jsm-lalu">JSM</span>':''}</td><td>${hK} ${jK?'<span class="tag-jsm">JSM</span>':''}</td><td>${vL.toLocaleString()}</td><td>${(pL*100).toFixed(2)}%</td><td>${tH.toLocaleString()}</td><td>${rK.total.toLocaleString()}</td><td style="background:#e8f8f5">${rK.total.toLocaleString()}</td><td style="color:${ak>=0?'green':'red'}">${ak.toLocaleString()}</td></tr>`;
+        }
+
+        // --- RUMUS DASHBOARD (MTD - MONTH TO DATE) ---
+        let aB = dK.target > 0 ? ((tk / dK.target) * 100).toFixed(1) : 0;
+        let jmlH = new Date(yK, mK, 0).getDate(), tfP = ((tglSkrg / jmlH) * 100).toFixed(1), gapW = (aB - tfP).toFixed(1);
+        
+        let tGM = dK.targetGM || 0;
+        // Real GM rata-rata dari tgl 1 sampai data terakhir di Drive
+        let rGM_MTD = totalSalesMTD > 0 ? (totalGMRpMTD / totalSalesMTD) * 100 : 0;
+        let actGMRp_MTD = totalGMRpMTD;
+        let tgtGMRp_MTD = totalSalesMTD * (tGM / 100);
+        let gapGMRp_MTD = actGMRp_MTD - tgtGMRp_MTD;
 
         document.getElementById('summaryDashboard').innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #ddd; margin-bottom:10px;">
-                <svg width="60" height="60" viewBox="0 0 36 36">
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="3"/>
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${dashColor}" stroke-width="3" stroke-dasharray="${Math.min(aB, 100)}, 100" stroke-linecap="round"/>
-                    <text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold" fill="#333">${aB}%</text>
-                </svg>
-                <div>
-                    <div style="font-size:12px; color:${dashColor}; font-weight:900;">${ak >= 0 ? '📈 NABUNG' : '📉 HUTANG'}</div>
-                    <div style="font-size:11px; font-weight:bold;">Rp ${Math.abs(ak).toLocaleString()}</div>
-                    <div style="font-size:9px; color:#7f8c8d;">${sisaText}</div>
+            <div style="background:#fff; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
+                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="${ak>=0?'#27ae60':'#e74c3c'}" stroke-width="3" stroke-dasharray="${aB}, 100"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${aB}%</text></svg><div style="font-size:7px; font-weight:bold; color:#27ae60;">SALES</div></div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${tk.toLocaleString()}</b><br>TGT: Rp ${dK.target.toLocaleString()}<br><span style="color:${ak>=0?'green':'red'}">GAP: Rp ${ak.toLocaleString()}</span></div>
                 </div>
-            </div>
-            <div class="progress-container" style="height:20px; border-radius:10px; position:relative; overflow:hidden; border:1px solid #ccc; background:#eee;">
-                <div class="progress-text" style="position:absolute; width:100%; text-align:center; font-size:10px; font-weight:bold; line-height:20px; z-index:2;">Hari Ini (Tgl ${tglInputUser}): ${aH}%</div>
-                <div class="progress-bar" style="width:${Math.min(aH, 100)}%; height:100%; background: linear-gradient(90deg, #f1c40f, ${aH>=100?'#2ecc71':'#e67e22'}); z-index:1;"></div>
-            </div>`;
-
-        let maxS = Math.max(rS.s1, rS.s2, rS.s3, 1);
-        let tipe = document.getElementById('tipeToko').value;
-
-        document.getElementById('shiftVisual').innerHTML = `
-            <div style="font-size:11px; font-weight:bold; margin: 15px 0 10px 0; border-top: 1px solid #eee; padding-top: 10px; color:#2c3e50;">
-                📊 PROGRESS PER SHIFT (TGL ${tglInputUser}):
-            </div>
-            <div style="margin-bottom: 8px;">
-                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:2px;">
-                    <span>SHIFT 1 (Pagi)</span>
-                    <span style="font-weight:bold;">Rp ${rS.s1.toLocaleString()}</span>
+                <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
+                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#3498db" stroke-width="3" stroke-dasharray="${tfP}, 100"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${tfP}%</text></svg><div style="font-size:7px; font-weight:bold; color:#3498db;">WAKTU</div></div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>H-KE ${tglSkrg} DARI ${jmlH}</b><br>SPEED: <span style="color:${(aB-tfP)>=0?'green':'red'}">${(aB-tfP).toFixed(1)}%</span></div>
                 </div>
-                <div style="background:#f0f0f0; height:10px; border-radius:5px; overflow:hidden;">
-                    <div style="width:${(rS.s1/maxS)*100}%; height:100%; background:#e67e22; border-radius:5px;"></div>
+                <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
+                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#9b59b6" stroke-width="3" stroke-dasharray="${(rGM_MTD/tGM*100)||0}, 100"/><text x="18" y="21" text-anchor="middle" font-size="7" font-weight="bold">${rGM_MTD.toFixed(2)}%</text></svg><div style="font-size:7px; font-weight:bold; color:#9b59b6;">GM %</div></div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>REAL MTD: ${rGM_MTD.toFixed(2)}%</b><br>TGT: ${tGM}%<br><span style="color:${rGM_MTD>=tGM?'green':'red'}">${rGM_MTD>=tGM?'NABUNG GM':'HUTANG GM'}</span></div>
                 </div>
-            </div>
-            <div style="margin-bottom: 8px;">
-                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:2px;">
-                    <span>SHIFT 2 (Siang)</span>
-                    <span style="font-weight:bold;">Rp ${rS.s2.toLocaleString()}</span>
-                </div>
-                <div style="background:#f0f0f0; height:10px; border-radius:5px; overflow:hidden;">
-                    <div style="width:${(rS.s2/maxS)*100}%; height:100%; background:#9b59b6; border-radius:5px;"></div>
-                </div>
-            </div>
-            <div id="visS3" style="margin-bottom: 8px; display:${tipe === '24jam' ? 'block' : 'none'};">
-                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:2px;">
-                    <span>SHIFT 3 (Malam)</span>
-                    <span style="font-weight:bold;">Rp ${rS.s3.toLocaleString()}</span>
-                </div>
-                <div style="background:#f0f0f0; height:10px; border-radius:5px; overflow:hidden;">
-                    <div style="width:${(rS.s3/maxS)*100}%; height:100%; background:#2c3e50; border-radius:5px;"></div>
+                <div style="display:flex; align-items:center;">
+                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="#e67e22" stroke-width="3"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">Rp</text></svg><div style="font-size:7px; font-weight:bold; color:#e67e22;">GM RP</div></div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${Math.round(actGMRp_MTD).toLocaleString()}</b><br>TGT MTD: Rp ${Math.round(tgtGMRp_MTD).toLocaleString()}<br><span style="color:${gapGMRp_MTD>=0?'green':'red'}">GAP: Rp ${Math.round(gapGMRp_MTD).toLocaleString()}</span></div>
                 </div>
             </div>
         `;
-        
-        document.getElementById('quoteDisplay').innerText = qList[Math.floor(Math.random() * qList.length)];
     }
+
+    async function tarikDataCloud() {
+        let t = document.getElementById('kodeToko').value.toUpperCase();
+        if (!t) return;
+        try {
+            let res = await fetch(`${scriptURL}?action=get&toko=${t}`);
+            let cloudData = await res.json();
+            if (cloudData.status === "success") {
+                let yK = document.getElementById('thnKini').value, mK = document.getElementById('blnKini').value;
+                if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {};
+                if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
+
+                db[t][yK][mK].target = cloudData.data.target || 0;
+                db[t][yK][mK].targetGM = cloudData.data.targetGM || 0;
+
+                if (cloudData.data.harianKini) {
+                    Object.keys(cloudData.data.harianKini).forEach(tgl => {
+                        let dataTgl = cloudData.data.harianKini[tgl];
+                        db[t][yK][mK].harianKini[tgl] = {
+                            s1: dataTgl.s1 || 0, s2: dataTgl.s2 || 0, s3: dataTgl.s3 || 0,
+                            total: dataTgl.total || 0,
+                            gm_persen: dataTgl.gm_persen || 0
+                        };
+                    });
+                }
+                localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
+                document.getElementById('targetKini').value = db[t][yK][mK].target || "";
+                document.getElementById('tgtGM').value = db[t][yK][mK].targetGM || "";
+                renderAll();
+            }
+        } catch (e) { console.log("Gagal Sinkron: " + e); }
+    }
+
+    window.onload = async function() {
+        const ses = JSON.parse(sessionStorage.getItem("userArea"));
+        if (!ses) { window.location.href = "index.html"; return; }
+        document.getElementById("kodeToko").value = ses.toko;
+        
+        if (ses.role === "locked") {
+            document.body.classList.add('locked-mode');
+            document.getElementById('inTgl').value = tglSkrg;
+            document.getElementById('inTgl').disabled = true;
+            document.getElementById('tgtGM').disabled = true; 
+            document.getElementById('tgtGM').style.backgroundColor = "#eee";
+
+            ['targetKini', 'totalLalu', 'tipeToko', 'thnLalu', 'blnLalu'].forEach(id => { 
+                let el = document.getElementById(id); if(el) el.disabled = true; 
+            });
+        }
+        await loadData();
+    };
+
+    function loadData() {
+        let t = document.getElementById('kodeToko').value.toUpperCase(); if(!t) return;
+        let yK=document.getElementById('thnKini').value, mK=document.getElementById('blnKini').value;
+        if(db[t]?.[yK]?.[mK]) { 
+            document.getElementById('targetKini').value=db[t][yK][mK].target||"";
+            document.getElementById('tgtGM').value=db[t][yK][mK].targetGM||"";
+        }
+        renderAll(); 
+        tarikDataCloud();
+    }
+
+    function save() { localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); renderAll(); }
+    setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString('id-ID'); }, 1000);
+    function resetDb() { if (confirm("RESET SEMUA?")) { localStorage.clear(); location.reload(); } }
+    function simpanLalu() { /* Simpan Acuan */ }
 
     function kirimWA() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        let tgl = document.getElementById('inTgl').value;
-        let tipe = document.getElementById('tipeToko').value;
+        const t = document.getElementById('kodeToko').value.toUpperCase();
+        const yK = document.getElementById('thnKini').value;
+        const mK = document.getElementById('blnKini').value;
+        const tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
+        const tipe = document.getElementById('tipeToko').value;
+        
+        // Ambil ID Dropdown Histori Bos
         let yL = document.getElementById('thnLalu').value, mL = document.getElementById('blnLalu').value;
-        let yK = document.getElementById('thnKini').value, mK = document.getElementById('blnKini').value;
+        let dK = db[t]?.[yK]?.[mK] || { target: 0, targetGM: 0, harianKini: {} };
+        let dL = db[t]?.[yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
+
+        // --- DATA TARGET & ACUAN LALU ---
+        let vL_Now = dL.harianLalu[tglIn] || 0;
+        let pL_Now = dL.totalLalu > 0 ? (vL_Now / dL.totalLalu) : 0;
+        let tH_Now = Math.round(pL_Now * dK.target);
+
+        // --- REALISASI HARI INI ---
+        let d = dK.harianKini[tglIn] || { s1: 0, s2: 0, s3: 0, total: 0, gm_persen: 0 };
         
-        let dK = db[t][yK][mK];
-        let d = dK.harianKini[tgl];
-        let dL = db[t][yL][mL];
+        // --- HITUNG PERFORMANCE (MTD) ---
+        let tsMTD = 0, tgmMTD = 0, jmlH = new Date(yK, mK, 0).getDate();
+        Object.keys(dK.harianKini).forEach(tg => { 
+            let data = dK.harianKini[tg]; 
+            if(data.total > 0){ tsMTD += data.total; tgmMTD += (data.total * (data.gm_persen/100)); }
+        });
 
-        if (!d) return alert("Input data dulu untuk tanggal ini!");
+        let ach = dK.target > 0 ? ((tsMTD / dK.target) * 100).toFixed(1) : 0;
+        let tfP = ((tglIn / jmlH) * 100).toFixed(1); 
+        let speed = (ach - tfP).toFixed(1);
+        let rgmMTD = tsMTD > 0 ? (tgmMTD / tsMTD * 100).toFixed(2) : 0;
+        let gapGMRp = Math.round(tgmMTD - (tsMTD * (dK.targetGM/100)));
 
-        let vL = dL.harianLalu[tgl] || 0;
-        let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0;
-        let tH = Math.round(pL * dK.target);
-        let ach = tH > 0 ? ((d.total / tH) * 100).toFixed(1) : 0;
+        // --- KATA-KATA STATUS ---
+        let statusSpeed = speed >= 0 ? "🟢 *AMAN (SPEED POSITIF)*" : "🔴 *OVER (SPEED NEGATIF)*";
+        let statusGM = gapGMRp >= 0 ? "😇 *NABUNG MARGIN*" : "💀 *HUTANG MARGIN*";
+        let sindiran = speed >= 0 ? "Pertahankan! Kasir gass terus jangan kasih kendor!" : "🔥 *KERJA WOY! JANGAN JUALAN BARANG PROMO DOANG!*";
+
+        // --- FORMAT PESAN WA ---
+        let pesan = `🚀 *MONITORING SALES [${t}]* 🚀%0A`;
+        pesan += `━━━━━━━━━━━━━━━━━━━%0A%0A`;
         
-        let hNama = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-        let hariLalu = hNama[new Date(yL, mL - 1, tgl).getDay()];
-        let hariKini = hNama[new Date(yK, mK - 1, tgl).getDay()];
+        // --- TAMBAHAN PERBANDINGAN BULAN LALU ---
+        pesan += `📅 *INFO KOMPARASI:*%0A`;
+        pesan += `• Hari Ini: ${tglIn}/${mK}%0A`;
+        pesan += `• *Bulan Lalu: Rp ${vL_Now.toLocaleString()}*%0A`;
+        pesan += `• *Target Harian: Rp ${tH_Now.toLocaleString()}*%0A`;
+        pesan += `• Kontribusi: ${(pL_Now * 100).toFixed(2)}%25%0A%0A`;
 
-        let bS1 = tH - d.s3; 
-        let bS2 = tH - (d.s3 + d.s1);
+        pesan += `🕒 *REALISASI PER SHIFT:*%0A`;
+        if(tipe === "24jam") pesan += `• S3 (Malam): Rp ${d.s3.toLocaleString()}%0A`;
+        pesan += `• S1 (Pagi) : Rp ${d.s1.toLocaleString()}%0A`;
+        pesan += `• S2 (Siang): Rp ${d.s2.toLocaleString()}%0A`;
+        pesan += `• *TOTAL REAL: Rp ${d.total.toLocaleString()}*%0A%0A`;
 
-        let prog = Math.min(Math.floor(ach / 10), 10);
-        let bar = (ach >= 100) ? "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩" : "🟧".repeat(prog) + "⬜".repeat(10 - prog);
+        pesan += `🏆 *DASHBOARD PERFORMANCE:*%0A`;
+        pesan += `• *ACTUAL MTD:* Rp ${tsMTD.toLocaleString()}%0A`;
+        pesan += `• *ACHIEVEMENT:* ${ach}%25%0A`;
+        pesan += `• *TIME FACTOR:* ${tfP}%25%0A`;
+        pesan += `• *SPEED:* ${speed >= 0 ? '📈 +' : '📉 '}${speed}%25%0A`;
+        pesan += `• *STATUS:* ${statusSpeed}%0A%0A`;
 
-        let pesan = `*🚀 MONITORING SALES [${t}] 🚀*\n` +
-                    `-------------------------------------------\n` +
-                    `📅 *INFO KOMPARASI*\n` +
-                    `• Hari Ini: ${hariKini} (${tgl}/${mK})\n` +
-                    `• Bulan Lalu: ${hariLalu} (${tgl}/${mL})\n` +
-                    `-------------------------------------------\n\n` +
-                    `📊 *ANALISA TARGET*\n` +
-                    `• *Target Harian: Rp ${tH.toLocaleString()}*\n` +
-                    `• Kontribusi: ${(pL * 100).toFixed(2)}%\n` +
-                    `• Sales Bln Lalu: Rp ${vL.toLocaleString()}\n` +
-                    `-------------------------------------------\n\n` +
-                    `💰 *REALISASI & BEBAN SHIFT*\n`;
+        pesan += `📈 *PERFORMA GM:*%0A`;
+        pesan += `• *REAL GM:* ${rgmMTD}%25 (Tgt: ${dK.targetGM}%25)%0A`;
+        pesan += `• *GAP GM:* Rp ${gapGMRp.toLocaleString()}%0A`;
+        pesan += `• *KONDISI:* ${statusGM}%0A%0A`;
 
-        if(tipe === "24jam") {
-            pesan += `🌚 *SHIFT 3 (00-08)*\n` +
-                     `• Real: Rp ${d.s3.toLocaleString()}\n` +
-                     `• *Beban S1:* Rp ${bS1 > 0 ? bS1.toLocaleString() : 'LUNAS ✅'}\n\n`;
-        }
+        pesan += `⚠️ *PESAN UNTUK TEAM:*%0A`;
+        pesan += `_${sindiran}_%0A`;
+        pesan += `━━━━━━━━━━━━━━━━━━━%0A`;
+        pesan += `_Sent via Monitoring Sales App_`;
 
-        pesan += `🔸 *SHIFT 1 (08-16)*\n` +
-                 `• Real: Rp ${d.s1.toLocaleString()}\n` +
-                 `• *Beban S2:* Rp ${bS2 > 0 ? bS2.toLocaleString() : 'LUNAS ✅'}\n\n` +
-                 `🔹 *SHIFT 2 (16-24)*\n` +
-                 `• Real: Rp ${d.s2.toLocaleString()}\n` +
-                 `• *Sisa Target:* Rp ${ (tH - d.total) > 0 ? (tH - d.total).toLocaleString() : 'LUNAS ✅'}\n` +
-                 `-------------------------------------------\n\n` +
-                 `🏆 *HASIL AKHIR TOKO*\n` +
-                 `• *TOTAL REAL:* Rp ${d.total.toLocaleString()}\n` +
-                 `• *ACHIEVEMENT:* ${ach}%\n` +
-                 `${bar}\n` +
-                 `-------------------------------------------\n` +
-                 `${d.total >= tH ? '🟢 *TARGET JEBOL!* 💪' : '🔴 *KURANG Rp ' + (tH - d.total).toLocaleString() + '*' }\n\n` +
-                 `*#omkopipait*`;
-
-        window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
+        window.open(`https://api.whatsapp.com/send?text=${pesan}`, '_blank');
     }
-
-    setInterval(() => { let d = new Date(); document.getElementById('liveClock').innerText = d.toLocaleString('id-ID'); }, 1000);
-    
-  function resetDb() {
-    if (confirm("🚨 RESET TOTAL SEKARANG?\n\nJika Drive sudah kosong, maka setelah ini web akan bersih total 100%.\nSemua tabel dan dashboard akan kembali ke NOL.")) {
-        
-        // 1. HAPUS SEMUA STORAGE (Tanpa kecuali)
-        localStorage.clear();
-        sessionStorage.clear();
-        
-        // 2. PAKSA VARIABEL DB JADI KOSONG TOTAL
-        // Kita hancurkan variabelnya di memori RAM
-        window.db = {}; 
-        db = {};
-
-        // 3. KOSONGKAN TAMPILAN TABEL SECARA PAKSA (Hard Clear)
-        const tabelBody = document.querySelector("#mainTable tbody");
-        if (tabelBody) tabelBody.innerHTML = "<tr><td colspan='9'>Data telah dibersihkan...</td></tr>";
-
-        // 4. KOSONGKAN INPUT MANUAL
-        document.querySelectorAll('input').forEach(i => i.value = "");
-        document.getElementById('summaryDashboard').innerHTML = "";
-        document.getElementById('shiftVisual').innerHTML = "";
-
-        // 5. JURUS PAMUNGKAS: REFRESH KERAS (Hard Reload)
-        alert("✅ SEMUA JEJAK DIHAPUS!\nWeb akan memuat ulang ke halaman login.");
-        
-        // Memaksa browser membuang cache halaman ini
-        window.location.replace("index.html");
-    }
-}
 </script>
 </body>
 </html>
