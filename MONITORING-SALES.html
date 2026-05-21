@@ -39,6 +39,24 @@
         .jsm-row { background: #fff5f5 !important; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         .quote-box { background: #fdf9e7; border-left: 5px solid #f1c40f; padding: 10px; margin-top: 15px; font-style: italic; font-size: 11px; color: #7f8c8d; }
+    
+        /* Styling Pop-up Modal AI */
+.modal-ai {
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+}
+.modal-content {
+    background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 15px;
+    width: 80%; max-width: 600px; border-top: 8px solid #f1c40f; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+.close-ai { float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
+.close-ai:hover { color: #000; }
+
+/* Styling Tabel Shift */
+.shift-log-container { margin-top: 15px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+.shift-log-table { width: 100%; min-width: unset; font-size: 10px; }
+.shift-log-table th { background: #f8f9fa; color: #333; padding: 5px; }
+.shift-log-table td { padding: 5px; border-bottom: 1px solid #eee; }  
     </style>
 </head>
 <body>
@@ -95,13 +113,37 @@
         </div>
 
         <div class="card" style="border: 2px solid #f1c40f;">
-            <h3>3. DASHBOARD VISUAL 📊</h3>
-            <div id="summaryDashboard"></div>
-            <div id="shiftVisual" style="margin-top:15px;"></div>
-            <div id="quoteDisplay" class="quote-box"></div>
-            <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none; margin-top:10px;">RESET DATA</button>
-        </div>
+    <h3 style="display: flex; justify-content: space-between; align-items: center;">
+        3. DASHBOARD VISUAL 📊
+        <button onclick="bukaModalAI()" style="width: auto; padding: 4px 10px; margin: 0; font-size: 10px; background: #2980b9; color: white;">🔍 PERBESAR</button>
+    </h3>
+    <div id="summaryDashboard"></div>
+    
+    <div class="shift-log-container">
+        <table class="shift-log-table">
+            <thead>
+                <tr><th>Shift</th><th>Realisasi Rp</th><th>Status</th></tr>
+            </thead>
+            <tbody id="listShiftKini">
+                </tbody>
+        </table>
     </div>
+
+    <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none; margin-top:10px;">RESET DATA</button>
+</div>
+
+<div id="aiModal" class="modal-ai">
+    <div class="modal-content" style="max-width: 750px;">
+        <span class="close-ai" onclick="tutupModalAI()">&times;</span>
+        <h2 style="color: #2c3e50; border-bottom: 2px solid #f1c40f; padding-bottom: 10px; margin-bottom: 20px;">🤖 AI PERFORMANCE INSIGHT</h2>
+        
+        <div id="aiAnalysisContent">
+            </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p id="aiMotivationalQuote" style="text-align:center; font-style:italic; color:#27ae60; font-weight:bold;"></p>
+    </div>
+</div>
 
     <div class="table-box">
         <table id="mainTable">
@@ -371,6 +413,7 @@
         }
         renderAll(); 
         tarikDataCloud();
+        updateShiftList();
     }
 
     function save() { localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); renderAll(); }
@@ -452,6 +495,91 @@
 
         window.open(`https://api.whatsapp.com/send?text=${pesan}`, '_blank');
     }
+
+    function bukaModalAI() {
+    const t = document.getElementById('kodeToko').value.toUpperCase();
+    const yK = document.getElementById('thnKini').value;
+    const mK = document.getElementById('blnKini').value;
+    const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
+    
+    // Hitung data MTD (sama seperti renderAll)
+    let totalSales = 0; let totalGMRp = 0;
+    Object.keys(dK.harianKini).forEach(tg => {
+        let data = dK.harianKini[tg];
+        if(data.total > 0) {
+            totalSales += data.total;
+            totalGMRp += (data.total * (data.gm_persen/100));
+        }
+    });
+
+    let ach = dK.target > 0 ? ((totalSales / dK.target) * 100).toFixed(1) : 0;
+    let jmlH = new Date(yK, mK, 0).getDate();
+    let tfP = ((tglSkrg / jmlH) * 100).toFixed(1);
+    let speed = (ach - tfP).toFixed(1);
+    let rgmMTD = totalSales > 0 ? (totalGMRp / totalSales * 100).toFixed(2) : 0;
+
+    // Ambil semua bulatan dari dashboard utama (SVG)
+    const svgs = document.querySelectorAll('#summaryDashboard svg');
+    
+    let htmlContent = `
+        <p style="margin-bottom:20px;">Halo Tim <b>${t}</b>! Berikut analisa mendalam hingga hari ke-${tglSkrg}:</p>
+        
+        <div style="display:flex; align-items:center; margin-bottom:20px; background:#f9f9f9; padding:10px; border-radius:10px;">
+            <div style="width:100px; transform: scale(1.3);">${svgs[0].outerHTML}</div>
+            <div style="flex:1; padding-left:30px;">
+                <b style="color:#27ae60;">🚀 PERFORMA SALES (${ach}%)</b><br>
+                <span style="font-size:13px;">${speed >= 0 ? 
+                    `Kondisi Aman! Speed kita <b>+${speed}%</b>. Tim sudah bekerja di atas rata-rata waktu.` : 
+                    `Butuh Akselerasi! Kita terlambat <b>${speed}%</b>. Fokus pada penawaran keranjang belanja dan tebus murah!`}</span>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; margin-bottom:20px; background:#f9f9f9; padding:10px; border-radius:10px;">
+            <div style="width:100px; transform: scale(1.3);">${svgs[2].outerHTML}</div>
+            <div style="flex:1; padding-left:30px;">
+                <b style="color:#9b59b6;">💰 KUALITAS MARGIN (${rgmMTD}%)</b><br>
+                <span style="font-size:13px;">${rgmMTD >= dK.targetGM ? 
+                    `Luar biasa! Kita sedang <b>NABUNG GM</b>. Terus tawarkan item privat label dan non-promo.` : 
+                    `Hati-hati! Kita sedang <b>HUTANG GM</b>. Kurangi ketergantungan pada item promo jsm.`}</span>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; background:#f9f9f9; padding:10px; border-radius:10px;">
+            <div style="width:100px; transform: scale(1.3);">${svgs[1].outerHTML}</div>
+            <div style="flex:1; padding-left:30px;">
+                <b style="color:#3498db;">📅 TIME FACTOR (${tfP}%)</b><br>
+                <span style="font-size:13px;">Sisa hari: <b>${jmlH - tglSkrg} hari lagi</b>. Gunakan setiap shift untuk menutup GAP sales yang ada!</span>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('aiAnalysisContent').innerHTML = htmlContent;
+    document.getElementById('aiMotivationalQuote').innerText = `"Satu transaksi kecil dari kalian adalah langkah besar menuju target bulanan. Gas pol!"`;
+    document.getElementById('aiModal').style.display = "block";
+}
+
+function tutupModalAI() {
+    document.getElementById('aiModal').style.display = "none";
+}
+
+// Update List Shift di Dashboard
+function updateShiftList() {
+    const t = document.getElementById('kodeToko').value.toUpperCase();
+    const yK = document.getElementById('thnKini').value;
+    const mK = document.getElementById('blnKini').value;
+    const tglIn = document.getElementById('inTgl').value || tglSkrg;
+    const d = db[t]?.[yK]?.[mK]?.harianKini[tglIn] || { s1: 0, s2: 0, s3: 0 };
+    
+    let html = `
+        <tr><td>Shift 1</td><td>Rp ${d.s1.toLocaleString()}</td><td>${d.s1 > 0 ? '✅ Ok' : '➖'}</td></tr>
+        <tr><td>Shift 2</td><td>Rp ${d.s2.toLocaleString()}</td><td>${d.s2 > 0 ? '✅ Ok' : '➖'}</td></tr>
+        <tr><td>Shift 3</td><td>Rp ${d.s3.toLocaleString()}</td><td>${d.s3 > 0 ? '✅ Ok' : '➖'}</td></tr>
+    `;
+    document.getElementById('listShiftKini').innerHTML = html;
+}
+
+// Panggil updateShiftList di dalam fungsi renderAll() yang sudah ada
+// Tambahkan baris "updateShiftList();" di baris terakhir fungsi renderAll() Anda.
 </script>
 </body>
 </html>
