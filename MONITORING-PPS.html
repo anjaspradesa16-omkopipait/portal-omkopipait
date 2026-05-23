@@ -30,88 +30,81 @@
     gap:15px;
 }
 
-/* ==========================
-   MODE HP RAPOR KOMPAK
-========================== */
+/* ====================
+   FIX KHUSUS HP FINAL
+==================== */
 
 @media screen and (max-width:768px){
 
-/* AKUMULASI TOKO */
-#akumulasiArea table{
+html,body{
+    overflow-x:hidden !important;
+    width:100%;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+.container{
     width:100% !important;
-    table-layout:fixed;
-    font-size:11px !important;
-}
-
-#akumulasiArea th,
-#akumulasiArea td{
-    padding:4px !important;
-    word-break:break-word;
-}
-
-#akumulasiArea .progress-container{
-    height:10px !important;
-}
-
-
-/* KARTU ANALISA */
-.rapor-card{
-    width:100% !important;
+    max-width:100% !important;
     padding:10px !important;
-    overflow:hidden !important;
+    overflow:hidden;
 }
 
-
-/* TABEL ANALISA JADI PADAT */
-.rapor-table{
+.grid{
+    display:flex !important;
+    flex-direction:column !important;
     width:100% !important;
-    min-width:100% !important;
-    table-layout:fixed;
-    font-size:10px !important;
 }
 
-.rapor-table th,
-.rapor-table td{
-    padding:5px 2px !important;
-    word-break:break-word;
+.card{
+    width:100% !important;
+    min-width:0 !important;
+    margin-bottom:15px;
 }
 
-
-/* kolom item diperkecil */
-.rapor-table th:first-child,
-.rapor-table td:first-child{
-    width:40%;
-    text-align:left;
+input,
+select,
+textarea,
+button{
+    width:100% !important;
+    max-width:100% !important;
 }
 
-
-/* kolom angka */
-.rapor-table th:nth-child(2),
-.rapor-table td:nth-child(2){
-    width:22%;
+.preview-area{
+    display:flex;
+    flex-wrap:wrap;
 }
 
-
-/* progress */
-.rapor-table th:nth-child(3),
-.rapor-table td:nth-child(3){
-    width:38%;
+.preview-area img{
+    width:80px !important;
+    height:80px !important;
 }
 
-
-/* progress lebih kecil */
-.progress-container{
-    height:8px !important;
+/* TABEL SAJA yang boleh geser */
+#wrapperHarian{
+    overflow-x:auto;
+    width:100%;
 }
 
-.progress-bar{
-    height:8px !important;
+#tabelPPS{
+    min-width:750px;
 }
 
+/* ANALISA KASIR */
+#raporArea{
+    overflow-x:auto;
+    max-width:100%;
+}
 
-/* nama kasir */
-.rapor-card div:first-child{
-    font-size:16px !important;
+.rapor-table{
+    min-width:600px;
+}
+
+/* tombol file upload */
+input[type=file]{
+    font-size:12px;
 }
 
 }
