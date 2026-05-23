@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- WAJIB untuk mode HP -->
+    <meta name="viewport"
+          content="width=device-width,
+          initial-scale=1.0,
+          maximum-scale=1.0,
+          user-scalable=no">
+
     <title>PPS MONITORING v34.0 FINAL - #omkopipait</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -35,6 +42,20 @@
         .rapor-table td { padding: 5px; border: 1px solid #ccc; font-weight: bold; }
         #manualWA { display:none; background:#ff9800; color:white; padding:10px; text-align:center; border-radius:5px; margin-top:10px; text-decoration:none; font-weight:bold; font-size:12px; }
         canvas { display: none; }
+    </style>
+    <style>
+.modal-rapor {
+    display: none; position: fixed; z-index: 9999; 
+    left: 0; top: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.8); overflow-y: auto;
+}
+.modal-content {
+    background-color: #fff; margin: 5% auto; padding: 20px;
+    border-radius: 15px; width: 90%; max-width: 800px;
+    animation: zoomIn 0.3s; color: #333;
+}
+@keyframes zoomIn { from {transform: scale(0.5); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+.btn-tutup { float: right; font-size: 30px; font-weight: bold; cursor: pointer; }
 
 /* ==========================
    MODE KHUSUS HANDPHONE
@@ -120,20 +141,6 @@
     }
 
 }
-    </style>
-    <style>
-.modal-rapor {
-    display: none; position: fixed; z-index: 9999; 
-    left: 0; top: 0; width: 100%; height: 100%; 
-    background-color: rgba(0,0,0,0.8); overflow-y: auto;
-}
-.modal-content {
-    background-color: #fff; margin: 5% auto; padding: 20px;
-    border-radius: 15px; width: 90%; max-width: 800px;
-    animation: zoomIn 0.3s; color: #333;
-}
-@keyframes zoomIn { from {transform: scale(0.5); opacity: 0;} to {transform: scale(1); opacity: 1;} }
-.btn-tutup { float: right; font-size: 30px; font-weight: bold; cursor: pointer; }
 
 </style>
 </head>
