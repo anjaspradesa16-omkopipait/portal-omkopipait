@@ -2,6 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
     <title>Monitoring Sales Pro v10 - ULTIMATE JOSS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -64,15 +66,219 @@
     box-shadow: 0 10px 50px rgba(0,0,0,0.5);
 }
 
-.close-ai { 
-    position: absolute; 
-    right: 20px; 
-    top: 15px; 
-    font-size: 40px; 
-    font-weight: bold; 
-    cursor: pointer; 
-    color: #666; 
-    z-index: 10000; /* Agar di atas konten modal */
+#aiQuestionBox{
+margin-top:0 !important;
+padding-top:10px !important;
+}
+
+/* ANIMASI POPUP */
+.modal-content{
+    background-color: #fff;
+    margin: 3vh auto;
+    padding: 25px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+}
+
+#aiAnalysisContent{
+margin-bottom:0 !important;
+padding-bottom:0 !important;
+}
+
+.modal-content{
+gap:0 !important;
+}
+
+
+#aiDecision{
+margin-top:6px !important;
+margin-bottom:2px !important;
+padding:12px !important;
+border-radius:15px;
+text-align:center;
+min-height:auto;
+}
+
+@keyframes popupMasuk{
+    from{
+        opacity:0;
+        transform:translateY(30px) scale(.9);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+/* HEADER AI BERGERAK */
+.ai-header{
+    background: linear-gradient(
+        270deg,
+        #3498db,
+        #9b59b6,
+        #f1c40f,
+        #3498db
+    );
+    background-size:600% 600%;
+    animation:gradientMove 8s ease infinite;
+    padding:15px;
+    color:white;
+    border-radius:15px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* KOTAK STATUS */
+.status-badge{
+padding:8px 15px;
+border-radius:50px;
+display:inline-block;
+font-size:12px;
+font-weight:bold;
+animation:pulseBadge 1.5s infinite;
+}
+
+@keyframes pulseBadge{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
+}
+
+.close-ai{
+    position: sticky;
+    top: 0;
+    float: right;
+    font-size: 40px;
+    z-index: 10000;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:20px;
+}
+
+/* ==========================================
+   MODE SMARTPHONE / MOBILE
+========================================== */
+
+@media screen and (max-width:768px){
+
+body{
+padding:8px;
+}
+
+/* container utama */
+.container{
+padding:10px;
+border-radius:15px;
+}
+
+/* 3 kolom jadi 1 */
+.grid{
+grid-template-columns:1fr !important;
+gap:12px;
+}
+
+/* card lebih rapat */
+.card{
+padding:12px;
+border-radius:12px;
+}
+
+/* judul */
+h2{
+font-size:18px !important;
+letter-spacing:1px !important;
+}
+
+h3{
+font-size:12px !important;
+}
+
+/* input */
+input,
+select,
+button{
+
+font-size:16px;
+padding:12px;
+}
+
+/* tabel HP scroll */
+.table-box{
+overflow-x:auto;
+padding:10px;
+}
+
+/* popup AI HP */
+.modal-content{
+
+width:96% !important;
+max-width:none !important;
+
+height:95vh;
+
+margin:2vh auto;
+
+padding:12px !important;
+
+overflow-y:auto;
+
+border-radius:15px;
+}
+
+/* kotak AI jadi 1 kolom */
+#aiAnalysisContent div{
+
+grid-template-columns:1fr !important;
+}
+
+/* header AI */
+.ai-header{
+
+padding:12px;
+
+font-size:14px;
+
+margin-bottom:10px;
+}
+
+/* tombol */
+button{
+margin-top:8px;
+}
+
+/* close popup */
+.close-ai{
+font-size:30px;
+right:10px;
+top:5px;
+position:absolute;
+}
+
+/* dashboard lingkaran */
+svg{
+width:45px;
+height:45px;
+}
+
+/* WA tombol */
+.btn-wa{
+font-size:13px;
+}
+
 }
 
 .close-ai:hover { color: #e74c3c; }
@@ -158,15 +364,110 @@
 <div id="aiModal" class="modal-ai">
     <div class="modal-content" style="max-width: 900px; width: 95%; background: #fdfdfd; border-radius: 20px;">
        <span class="close-ai" onclick="tutupModalAI()">&times;</span>
-        <h2 style="color: #2c3e50; border-bottom: 3px solid #f1c40f; padding-bottom: 15px; text-align: center;">
-            🤖 AI EXECUTIVE REPORT (IKT ANALYST)
-        </h2>
+       <div class="ai-header">
+   <h2>🤖 AI EXECUTIVE REPORT</h2>
+   <small>IKT Analyst • Smart Prediction Engine</small>
+</div>
         
         <div id="aiAnalysisContent" style="margin-top: 20px;">
             </div>
+        
+<div id="aiDecision"></div>
 
-        <div id="aiDecision" style="margin-top: 25px; padding: 20px; border-radius: 15px; text-align: center;">
-            </div>
+<div id="aiQuestionBox" style="
+    margin-top:15px;
+    background:#f8f9fa;
+    padding:15px;
+    border-radius:15px;
+    border:1px solid #ddd;
+">
+
+<div style="
+font-size:28px;
+margin-bottom:5px;
+">
+🧠 <b style="font-size:16px;color:#2c3e50">
+Tanya IA IKT
+</b>
+</div>
+
+<div style="
+font-size:12px;
+color:#666;
+margin-bottom:12px;
+">
+Pilih pertanyaan untuk mendapatkan analisa IA berdasarkan data toko saat ini.
+</div>
+
+<select id="pilihanAI"
+style="
+width:100%;
+padding:14px;
+font-size:14px;
+border-radius:10px;
+border:1px solid #ccc;
+">
+
+<option value="">
+Pilih Pertanyaan...
+</option>
+
+<option value="harapan">
+🌱 1. Apakah masih ada harapan untuk menang IKT dengan data ini?
+</option>
+
+<option value="strategi">
+🎯 2. Strategi apa yang harus dikejar dan difokuskan?
+</option>
+
+<option value="prediksi">
+🧮 3. Apakah sampai akhir bulan akan menang?
+</option>
+
+<option value="kenapa">
+❓ 4. Kenapa tidak ada harapan menang IKT?
+</option>
+
+<option value="faktor">
+⚠️ 5. Faktor apa yang mengakibatkan tidak menang?
+</option>
+
+</select>
+
+<button onclick="jawabAI()"
+style="
+margin-top:12px;
+background:linear-gradient(
+90deg,
+#2f80ed,
+#56ccf2
+);
+color:white;
+font-size:15px;
+font-weight:bold;
+border-radius:10px;
+padding:14px;
+">
+
+🔍 ANALISA IA
+
+</button>
+
+<div id="jawabanAI"
+style="
+margin-top:15px;
+display:none;
+padding:18px;
+border-radius:12px;
+background:#eef5ff;
+border-left:5px solid #3498db;
+line-height:1.8;
+font-size:14px;
+">
+ℹ️ Jawaban IA akan muncul di sini
+</div>
+
+</div>
 
         <div style="text-align: center; margin-top: 20px;">
             <button onclick="tutupModalAI()" style="width: auto; padding: 10px 40px; background: #34495e; color: white;">TUTUP LAPORAN</button>
@@ -609,14 +910,29 @@
         motivasi = "SPEED MINUS! Segera push sales 'Tebus Murah' dan 'Keranjang Belanja'!";
     }
 
-    document.getElementById('aiAnalysisContent').innerHTML = htmlContent;
+    document.getElementById('aiAnalysisContent').innerHTML = `
+<div style="
+margin-bottom:10px;
+">
+${htmlContent}
+</div>
+`;
     
     const decEl = document.getElementById('aiDecision');
     decEl.style.background = color;
-    decEl.innerHTML = `
-        <h1 style="color: white; margin: 0; font-size: 28px;">${decision}</h1>
-        <p style="color: white; font-size: 16px; margin-top: 10px;">${motivasi}</p>
-    `;
+   decEl.innerHTML = `
+<div class="status-badge">
+${decision}
+</div>
+
+<p style="
+margin-top:15px;
+font-size:15px;
+line-height:1.7;
+">
+${motivasi}
+</p>
+`;
 
     document.getElementById('aiModal').style.display = "block";
 }
@@ -697,6 +1013,167 @@ function updateAIPrediction() {
         ntEl.innerHTML = "Sales: " + aB.toFixed(1) + "% | Waktu: " + tfP.toFixed(1) + "% | GM: " + rGM_MTD.toFixed(2) + "%";
         tgEl.innerHTML = "<b>💡 CATATAN IA:</b><br>" + saran;
     }
+}
+
+function jawabAI(){
+
+const q=
+document.getElementById("pilihanAI").value;
+
+const box=
+document.getElementById("jawabanAI");
+
+const t=
+document.getElementById('kodeToko').value.toUpperCase();
+
+const yK=
+document.getElementById('thnKini').value;
+
+const mK=
+document.getElementById('blnKini').value;
+
+const dK=
+db[t]?.[yK]?.[mK]||
+{
+target:0,
+harianKini:{},
+targetGM:0
+};
+
+let total=0;
+
+Object.values(
+dK.harianKini
+).forEach(x=>{
+
+total += x.total||0;
+
+});
+
+let ach=
+dK.target>0 ?
+(total/dK.target)*100
+:0;
+
+let sisa=
+new Date(
+yK,
+mK,
+0
+).getDate()-tglSkrg;
+
+let gap=
+dK.target-total;
+
+let isi="";
+
+switch(q){
+
+case "harapan":
+
+isi=`
+✅ MASIH ADA PELUANG.
+
+Achievement saat ini:
+${ach.toFixed(1)}%
+
+Masih ada ${sisa} hari tersisa.
+
+Untuk mengejar target dibutuhkan sekitar:
+
+Rp ${Math.round(gap/sisa).toLocaleString()}
+
+per hari.
+
+Kondisi seperti ini belum kalah.
+Fokus minggu terakhir sangat menentukan.
+`;
+
+break;
+
+case "strategi":
+
+isi=`
+🎯 STRATEGI PRIORITAS
+
+1. Push tebus murah
+
+2. Tambah keranjang belanja
+
+3. Fokus item margin tinggi
+
+4. Wajib upselling kasir
+
+5. Manfaatkan jam ramai
+
+Fokus nilai transaksi.
+`;
+
+break;
+
+
+case "prediksi":
+
+isi=
+ach>80 ?
+
+`
+📈 Prediksi masih terbuka.
+
+Dengan performa sekarang peluang masih ada.
+
+Tetap jaga speed.
+`
+
+:
+
+`
+⚠️ Peluang kecil.
+
+Tetapi belum selesai.
+
+Minggu terakhir masih bisa mengubah hasil.
+`;
+
+break;
+
+case "kenapa":
+
+isi=`
+📉 Penyebab utama:
+
+Speed sales kalah terhadap progress waktu.
+
+Perlu percepatan transaksi harian.
+`;
+
+break;
+
+
+case "faktor":
+
+isi=`
+⚠️ Faktor terbesar:
+
+• Keranjang kecil
+
+• Tebus murah kurang
+
+• Margin kecil
+
+• Item non promo rendah
+
+• Nominal transaksi kecil
+`;
+
+break;
+
+}
+
+box.style.display="block";
+
+box.innerHTML=isi;
+
 }
 </script>
 </body>
