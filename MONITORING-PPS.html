@@ -30,50 +30,81 @@
     gap:15px;
 }
 
-/* KHUSUS HP */
-@media only screen and (max-width:768px){
+/* ====================
+   FIX KHUSUS HP FINAL
+==================== */
 
-.grid{
-    grid-template-columns:1fr !important;
+@media screen and (max-width:768px){
+
+html,body{
+    overflow-x:hidden !important;
+    width:100%;
+}
+
+*{
+    box-sizing:border-box;
 }
 
 .container{
     width:100% !important;
+    max-width:100% !important;
     padding:10px !important;
+    overflow:hidden;
+}
+
+.grid{
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
 }
 
 .card{
     width:100% !important;
-    margin-bottom:10px;
-}
-
-body{
-    padding:5px !important;
-}
-
-h2{
-    font-size:20px !important;
+    min-width:0 !important;
+    margin-bottom:15px;
 }
 
 input,
 select,
 textarea,
 button{
-    min-height:45px;
-    font-size:16px !important;
-}
-
-#wrapperHarian{
-    overflow-x:auto;
-}
-
-#tabelPPS{
-    min-width:800px;
+    width:100% !important;
+    max-width:100% !important;
 }
 
 .preview-area{
     display:flex;
     flex-wrap:wrap;
+}
+
+.preview-area img{
+    width:80px !important;
+    height:80px !important;
+}
+
+/* TABEL SAJA yang boleh geser */
+#wrapperHarian{
+    overflow-x:auto;
+    width:100%;
+}
+
+#tabelPPS{
+    min-width:750px;
+}
+
+/* ANALISA KASIR */
+#raporArea{
+    overflow-x:auto;
+    max-width:100%;
+}
+
+.rapor-table{
+    min-width:600px;
+}
+
+/* tombol file upload */
+input[type=file]{
+    font-size:12px;
 }
 
 }
