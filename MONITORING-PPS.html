@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPS MONITORING v34.0 FINAL - #omkopipait</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -48,6 +49,91 @@
 }
 @keyframes zoomIn { from {transform: scale(0.5); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 .btn-tutup { float: right; font-size: 30px; font-weight: bold; cursor: pointer; }
+
+/* ==========================
+   MODE KHUSUS HANDPHONE
+   ========================== */
+@media screen and (max-width:768px){
+
+    body{
+        padding:8px;
+    }
+
+    .container{
+        padding:10px;
+        border-radius:10px;
+    }
+
+    /* dari 3 kolom jadi 1 kolom */
+    .grid{
+        grid-template-columns:1fr !important;
+        gap:10px;
+    }
+
+    .card{
+        padding:10px;
+    }
+
+    h2{
+        font-size:18px !important;
+    }
+
+    h3{
+        font-size:12px;
+    }
+
+    input,
+    select,
+    textarea,
+    button{
+        font-size:16px !important;
+        padding:12px;
+    }
+
+    /* upload foto jadi vertikal */
+    .preview-area{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+    .preview-area img{
+        width:90px !important;
+        height:90px !important;
+    }
+
+    /* tabel bisa digeser kiri kanan */
+    #wrapperHarian{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    table{
+        min-width:700px;
+        font-size:10px;
+    }
+
+    th,td{
+        padding:6px;
+    }
+
+    .rapor-card{
+        padding:8px;
+    }
+
+    .modal-content{
+        width:95% !important;
+        margin:3% auto !important;
+    }
+
+    .btn-wa,
+    .btn-save,
+    .btn-danger,
+    .btn-excel{
+        padding:14px;
+        font-size:14px;
+    }
+
+}
 </style>
 </head>
 <body>
