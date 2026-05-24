@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <head>
     <meta charset="UTF-8">
     <!-- WAJIB untuk mode HP -->
     <meta name="viewport"
@@ -26,33 +25,29 @@
 /* =========================
    FIX HP FINAL v2
 =========================*/
+
 @media only screen and (max-width:768px){
 
-*{
-   box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
-html,
-body{
+html, body{
     width:100%;
-    overflow-x:hidden !important;
     margin:0;
     padding:0;
+    overflow-x:hidden !important;
 }
 
-body{
-    padding:6px !important;
-}
+body{padding:6px !important;}
 
 .container{
     width:100% !important;
     max-width:100% !important;
-    padding:12px !important;
     margin:0 !important;
+    padding:12px !important;
     overflow:hidden;
 }
 
-/* jadi vertikal */
+/* layout vertikal */
 .grid{
     display:flex !important;
     flex-direction:column !important;
@@ -64,44 +59,26 @@ body{
     min-width:0 !important;
 }
 
-/* FLEX YANG BIKIN MELEBAR */
+/* cegah flex melebar */
 .card div[style*="display:flex"]{
     flex-wrap:wrap !important;
 }
 
-/* upload foto */
-input[type=file]{
-    width:100% !important;
-}
-
 /* form */
-input,
-select,
-textarea,
-button{
+input, select, textarea, button, input[type=file]{
     width:100% !important;
     max-width:100% !important;
 }
 
 /* monitoring harian boleh geser */
-#wrapperHarian{
-    overflow-x:auto;
-}
-
-#tabelPPS{
-    min-width:700px;
-}
+#wrapperHarian{overflow-x:auto;}
+#tabelPPS{min-width:700px;}
 
 /* akumulasi toko boleh geser */
-#akumulasiArea{
-    overflow-x:auto;
-}
+#akumulasiArea{overflow-x:auto;}
+#akumulasiArea table{min-width:500px;}
 
-#akumulasiArea table{
-    min-width:500px;
-}
-
-/* ANALISA KASIR JANGAN GESER */
+/* analisa personil jangan geser */
 #raporArea{
     overflow-x:hidden !important;
     padding:5px !important;
@@ -120,8 +97,8 @@ button{
 
 .rapor-table td,
 .rapor-table th{
-    word-break:break-word;
     padding:4px;
+    word-break:break-word;
 }
 
 }
@@ -151,18 +128,71 @@ button{
         canvas { display: none; }
     </style>
     <style>
-.modal-rapor {
-    display: none; position: fixed; z-index: 9999; 
-    left: 0; top: 0; width: 100%; height: 100%; 
-    background-color: rgba(0,0,0,0.8); overflow-y: auto;
+.rapor-card{
+margin-top:10px;
+border:none;
+padding:12px;
+border-radius:16px;
+background:linear-gradient(135deg,#ffffff,#f8f9ff);
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+transition:.3s;
 }
-.modal-content {
-    background-color: #fff; margin: 5% auto; padding: 20px;
-    border-radius: 15px; width: 90%; max-width: 800px;
-    animation: zoomIn 0.3s; color: #333;
+
+.rapor-card:hover{
+transform:translateY(-3px);
+box-shadow:0 8px 25px rgba(0,0,0,.15);
 }
-@keyframes zoomIn { from {transform: scale(0.5); opacity: 0;} to {transform: scale(1); opacity: 1;} }
-.btn-tutup { float: right; font-size: 30px; font-weight: bold; cursor: pointer; }
+
+.modal-rapor{
+    display:none;
+    position:fixed;
+    z-index:9999;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    overflow-y:auto;
+    padding:15px;
+    backdrop-filter:blur(4px);
+}
+
+.modal-content{
+    position:relative;
+    background:linear-gradient(135deg,#ffffff,#f4f8ff,#fff5ec);
+    margin:30px auto;
+    padding:20px;
+    border-radius:20px;
+    width:90%;
+    max-width:850px;
+    color:#333;
+    border:3px solid #fff;
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+    animation:zoomIn .4s;
+}
+
+.modal-content::before{
+    content:"🏆 PPS MONITORING";
+    display:block;
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:10px;
+    padding:10px;
+    border-radius:12px;
+    background:linear-gradient(90deg,#8e44ad,#3498db,#2ecc71);
+    color:#fff;
+}
+
+.btn-tutup{
+    float:right;
+    font-size:30px;
+    font-weight:bold;
+    cursor:pointer;
+    color:#e74c3c;
+    transition:.3s;
+}
+
+.btn-tutup:hover{
+    transform:scale(1.2) rotate(90deg);
+}
 
 </style>
 </head>
@@ -371,7 +401,10 @@ button{
         if(!db[k.yr][k.mn][k.tk]) db[k.yr][k.mn][k.tk] = { target: {1:{},2:{},3:{},4:{}}, harian: {}, kru: "", tipe: "3", reasons: [] };
         document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru || "";
         document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe || "3";
-        updateKruList(); switchWeek(); updateUI();
+        updateKruList();
+        updateShiftOption();
+        switchWeek();
+        updateUI();
     }
 
     function updateKruList() {
@@ -381,8 +414,24 @@ button{
         s.value = valLama;
     }
 
-    function saveKru() { const k = getK(); if(!k.tk) return; db[k.yr][k.mn][k.tk].kru = document.getElementById('listKru').value; saveDisk(); updateKruList(); }
-    function saveTipe() { const k = getK(); if(!k.tk) return; db[k.yr][k.mn][k.tk].tipe = document.getElementById('tipeToko').value; saveDisk(); }
+   function saveKru() {
+    const k = getK();
+    if(!k.tk) return;
+
+    db[k.yr][k.mn][k.tk].kru =
+    document.getElementById('listKru').value;
+    saveDisk();
+    updateKruList();
+    updateShiftOption();
+}
+    function saveTipe() { 
+    const k = getK();
+    if(!k.tk) return;
+
+    db[k.yr][k.mn][k.tk].tipe = document.getElementById('tipeToko').value;
+    saveDisk();
+    updateShiftOption();
+}
 
     function getLogic(tgl, it, yr, mn) {
         const dM = new Date(yr, mn, 0).getDate();
@@ -433,22 +482,63 @@ button{
         cekStatusGembok();
     }
 
-    function checkTargetStatus() {
-        const k = getK(); const tgl = parseInt(document.getElementById('tglInput').value); if(!tgl) return false;
-        const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
-        let failItems = [];
-        items.forEach(it => {
-            const log = getLogic(tgl, it, k.yr, k.mn); 
-            const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
-            if(tTotal > 0) {
-                const tS = Math.ceil(Math.ceil(tTotal / log.dWk) / tipe);
-                if((parseFloat(document.getElementById(`r_${it}`).value) || 0) < tS) failItems.push(it.replace('_',' '));
-            }
-        });
-        const lbl = document.getElementById('labelWarning');
-        if(failItems.length > 0) { lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`; lbl.style.display = 'block'; return true; } 
-        else { lbl.style.display = 'none'; return false; }
+  function updateShiftOption() {
+
+    const tipe=
+    document.getElementById('tipeToko').value;
+
+    const shf=
+    document.getElementById('shfInput');
+
+    const old=
+    shf.value;
+
+    shf.innerHTML=
+    tipe=="3"
+    ? `<option value="s3">Shift 3</option>
+       <option value="s1">Shift 1</option>
+       <option value="s2">Shift 2</option>`
+    :
+      `<option value="s1">Shift 1</option>
+       <option value="s2">Shift 2</option>`;
+
+    if(
+       [...shf.options]
+       .some(o=>o.value===old)
+    ){
+       shf.value=old;
     }
+
+}
+
+   function checkTargetStatus() {
+    const k = getK(); const tgl = parseInt(document.getElementById('tglInput').value); if(!tgl) return false;
+    const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+    let failItems = [];
+
+    items.forEach(it => {
+        const log = getLogic(tgl, it, k.yr, k.mn);
+        const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
+
+        if(tTotal > 0) {
+            const tS = Math.ceil(tTotal / (log.dWk * tipe));
+
+            if((parseFloat(document.getElementById(`r_${it}`).value) || 0) < tS)
+                failItems.push(it.replace('_',' '));
+        }
+    });
+
+    const lbl = document.getElementById('labelWarning');
+
+    if(failItems.length > 0) {
+        lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`;
+        lbl.style.display = 'block';
+        return true;
+    } else {
+        lbl.style.display = 'none';
+        return false;
+    }
+}
 
     function simpanReal() {
         const k = getK(); const tgl = document.getElementById('tglInput').value;
@@ -518,7 +608,10 @@ button{
                 localStorage.setItem('dbPPS_v30', JSON.stringify(db));
                 document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
                 document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
-                updateKruList(); switchWeek(); updateUI();
+                updateKruList();
+                updateShiftOption();
+                switchWeek();
+                updateUI();
             }
         }).catch(e => console.log("Cloud Pull Error"));
     }
@@ -617,12 +710,61 @@ button{
             body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
         }
 
-        let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
-        items.forEach((it, i) => { 
-            const p = ttToko[it]>0?(trToko[it]/ttToko[it])*100:0; 
-            akHtml += `<tr><td>${it.replace('_',' ')}</td><td>${trToko[it]}</td><td>${ttToko[it]}</td><td><b>${Math.round(p)}%</b><div class="progress-container"><div class="progress-bar ${colors[i]}" style="width:${Math.min(100, p)}%"></div></div></td></tr>`; 
+     let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
+
+/* ITEM PERIODE */
+[['PWP','PWP'], ['SERBA_GRATIS','SERBA'], ['SUGER','SUGER'], ['CEBAN','CEBAN']].forEach(([key,label]) => {
+
+    for(let p=1; p<=2; p++) {
+        let real=0, target=0;
+
+        for(let tgl=1; tgl<=dM; tgl++) {
+            const periode = (tgl<=15)?1:2;
+            if(periode!==p) continue;
+
+            const h = harianData[tgl] || {};
+
+            Object.keys(h).forEach(k => {
+                if(!k.endsWith('_nama') && !k.endsWith('_note') && !k.endsWith('_jam') && h[k])
+                    real += parseFloat(h[k][key]) || 0;
+            });
+        }
+
+        if(p===1) target = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[key])||0);
+        else target = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[key])||0);
+
+        const pct = target>0 ? (real/target)*100 : 0;
+
+        akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
+    }
+
+});
+
+
+/* PSM WEEK */
+for(let w=1; w<=4; w++) {
+    let real = 0;
+
+    for(let tgl=1; tgl<=dM; tgl++) {
+        const log = getLogic(tgl,'PSM',k.yr,k.mn);
+        if(log.wk !== w) continue;
+
+        const h = harianData[tgl] || {};
+
+        Object.keys(h).forEach(key => {
+            if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key])
+                real += parseFloat(h[key].PSM) || 0;
         });
-        if(document.getElementById('akumulasiArea')) document.getElementById('akumulasiArea').innerHTML = akHtml + "</table>";
+    }
+
+    const target = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.PSM) || 0;
+    const pct = target > 0 ? (real/target)*100 : 0;
+
+    akHtml += `<tr><td>PSM WEEK ${w}</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
+}
+
+akHtml += "</table>";
+document.getElementById('akumulasiArea').innerHTML = akHtml;
 
         // --- AWAL BAGIAN COPY-PASTE ---
         let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
@@ -678,27 +820,22 @@ button{
                 rHtml += buatBar(`${it.l} (16-AKHIR)`, r2, t2, it.c);
             });
 
-            // 2. TAMPILKAN PSM (WEEKLY - TARGET MINGGUAN)
-            for(let w=1; w<=4; w++) {
-                let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
-                let rW = kStats[n].w[w].items?.['PSM'] || 0;
-                
-                if(tW > 0 || rW > 0) {
-                    rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
-                }
+          // 2. TAMPILKAN PSM (WEEKLY - TARGET MINGGUAN)
+for(let w=1; w<=4; w++) {
+    let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
+    let rW = kStats[n].w[w].items?.['PSM'] || 0;
 
-        // Tampilkan hasil gabungan ke area rapor
-        const rArea = document.getElementById('raporArea');
-        if (rArea) rArea.innerHTML = rHtml;
-    } // Tutup fungsi updateUI
-        
-        // Update tampilan ke area Rapor
-        const rArea = document.getElementById('raporArea');
-        if(rArea) rArea.innerHTML = rHtml;
-        // --- AKHIR BAGIAN COPY-PASTE ---
-         rHtml += `</table></div>`; // Tutup Card tiap orang
-        } // Tutup perulangan kasir (for let n in kStats)
-    }
+    if(tW > 0 || rW > 0)
+        rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
+}
+
+rHtml += `</table></div>`; // tutup card personil
+} // tutup perulangan kasir
+
+// tampilkan hasil ke area rapor
+const rArea = document.getElementById('raporArea');
+if(rArea) rArea.innerHTML = rHtml;
+}
 
     function setInputState(bolehEdit, pesan = "") {
         const listID = ['r_PWP', 'r_PSM', 'r_SERBA_GRATIS', 'r_SUGER', 'r_CEBAN', 'noteWA', 'kasirAktif'];
@@ -736,27 +873,47 @@ button{
         if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
 
         // --- 1. RUMUS TARGET ---
-        const p = tgl <= 15 ? 1 : 2;
-        const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
-        let tTokoBulat = {};
-        const itm = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
-        const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+const p = tgl <= 15 ? 1 : 2;
+const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+let tTokoBulat = {};
+const itm = ['PWP','PSM','SERBA_GRATIS','SUGER','CEBAN'];
+const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
 
-        let pDetail = "📊 *HASIL SHIFT INI:*\n";
-        let adaBebanShift = false;
+let pDetail = "📊 *HASIL SHIFT INI:*\n";
+let adaBebanShift = false;
 
-        itm.forEach(it => {
-            tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it])||0);
-            const logPSM = getLogic(tgl, it, k.yr, k.mn);
-            if(it === 'PSM') tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.[it]) || 0;
+itm.forEach(it => {
 
-            const tS = Math.ceil(tTokoBulat[it] / (tipe * (tgl <= 15 ? 15 : (new Date(k.yr, k.mn, 0).getDate()-15))));
-            const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
-            const pct = tS > 0 ? (rS/tS)*100 : 0;
-            if(rS < tS) adaBebanShift = true;
+    tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
 
-            pDetail += `🔹 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt Shift: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n${rS >= tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* ' + (tS-rS) + ' Pcs'}\n\n`;
-        });
+    if(it === 'PSM') {
+        const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
+        tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.PSM) || 0;
+    }
+
+    let tS = 0;
+
+    if(it === 'PSM') {
+        const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
+        tS = Math.ceil(tTokoBulat[it] / (logPSM.dWk * tipe));
+    } else {
+        tS = Math.ceil(tTokoBulat[it] / (tipe * (tgl<=15 ? 15 : (new Date(k.yr,k.mn,0).getDate()-15))));
+    }
+
+    const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
+    const pct = tS > 0 ? (rS/tS)*100 : 0;
+
+    if(rS < tS) adaBebanShift = true;
+
+    pDetail += `🔹 *${it.replace('_',' ')}*
+Real: ${rS} / Tgt Shift: ${tS}
+${getTextBar(pct)} (${Math.round(pct)}%)
+
+${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
+
+`;
+
+});
 
         // --- 2. KUNCI ALASAN BERULANG ---
         if(adaBebanShift) {
@@ -848,7 +1005,8 @@ function bukaRapor() {
         document.body.appendChild(modal);
     }
     modal.className = 'modal-rapor';
-    modal.style.display = 'block';
+    modal.style.display='block';
+    modal.style.pointerEvents='auto';
     document.body.style.overflow = 'hidden';
     modal.innerHTML = `
         <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
