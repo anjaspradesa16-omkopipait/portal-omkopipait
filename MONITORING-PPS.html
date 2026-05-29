@@ -263,6 +263,9 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
             <button id="btnSimpanShift" class="btn-save" onclick="simpanReal()">✅ SIMPAN DATA SHIFT</button>
             <button onclick="bukaRapor()" style="width:100%; background:#8e44ad; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
             🔍 PERBESAR ANALISA KASIR
+            <button onclick="bukaRanking()"
+            style="width:100%;background:#f39c12;color:white;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;font-weight:bold;">
+            🏆 RANKING PENJUALAN
             </button>
         </div>
 
@@ -315,6 +318,262 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
             r.readAsDataURL(input.files[0]); 
         } 
     }
+
+    function tutupRanking(){
+    const modal=document.getElementById('rankingModal');
+    if(modal) modal.remove();
+}
+
+function bukaRanking(){
+
+const k=getK();
+
+const html=`
+<div class="modal-rapor" id="rankingModal"
+style="display:block;">
+
+<div class="modal-content">
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+<select id="rankItem">
+<option value="PWP">PWP</option>
+<option value="PSM">PSM</option>
+<option value="SERBA_GRATIS">SERBA GRATIS</option>
+<option value="SUGER">SUGER</option>
+<option value="CEBAN">CEBAN</option>
+</select>
+
+<select id="rankPeriode">
+
+<option value="1">
+PERIODE 1 (1-15)
+</option>
+
+<option value="2">
+PERIODE 2 (16-AKHIR)
+</option>
+
+<option value="3">
+PSM WEEK 1
+</option>
+
+<option value="4">
+PSM WEEK 2
+</option>
+
+<option value="5">
+PSM WEEK 3
+</option>
+
+<option value="6">
+PSM WEEK 4
+</option>
+
+</select>
+
+<button onclick="generateRanking()">
+TAMPILKAN
+</button>
+
+</div>
+
+<hr>
+
+<div id="rankingArea">
+Pilih Item & Periode
+</div>
+
+<button
+onclick="tutupRanking()"
+style="margin-top:10px;background:#e74c3c;color:white;">
+TUTUP
+</button>
+
+</div>
+</div>`;
+
+document.body.insertAdjacentHTML(
+'beforeend',
+html
+);
+
+document.getElementById('rankItem').onchange=function(){
+
+const p=document.getElementById('rankPeriode');
+
+if(this.value==='PSM'){
+
+p.innerHTML=`
+<option value="3">PSM WEEK 1</option>
+<option value="4">PSM WEEK 2</option>
+<option value="5">PSM WEEK 3</option>
+<option value="6">PSM WEEK 4</option>
+`;
+
+}else{
+
+p.innerHTML=`
+<option value="1">PERIODE 1 (1-15)</option>
+<option value="2">PERIODE 2 (16-AKHIR)</option>
+`;
+
+}
+
+};
+
+}
+
+function generateRanking(){
+    const k=getK();
+    const item=document.getElementById('rankItem').value;
+    const periode=document.getElementById('rankPeriode').value;
+    const dM=new Date(k.yr,k.mn,0).getDate();
+    let hasil={};
+    const kru=(document.getElementById('listKru').value||'').split(',').map(x=>x.trim()).filter(Boolean);
+    kru.forEach(n=>hasil[n]=0);
+    const harian=db[k.yr]?.[k.mn]?.[k.tk]?.harian||{};
+    for(let tgl=1;tgl<=dM;tgl++){
+        const h=harian[tgl]||{};
+        Object.keys(h).forEach(key=>{
+            if(!key.endsWith('_nama')) return;
+            const nama=h[key];
+            const dataKey=key.replace('_nama','');
+            const data=h[dataKey];
+            if(!data) return;
+            let masuk=false;
+            if(item!=="PSM"){
+                if(periode=="1" && tgl<=15) masuk=true;
+                if(periode=="2" && tgl>15) masuk=true;
+            } else{
+                const log=getLogic(tgl,'PSM',k.yr,k.mn);
+                if(periode=="3" && log.wk==1) masuk=true;
+                if(periode=="4" && log.wk==2) masuk=true;
+                if(periode=="5" && log.wk==3) masuk=true;
+                if(periode=="6" && log.wk==4) masuk=true;
+            }
+            if(masuk) hasil[nama]=(hasil[nama]||0)+(parseFloat(data[item])||0);
+        });
+    }
+    // hitung target personil
+    let targetPersonil=0;
+    if(item!=="PSM"){
+        const p=(periode=="1")?1:2;
+        const targetToko=(parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[item])||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[item])||0);
+        targetPersonil=kru.length>0?Math.ceil(targetToko/kru.length):0;
+    } else{
+        const wk=parseInt(periode)-2;
+        const targetToko=parseFloat(db[k.yr][k.mn][k.tk].target[wk]?.PSM)||0;
+        targetPersonil=kru.length>0?Math.ceil(targetToko/kru.length):0;
+    }
+    // buat array ranking
+    let arr=Object.entries(hasil).map(x=>{
+        const real=x[1];
+        const gap=Math.max(0,targetPersonil-real);
+        const pct=targetPersonil>0?(real/targetPersonil)*100:0;
+        return {nama:x[0],real,gap,pct};
+    });
+    const sortBy=document.getElementById('rankSort')?.value||'real';
+    if(sortBy==="real") arr.sort((a,b)=>b.real-a.real);
+    if(sortBy==="gap") arr.sort((a,b)=>a.gap-b.gap);
+    if(sortBy==="pct") arr.sort((a,b)=>b.pct-a.pct);
+    // hitung top/bottom/avg
+    const topNama=arr.length?arr[0].nama:"-";
+    const topReal=arr.length?arr[0].real:0;
+    const bawahNama=arr.length?arr[arr.length-1].nama:"-";
+    const bawahReal=arr.length?arr[arr.length-1].real:0;
+    const avg=arr.length?Math.round(arr.reduce((a,b)=>a+b.real,0)/arr.length):0;
+    // bikin html popup
+    let html=`<h3>🏆 RANKING ${item}</h3>
+
+<div style="background:#f8f9fa;padding:12px;border-radius:12px;margin-bottom:10px;line-height:1.8;">
+
+🏆 TOP SELLER :
+<b>${topNama}</b>
+(${topReal})
+
+<br>
+
+🚨 ZONA BAHAYA :
+<b>${bawahNama}</b>
+(${bawahReal})
+
+<br>
+
+🔥 SELISIH PEMIMPIN :
+<b>${topReal-bawahReal} PCS</b>
+
+<br>
+
+📊 RATA-RATA TIM :
+<b>${avg}</b>
+
+<br>
+
+🎯 TARGET PERSONIL :
+<b>${targetPersonil}</b>
+
+</div>`;
+
+    arr.forEach((x,i)=>{
+    const real = x.real;
+    const gap = x.gap;
+    const pct = x.pct;
+
+    // Medal/Ranking
+    const medal = i==0?"🥇":i==1?"🥈":i==2?"🥉":(i+1)+".";
+    
+
+    // STATUS kejam
+if(pct>=120)
+status="🔥 DI ATAS TARGET";
+
+else if(pct>=100)
+status="🏆 TARGET TERCAPAI";
+
+else if(pct>=80)
+status="⚠️ HAMPIR TERCAPAI";
+
+else
+status="🚨 PERLU PERCEPATAN";
+
+    // Warna GAP
+    let gapColor="#e74c3c";
+    if(gap<=20) gapColor="#27ae60";
+    else if(gap<=50) gapColor="#f1c40f";
+    else if(gap<=100) gapColor="#e67e22";
+
+    html+=`
+    <div style="margin:10px 0;padding:10px;background:#fff;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,.1);">
+        <div>${medal} <b>${x.nama}</b></div>
+        <div style="margin-top:5px;font-size:13px;">${real} / ${targetPersonil} (${Math.round(pct)}%)</div>
+        <div style="
+color:${gapColor};
+font-weight:bold;
+">
+
+🎯 GAP : ${gap}
+
+<br>
+
+🏁 TERTINGGAL DARI PEMIMPIN :
+${topReal-real} PCS
+
+<br>
+
+${status}
+
+</div>
+        <div style="height:20px;background:#eee;border-radius:10px;overflow:hidden;margin-top:5px;">
+            <div style="height:100%;width:${Math.min(100,pct)}%;background:#3498db;"></div>
+        </div>
+        <div style="margin-top:5px;font-weight:bold;font-size:14px;">${status}</div>
+        <div style="font-size:12px;color:#888;">🏁 TERTINGGAL DARI PEMIMPIN : ${topReal - real} PCS</div>
+    </div>
+    `;
+});
+    document.getElementById('rankingArea').innerHTML=html;
+}
     
     function resetBukti() { ['pBuku','pSIS'].forEach(id => { const i = document.getElementById(id); if(i) { i.style.display = 'none'; i.src = ""; i.removeAttribute('data-loaded'); } }); }
 

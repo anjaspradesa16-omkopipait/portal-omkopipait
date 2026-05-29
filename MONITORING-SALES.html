@@ -1135,210 +1135,138 @@ Object.keys(dK.harianKini).forEach(tg => {
 }
 
 function jawabAI(){
+    const q = document.getElementById("pilihanAI").value;
+    const box = document.getElementById("jawabanAI");
 
-const q=
-document.getElementById("pilihanAI").value;
+    if(!q){
+        box.style.display="block";
+        box.innerHTML="⚠️ Pilih pertanyaan terlebih dahulu";
+        return;
+    }
 
-const box=
-document.getElementById("jawabanAI");
+    const t = document.getElementById('kodeToko').value.toUpperCase();
+    const yK = document.getElementById('thnKini').value;
+    const mK = document.getElementById('blnKini').value;
+    const dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 };
 
-if(!q){
-box.style.display="block";
-box.innerHTML="⚠️ Pilih pertanyaan terlebih dahulu";
-return;
+    let total=0;
+    let tglIn = parseInt(document.getElementById('inTgl').value)||tglSkrg;
+
+    Object.keys(dK.harianKini).forEach(tg=>{
+        let x = dK.harianKini[tg];
+        if(parseInt(tg)<=tglIn){
+            total += x.total||0;
+        }
+    });
+
+    let ach = dK.target>0 ? (total/dK.target)*100 : 0;
+    let sisa = Math.max(0,new Date(yK,mK,0).getDate()-tglIn);
+    let gap = Math.max(0,dK.target-total);
+    let isi="";
+
+    if(dK.target<=0){
+        box.style.display="block";
+        box.innerHTML="⚠️ Isi target bulanan terlebih dahulu";
+        return;
+    }
+
+    switch(q){
+        case "harapan":
+            let perHari = Math.ceil(gap / Math.max(1,sisa));
+            if(ach>=95){
+                isi=`🏆 PELUANG MENANG SANGAT BESAR.
+Achievement saat ini: ${ach.toFixed(1)}%
+Masih ada ${sisa} hari kerja aktif.
+Kebutuhan sales sekitar: Rp ${perHari.toLocaleString()} per hari.
+Posisi toko sudah sangat dekat dengan target. Fokus menjaga speed sales dan konsistensi transaksi sampai closing akhir bulan.`;
+            }else if(ach>=85){
+                isi=`✅ MASIH ADA HARAPAN MENANG.
+Achievement saat ini: ${ach.toFixed(1)}%
+Masih ada ${sisa} hari kerja aktif.
+Untuk mencapai target dibutuhkan sekitar: Rp ${perHari.toLocaleString()} per hari.
+Posisi memang tertinggal, namun peluang masih terbuka. Fokus pada keranjang belanja, tebus murah, dan transaksi bernilai besar.`;
+            }else{
+                isi=`⚠️ PELUANG MASIH ADA NAMUN BERAT.
+Achievement saat ini: ${ach.toFixed(1)}%
+Masih ada ${sisa} hari kerja aktif.
+Kebutuhan sales mencapai: Rp ${perHari.toLocaleString()} per hari.
+Diperlukan percepatan sales yang cukup tinggi agar toko kembali ke jalur target.`;
+            }
+        break;
+
+        case "strategi":
+            if(ach>=90){
+                isi=`🎯 STRATEGI UTAMA SAAT INI
+• Pertahankan speed sales harian
+• Jaga GM tetap di atas target
+• Push keranjang belanja
+• Maksimalkan attach selling kasir
+• Hindari penurunan transaksi di akhir bulan
+Fokus menjaga momentum karena posisi toko sudah cukup baik.`;
+            }else if(ach>=75){
+                isi=`🎯 STRATEGI YANG HARUS DIFOKUSKAN
+• Push Tebus Murah
+• Naikkan basket size pelanggan
+• Fokus item kebutuhan harian
+• Maksimalkan transaksi member
+• Recovery jam sepi
+Target masih realistis jika speed sales meningkat pada sisa hari.`;
+            }else{
+                isi=`🚨 STRATEGI PENYELAMATAN TARGET
+• Kejar transaksi bernilai besar
+• Push seluruh program promo
+• Fokus item fast moving
+• Tingkatkan attach selling kasir
+• Recovery setiap jam operasional
+Dibutuhkan percepatan sales yang signifikan untuk mengejar target.`;
+            }
+        break;
+
+        case "prediksi":
+            let prediksi = Math.round((total/tglIn)*new Date(yK,mK,0).getDate());
+            let selisih = prediksi - dK.target;
+            if(prediksi>=dK.target){
+                isi=`📈 BERDASARKAN KECEPATAN SAAT INI
+Prediksi akhir bulan: Rp ${prediksi.toLocaleString()}
+Target: Rp ${dK.target.toLocaleString()}
+Estimasi surplus: Rp ${selisih.toLocaleString()}
+Jika ritme sales tetap terjaga, peluang menang sangat besar.`;
+            }else{
+                isi=`📊 BERDASARKAN KECEPATAN SAAT INI
+Prediksi akhir bulan: Rp ${prediksi.toLocaleString()}
+Target: Rp ${dK.target.toLocaleString()}
+Estimasi kekurangan: Rp ${Math.abs(selisih).toLocaleString()}
+Perlu percepatan sales pada sisa hari agar target dapat tercapai.`;
+            }
+        break;
+
+        case "kenapa":
+            isi=`📉 PENYEBAB BELUM MENANG IKT
+Achievement saat ini: ${ach.toFixed(1)}%
+Masih terdapat gap sales sebesar: Rp ${gap.toLocaleString()}
+Kecepatan sales masih berada di bawah progress waktu sehingga target belum berhasil dikejar.
+Fokus utama saat ini adalah meningkatkan sales harian.`;
+        break;
+
+        case "faktor":
+            isi=`🔍 FAKTOR YANG PALING MEMPENGARUHI IKT
+• Gap sales terhadap target masih tinggi
+• Achievement saat ini: ${ach.toFixed(1)}%
+• Waktu tersisa: ${sisa} hari
+• Kecepatan sales perlu ditingkatkan
+• GM saat ini bukan faktor utama
+Faktor dominan saat ini adalah pencapaian sales terhadap target bulanan.`;
+        break;
+
+        default:
+            isi="Silakan pilih pertanyaan terlebih dahulu.";
+    }
+
+    // ✅ Tambahkan ini supaya jawaban tampil
+    box.style.display = "block";
+    box.innerHTML = isi;
 }
 
-const t=
-document.getElementById('kodeToko').value.toUpperCase();
-
-const yK=
-document.getElementById('thnKini').value;
-
-const mK=
-document.getElementById('blnKini').value;
-
-const dK=
-db[t]?.[yK]?.[mK]||
-{
-target:0,
-harianKini:{},
-targetGM:0
-};
-
-let total=0;
-
-let tglIn=
-parseInt(
-document.getElementById('inTgl').value
-)||tglSkrg;
-
-Object.keys(
-dK.harianKini
-).forEach(tg=>{
-
-let x=
-dK.harianKini[tg];
-
-if(parseInt(tg)<=tglIn){
-
-total += x.total||0;
-
-}
-
-});
-
-let ach=
-dK.target>0 ?
-(total/dK.target)*100
-:0;
-
-let sisa=Math.max(
-0,
-new Date(yK,mK,0).getDate()-tglIn
-);
-
-let gap=Math.max(0,dK.target-total);
-
-let isi="";
-
-if(dK.target<=0){
-box.style.display="block";
-box.innerHTML="⚠️ Isi target bulanan terlebih dahulu";
-return;
-}
-
-switch(q){
-
-case "harapan":
-
-isi=`
-✅ MASIH ADA PELUANG.
-
-Achievement saat ini:
-${ach.toFixed(1)}%
-
-Masih ada ${sisa} hari tersisa.
-
-Untuk mengejar target dibutuhkan sekitar:
-
-Rp ${(sisa>0?Math.round(gap/sisa):0).toLocaleString()}
-
-per hari.
-
-Kondisi seperti ini belum kalah.
-Fokus minggu terakhir sangat menentukan.
-`;
-
-break;
-
-case "strategi":
-
-if(ach<50){
-
-isi=`
-🎯 Kondisi berat.
-
-Prioritas:
-
-1. Fokus transaksi besar
-2. Push tebus murah
-3. Paket hemat
-4. Kasir wajib upselling
-
-Kejar recovery.
-`;
-
-}else if(ach<80){
-
-isi=`
-🎯 Posisi menengah.
-
-1. Jaga speed
-2. Fokus item GM tinggi
-3. Naikkan basket size
-
-Peluang masih besar.
-`;
-
-}else{
-
-isi=`
-🚀 Posisi bagus.
-
-1. Pertahankan speed
-2. Jaga GM
-3. Push item margin
-
-Jangan kendor.
-`;
-
-}
-break;
-
-
-case "prediksi":
-
-isi=
-ach>80 ?
-
-`
-📈 Prediksi masih terbuka.
-
-Dengan performa sekarang peluang masih ada.
-
-Tetap jaga speed.
-`
-
-:
-
-`
-⚠️ Peluang kecil.
-
-Tetapi belum selesai.
-
-Minggu terakhir masih bisa mengubah hasil.
-`;
-
-break;
-
-case "kenapa":
-
-isi=`
-📉 Penyebab utama:
-
-Speed sales kalah terhadap progress waktu.
-
-Perlu percepatan transaksi harian.
-`;
-
-break;
-
-
-case "faktor":
-
-isi=`
-⚠️ Faktor terbesar:
-
-• Keranjang kecil
-
-• Tebus murah kurang
-
-• Margin kecil
-
-• Item non promo rendah
-
-• Nominal transaksi kecil
-`;
-
-break;
-
-}
-
-box.style.display="block";
-
-box.innerHTML=isi;
-
-}
 </script>
 </body>
 </html>
