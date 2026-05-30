@@ -484,9 +484,52 @@ function generateRanking(){
     const bawahReal=arr.length?arr[arr.length-1].real:0;
     const avg=arr.length?Math.round(arr.reduce((a,b)=>a+b.real,0)/arr.length):0;
     // bikin html popup
-    let html=`<h3>🏆 RANKING ${item}</h3>
+    let targetToko=0;
+let realToko=0;
 
-<div style="background:#f8f9fa;padding:12px;border-radius:12px;margin-bottom:10px;line-height:1.8;">
+arr.forEach(x=>realToko+=x.real);
+
+if(item!=="PSM"){
+
+    const p=(periode=="1")?1:2;
+
+    targetToko=
+    (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[item])||0)+
+    (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[item])||0);
+
+}else{
+
+    const wk=parseInt(periode)-2;
+
+    targetToko=
+    parseFloat(
+    db[k.yr][k.mn][k.tk].target[wk]?.PSM
+    )||0;
+
+}
+
+const sisaToko=
+Math.max(
+0,
+targetToko-realToko
+);
+
+const pctToko=
+targetToko>0
+?Math.round((realToko/targetToko)*100)
+:0;
+
+let html=`
+
+<h3>🏆 RANKING ${item}</h3>
+
+<div style="
+background:#f8f9fa;
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
+line-height:1.8;
+">
 
 🏆 TOP SELLER :
 <b>${topNama}</b>
@@ -505,15 +548,32 @@ function generateRanking(){
 
 <br>
 
-📊 RATA-RATA TIM :
-<b>${avg}</b>
+🏪 TARGET TOKO :
+<b>${targetToko}</b>
 
 <br>
 
-🎯 TARGET PERSONIL :
+📦 REAL TOKO :
+<b>${realToko}</b>
+
+<br>
+
+📈 PROGRESS TOKO :
+<b>${pctToko}%</b>
+
+<br>
+
+🔥 SISA TARGET TOKO :
+<b>${sisaToko} PCS</b>
+
+<br>
+
+👥 TARGET PERSONIL :
 <b>${targetPersonil}</b>
 
-</div>`;
+</div>
+
+`;
 
     arr.forEach((x,i)=>{
     const real = x.real;
@@ -546,7 +606,10 @@ status="🚨 PERLU PERCEPATAN";
     html+=`
     <div style="margin:10px 0;padding:10px;background:#fff;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,.1);">
         <div>${medal} <b>${x.nama}</b></div>
-        <div style="margin-top:5px;font-size:13px;">${real} / ${targetPersonil} (${Math.round(pct)}%)</div>
+        <div style="margin-top:5px;font-size:13px;">
+${real} / ${targetToko}
+(${Math.round((real/targetToko)*100)}%)
+</div>
         <div style="
 color:${gapColor};
 font-weight:bold;
