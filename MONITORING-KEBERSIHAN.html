@@ -389,6 +389,17 @@ document.getElementById('user-badge').innerText='Crew Store';
 
 document.getElementById('panel-kacab').classList.add('hidden');
 
+// KUNCI FILTER CREW
+document.getElementById('select-tipe-toko').disabled=true;
+document.getElementById('filter-bulan').disabled=true;
+document.getElementById('filter-tahun').disabled=true;
+
+// TAMPILKAN TANGGAL
+isiTanggalAdmin();
+
+// KUNCI TANGGAL
+document.getElementById('admin-tanggal').disabled=true;
+
 }
 
 };
@@ -558,9 +569,6 @@ initDatabasePeriodeIniLokal();
 
 function isiTanggalAdmin(){
 
-if(currentActiveUser.role!="admin")
-return;
-
 let h='';
 
 for(let i=1;i<=31;i++){
@@ -575,7 +583,9 @@ document.getElementById('admin-tanggal').innerHTML=h;
 document.getElementById('admin-tanggal').value=tgl;
 
 if(currentActiveUser.role==="admin"){
+
 window.tanggalMode=tgl;
+
 }
 
 document.getElementById('admin-tanggal').classList.remove('hidden');
@@ -1931,7 +1941,7 @@ container.appendChild(div);
         function closeFormPenarikan() { document.getElementById('modal-penarikan').classList.add('hidden'); }
         function prosesSelesaiTarik() { closeFormPenarikan(); }
 
-        
+
 async function generateLaporanWA(e){
 
 e.preventDefault();
