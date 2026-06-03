@@ -501,6 +501,18 @@ let hasil=await respon.json();
 
 console.log('DATA DRIVE:',hasil);
 
+console.log(
+'PEMBAGIAN RAK DRIVE:',
+JSON.stringify(
+hasil.pembagianRak
+)
+);
+
+console.log(
+'USER LOGIN:',
+currentActiveUser.nama.toUpperCase()
+);
+
 if(hasil.data)
 hasil=hasil.data;
 
@@ -535,7 +547,15 @@ kunciLaporanUserHariIni:{}
 globalDatabase[keyPeriode]={
 
 pembagianRak:
-databaseCloudToko.pembagianRak||{},
+databaseCloudToko.pembagianRak
+&&
+Object.keys(
+databaseCloudToko.pembagianRak
+).length
+?
+databaseCloudToko.pembagianRak
+:
+(dbLocal.pembagianRak||{}),
 
 statusRak:
 dbLocal.statusRak||{},
@@ -1356,7 +1376,16 @@ JSON.stringify(userKey)
 
 console.log(
 'KEY PEMBAGIAN:',
-Object.keys(db.pembagianRak)
+JSON.stringify(
+db.pembagianRak
+)
+);
+
+console.log(
+'RAK USER:',
+JSON.stringify(
+db.pembagianRak[userKey]
+)
 );
 
 const rakSaya=
