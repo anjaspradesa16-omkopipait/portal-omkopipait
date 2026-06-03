@@ -289,7 +289,7 @@ Belum Upload
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbyzqgunBsXtSQoFFGjN-sV3wWrNsGar4ZuadWpZH86FNvsM7F9TsUT7iK_D-MhesLyK/exec"; 
+        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbwZHic21ULJTnMu_9ftpoaGHYSifJ_ItqFj_yvC5VyQlLtJfUZZ9PIe63vINTbepYvV/exec"; 
 
 let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
 
@@ -558,16 +558,20 @@ refreshSemuaUI();
 
 catch(error){
 
-console.log('Cloud gagal:',error);
+console.log(
+'Cloud gagal:',
+error
+);
 
 initDatabasePeriodeIniLokal();
 
-databaseCloudToko=hasil||{};
+databaseCloudToko={};
 
 console.log(
-'DATA CLOUD MENTAH:',
-JSON.stringify(databaseCloudToko)
+'Fallback ke database lokal'
 );
+
+refreshSemuaUI();
 
 }
 
@@ -584,18 +588,25 @@ h+=`<option value="${i}">TGL ${i}</option>`;
 
 }
 
-const tgl=new Date().getDate();
+const tgl=
+new Date().getDate();
 
-document.getElementById('admin-tanggal').innerHTML=h;
-document.getElementById('admin-tanggal').value=tgl;
+document.getElementById(
+'admin-tanggal'
+).innerHTML=h;
 
-if(currentActiveUser.role==="admin"){
+document.getElementById(
+'admin-tanggal'
+).value=tgl;
 
+// ADMIN & CREW SAMA-SAMA PUNYA TANGGAL AKTIF
 window.tanggalMode=tgl;
 
-}
-
-document.getElementById('admin-tanggal').classList.remove('hidden');
+document.getElementById(
+'admin-tanggal'
+).classList.remove(
+'hidden'
+);
 
 }
 
