@@ -321,7 +321,19 @@ font-size:13px;
             <label>Target Total Net Sales Bulan Berjalan</label>
             <input type="number" id="targetKini" oninput="renderAll()">
             <hr>
-            <div style="display:none; gap:5px;"><select id="thnKini" onchange="loadData()"></select><select id="blnKini" onchange="loadData()"></select></div>
+            <label>Periode Aktif</label>
+
+<div style="
+display:flex;
+gap:5px;
+margin-bottom:10px;
+">
+
+<select id="thnKini" onchange="loadData()"></select>
+
+<select id="blnKini" onchange="loadData()"></select>
+
+</div>
             <label id="labelTglInput">Tanggal Input (Hari Ini: <span id="tglOto"></span>)</label>
             <input type="number" id="inTgl" oninput="cekKunci()">
             <div id="lockMsg" style="font-size:10px; font-weight:bold;"></div>
@@ -506,7 +518,7 @@ font-size:14px;
 <script>
     let db = JSON.parse(localStorage.getItem('alfaSalesPaten_v10')) || {};
     if(typeof db!=="object") db={};
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyb_Bq7X70e29P6PhbtW3Cyc_rsQiauVW9hpgsGCoOuFpEk3Tpu51k5V-DcF9Ct6i4/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwZepOIe6PmjYsxYrv-J-im8DG4E2fmOMdeWfeUscPsj-9EYUOr4T3U7Lu3vitphS4l/exec";
     const tglSkrg = new Date().getDate();
     document.getElementById('tglOto').innerText = tglSkrg;
 
@@ -550,10 +562,32 @@ font-size:14px;
 
     let t = document.getElementById('kodeToko').value.toUpperCase();
     let tgl = parseInt(document.getElementById('inTgl').value)||tglSkrg;
-    let yK = document.getElementById('thnKini').value;
-    let mK = document.getElementById('blnKini').value;
-    let yL = document.getElementById('thnLalu').value;
-    let mL = document.getElementById('blnLalu').value;
+let yK =
+Number(document.getElementById('thnKini').value);
+
+let mK =
+Number(document.getElementById('blnKini').value);
+
+let yL = yK;
+let mL = mK - 1;
+
+if(mL < 1){
+    mL = 12;
+    yL--;
+}
+
+console.log(
+"RENDER AKTIF",
+yK,
+mK,
+"ACUAN",
+yL,
+mL
+);
+
+console.log(
+db[t]?.[yL]?.[mL]
+);
     
     let targetBulanan = parseFloat(document.getElementById('targetKini').value) || 0;
     let tGM = parseFloat(document.getElementById('tgtGM').value) || 0;
@@ -592,19 +626,31 @@ accumGapMTD
 
     // 3. KIRIM PAYLOAD LENGKAP KE DRIVE (Apps Script)
     let payload = {
-        action: "save",
-        toko: t,
-        type: "KINI",
-        key: tgl,
-        target: targetBulanan,
-        gap: accumGapMTD, // <-- INI ANGKA -5 JUTA TADI, KITA KIRIM HASIL HITUNGAN MTD
-        payload: {
-            s1: inS1, s2: inS2, s3: inS3,
-            total: totalHariIni,
-            gm_persen: rGM,
-            target_gm: tGM
-        }
-    };
+    action: "save",
+
+    toko: t,
+
+    bulan: Number(mK),
+    tahun: Number(yK),
+
+    key: tgl,
+
+    target: targetBulanan,
+
+    gap: accumGapMTD,
+
+    payload: {
+        s1: inS1,
+        s2: inS2,
+        s3: inS3,
+
+        total: totalHariIni,
+
+        gm_persen: rGM,
+
+        target_gm: tGM
+    }
+};
 
     localStorage.setItem(
 'alfaSalesPaten_v10',
@@ -654,12 +700,63 @@ try {
 }
 
     function renderAll() {
-        let t = document.getElementById('kodeToko').value.toUpperCase(), tb = document.querySelector("#mainTable tbody");
-        tb.innerHTML = ""; if (!t || !db[t]) return;
-        let yK = document.getElementById('thnKini').value, mK = document.getElementById('blnKini').value, yL = document.getElementById('thnLalu').value, mL = document.getElementById('blnLalu').value;
-        let dL=db[t]?.[yL]?.[mL]||{totalLalu:0,harianLalu:{}}, dK=db[t]?.[yK]?.[mK]||{target:0,harianKini:{},targetGM:0};
-        let ak = 0, tk = 0, tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
-        
+
+    let t = document.getElementById('kodeToko').value.toUpperCase(),
+        tb = document.querySelector("#mainTable tbody");
+
+    tb.innerHTML = "";
+
+    if (!t || !db[t]) return;
+
+   let yK = Number(document.getElementById('thnKini').value);
+let mK = Number(document.getElementById('blnKini').value);
+
+let yL = yK;
+let mL = mK - 1;
+
+if(mL < 1){
+    mL = 12;
+    yL--;
+}
+
+let dL =
+db[t]?.[yL]?.[mL] ||
+{
+    totalLalu:0,
+    harianLalu:{}
+};
+
+let dK =
+db[t]?.[yK]?.[mK] ||
+{
+    target:0,
+    harianKini:{},
+    targetGM:0
+};
+
+console.log(
+"RENDER",
+"AKTIF",
+yK,
+mK,
+"ACUAN",
+yL,
+mL
+);
+
+console.log("dL", dL);
+
+    let ak = 0;
+    let tk = 0;
+
+    let hariData = Object.keys(dK.harianKini || {})
+        .filter(x => Number(x) > 0)
+        .map(Number);
+
+    let tglIn = hariData.length > 0
+        ? Math.max(...hariData)
+        : 0;
+
         // --- TANDAI: LOGIKA GEMBOK SHIFT 3 ---
         let tipe = document.getElementById('tipeToko').value;
         if (tipe === "non24") {
@@ -673,12 +770,54 @@ try {
         let totalSalesMTD = 0;
         let totalGMRpMTD = 0;
 
-        let totalHari=new Date(yK,mK,0).getDate();
-        for(let i=1;i<=totalHari;i++) {
-            let vL = dL.harianLalu[i] || 0, rK = dK.harianKini[i] || {s1:0,s2:0,s3:0,total:0,gm_persen:0};
-            let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0, tH = Math.round(pL * dK.target), dtK = new Date(yK, mK - 1, i), dtL = new Date(yL, mL - 1, i);
-            if (dtK.getMonth() !== mK - 1) continue;
-            
+let totalHari=new Date(yK,mK,0).getDate();
+
+for(let i=1;i<=totalHari;i++) {
+
+    let vL = (dL && dL.harianLalu && dL.harianLalu[i])
+        ? Number(dL.harianLalu[i])
+        : 0;
+
+    let rK = (dK && dK.harianKini && dK.harianKini[i])
+        ? dK.harianKini[i]
+        : {s1:0,s2:0,s3:0,total:0,gm_persen:0};
+
+let totalAcuan = dL.totalLalu || 0;
+
+// Jika bulan acuan lebih panjang,
+// keluarkan hari carry over dari pembagi
+let hariAcuan =
+Object.keys(dL.harianLalu || {}).length;
+
+if(hariAcuan > totalHari){
+
+    let carryOver = 0;
+
+    for(
+        let x = totalHari + 1;
+        x <= hariAcuan;
+        x++
+    ){
+        carryOver +=
+        Number(
+            dL.harianLalu[x]
+        ) || 0;
+    }
+
+    totalAcuan =
+    totalAcuan - carryOver;
+}
+
+let pL =
+totalAcuan > 0
+? (vL / totalAcuan)
+: 0;
+        tH = Math.round(pL * dK.target),
+        dtK = new Date(yK, mK - 1, i),
+        dtL = new Date(yL, mL - 1, i);
+
+    if (dtK.getMonth() !== mK - 1) continue;
+        
             let hL = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtL.getDay()], hK = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtK.getDay()], jK = [0, 5, 6].includes(dtK.getDay()), jL = [0, 5, 6].includes(dtL.getDay());
             
              // Logika Sales (Tetap)
@@ -699,6 +838,54 @@ try {
 ${ak.toLocaleString()}
 </td></tr>`;
         }
+
+// TAMPILKAN HARI LEBIH DARI BULAN ACUAN
+let hariAcuan =
+Object.keys(dL.harianLalu || {}).length;
+
+if(hariAcuan > totalHari){
+
+    for(
+        let x = totalHari + 1;
+        x <= hariAcuan;
+        x++
+    ){
+
+        let vExtra =
+        Number(
+            dL.harianLalu[x]
+        ) || 0;
+
+        tb.innerHTML += `
+        <tr style="
+            background:#fff8dc;
+            font-weight:bold;
+        ">
+            <td>${x}*</td>
+            <td colspan="2">
+                Carry Over Bulan Lalu
+            </td>
+            <td>
+                ${vExtra.toLocaleString()}
+            </td>
+            <td>
+                -
+            </td>
+            <td>
+                -
+            </td>
+            <td>
+                -
+            </td>
+            <td>
+                -
+            </td>
+            <td>
+                -
+            </td>
+        </tr>`;
+    }
+}
 
         // --- RUMUS DASHBOARD (MTD - MONTH TO DATE) ---
         let aB = dK.target > 0 ? ((tk / dK.target) * 100) : 0;
@@ -739,42 +926,89 @@ GAP: Rp ${gapSales.toLocaleString()}
                     <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${Math.round(actGMRp_MTD).toLocaleString()}</b><br>TGT MTD: Rp ${Math.round(tgtGMRp_MTD).toLocaleString()}<br><span style="color:${gapGMRp_MTD>=0?'green':'red'}">GAP: Rp ${Math.round(gapGMRp_MTD).toLocaleString()}</span></div>
                 </div>
             </div>
-        `;
+`;
         updateAIPrediction(); // Pindahkan ke sini (di luar tanda kutip backtick)
-    }
-
-    async function tarikDataCloud() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        if (!t) return;
-        try {
-            let res = await fetch(`${scriptURL}?action=get&toko=${t}`);
-            let cloudData = await res.json();
-            if (cloudData.status === "success") {
-                let yK = document.getElementById('thnKini').value, mK = document.getElementById('blnKini').value;
-                if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {};
-                if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
-
-                db[t][yK][mK].target = cloudData.data.target || 0;
-                db[t][yK][mK].targetGM = cloudData.data.targetGM || 0;
-
-                if (cloudData.data.harianKini) {
-                Object.keys(cloudData.data.harianKini).forEach(tgl => {
-                let dataTgl = cloudData.data.harianKini[tgl];
-                db[t][yK][mK].harianKini[tgl] = {
-                s1: dataTgl.s1 || 0, s2: dataTgl.s2 || 0, s3: dataTgl.s3 || 0,
-                total: dataTgl.total || 0,
-            gm_persen: dataTgl.gm_persen || 0
-        };
-    });
 }
-let yL=document.getElementById('thnLalu').value, mL=document.getElementById('blnLalu').value; if(cloudData.data.harianLalu){ if(!db[t][yL]) db[t][yL]={}; if(!db[t][yL][mL]) db[t][yL][mL]={totalLalu:0,harianLalu:{}}; db[t][yL][mL].totalLalu=cloudData.data.totalLalu||0; db[t][yL][mL].harianLalu=cloudData.data.harianLalu||{}; }
-                localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
-                document.getElementById('targetKini').value = db[t][yK][mK].target || "";
-                document.getElementById('tgtGM').value = db[t][yK][mK].targetGM || "";
-                renderAll();
-            }
-        } catch (e) { console.log("Gagal Sinkron: " + e); }
-    }
+
+async function tarikDataCloud() {
+
+let t = document.getElementById('kodeToko').value.toUpperCase();
+if (!t) return;
+
+let bulan = Number(document.getElementById('blnKini').value);
+let tahun = Number(document.getElementById('thnKini').value);
+
+let res = await fetch(
+    `${scriptURL}?action=get&toko=${t}&bulan=${bulan}&tahun=${tahun}`
+);
+
+let cloudData = await res.json();
+
+if (cloudData.status !== "success") return;
+
+if (!db[t]) db[t] = {};
+if (!db[t][tahun]) db[t][tahun] = {};
+
+db[t][tahun][bulan] = {
+    target: cloudData.data.target || 0,
+    targetGM: cloudData.data.targetGM || 0,
+    harianKini: {}
+};
+
+if (cloudData.data.harianKini) {
+
+    Object.keys(cloudData.data.harianKini).forEach(tgl => {
+
+        let d = cloudData.data.harianKini[tgl];
+
+        db[t][tahun][bulan].harianKini[tgl] = {
+            s1: Number(d.s1) || 0,
+            s2: Number(d.s2) || 0,
+            s3: Number(d.s3) || 0,
+            total: Number(d.total) || 0,
+            gm_persen: Number(d.gm_persen) || 0
+        };
+
+    });
+
+}
+
+let mL = bulan - 1;
+let yL = tahun;
+
+if (mL < 1) {
+    mL = 12;
+    yL--;
+}
+
+if (!db[t][yL]) db[t][yL] = {};
+
+db[t][yL][mL] = db[t][yL][mL] || {};
+
+db[t][yL][mL].totalLalu =
+    Number(cloudData.data.totalLalu) || 0;
+
+db[t][yL][mL].harianLalu =
+    cloudData.data.harianLalu || {};
+
+console.log(
+"SIMPAN LALU KE",
+yL,
+mL
+);
+
+console.log(
+cloudData.data.harianLalu
+);
+
+localStorage.setItem(
+    'alfaSalesPaten_v10',
+    JSON.stringify(db)
+);
+
+
+}
+
 
     window.onload = async function() {
         const ses = JSON.parse(sessionStorage.getItem("userArea"));
@@ -796,33 +1030,54 @@ let yL=document.getElementById('thnLalu').value, mL=document.getElementById('bln
         cekKunci();
     };
 
-async function loadData(){
+async function loadData() {
 
-let t=document.getElementById('kodeToko').value.toUpperCase();
-if(!t)return;
+    console.log(
+        "LOAD DATA",
+        document.getElementById('thnKini').value,
+        document.getElementById('blnKini').value
+    );
 
-let yK=document.getElementById('thnKini').value;
-let mK=document.getElementById('blnKini').value;
+    let t = document.getElementById('kodeToko').value.toUpperCase();
+    if(!t) return;
 
-if(db[t]?.[yK]?.[mK]){
+    let yK = document.getElementById('thnKini').value;
+    let mK = document.getElementById('blnKini').value;
 
-document.getElementById('targetKini').value=
-db[t][yK][mK].target||"";
+    await tarikDataCloud();
 
-document.getElementById('tgtGM').value=
-db[t][yK][mK].targetGM||"";
+    if(!db[t]) db[t] = {};
+    if(!db[t][yK]) db[t][yK] = {};
 
-document.getElementById('totalLalu').value=
-db[t]?.[document.getElementById('thnLalu').value]?.[document.getElementById('blnLalu').value]?.totalLalu||"";
+    if(!db[t][yK][mK]){
+        db[t][yK][mK] = {
+            target:0,
+            harianKini:{},
+            targetGM:0
+        };
+    }
 
-}
+    document.getElementById('targetKini').value =
+        db[t][yK][mK].target || "";
 
-await tarikDataCloud();
+    document.getElementById('tgtGM').value =
+        db[t][yK][mK].targetGM || "";
 
-renderAll();
+    let yL = Number(yK);
+    let mL = Number(mK) - 1;
 
-cekKunci();
+    if(mL < 1){
+        mL = 12;
+        yL--;
+    }
 
+    document.getElementById('totalLalu').value =
+        db[t]?.[yL]?.[mL]?.totalLalu || "";
+
+    renderAll();
+    updateShiftList();
+    updateAIPrediction();
+    cekKunci();
 }
 
     function save() { localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); renderAll(); }
@@ -951,7 +1206,25 @@ alert("✅ Histori tersimpan");
     const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
     
     // Hitung Data MTD
-    let tglIn=parseInt(document.getElementById('inTgl').value)||tglSkrg;
+let hariData =
+Object.keys(dK.harianKini)
+.filter(x =>
+    dK.harianKini[x] &&
+    dK.harianKini[x].total > 0
+)
+.map(Number);
+
+let tglIn =
+hariData.length > 0
+?
+Math.max(...hariData)
+:
+0;
+
+console.log(
+"AI tglIn =",
+tglIn
+);
 
 let tk = 0;
 let tgmMTD = 0;
@@ -960,7 +1233,11 @@ Object.keys(dK.harianKini).forEach(tg => {
 
     let data = dK.harianKini[tg];
 
-    if(parseInt(tg)<=tglIn && data.total>0){
+    if(
+        parseInt(tg) <= tglIn &&
+        data &&
+        data.total > 0
+    ){
 
         tk += data.total;
 
@@ -970,6 +1247,23 @@ Object.keys(dK.harianKini).forEach(tg => {
     }
 
 });
+
+console.log("AI BULAN", yK, mK);
+console.log("dK", dK);
+console.log(
+"TOTAL HARIAN",
+Object.keys(dK.harianKini)
+);
+
+console.log(
+"TARGET",
+dK.target
+);
+
+console.log(
+"TARGET GM",
+dK.targetGM
+);
 
     let aB = dK.target > 0 ? (tk / dK.target * 100) : 0;
     let rGM = tk > 0 ? (tgmMTD / tk * 100) : 0;
@@ -1147,99 +1441,84 @@ modal.style.display="none";
 
 function updateAIPrediction() {
     const t = document.getElementById('kodeToko').value.toUpperCase();
-    const yK = document.getElementById('thnKini').value;
-    const mK = document.getElementById('blnKini').value;
+    const yK = Number(document.getElementById('thnKini').value);
+    const mK = Number(document.getElementById('blnKini').value);
     const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
-    
-    let tglIn=parseInt(document.getElementById('inTgl').value)||tglSkrg;
 
-let tk = 0;
-let tgmMTD = 0;
-
-Object.keys(dK.harianKini).forEach(tg => {
-
-    let data = dK.harianKini[tg];
-
-    if(parseInt(tg)<=tglIn && data.total>0){
-
-        tk += data.total;
-
-        tgmMTD +=
-        (data.total*(data.gm_persen/100));
-
+    // Tentukan tglIn sesuai bulan
+    let tglIn;
+    const now = new Date();
+    if (yK === now.getFullYear() && mK === (now.getMonth()+1)) {
+        // Bulan berjalan
+        tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
+    } else {
+        // Bulan lalu / histori
+        let hariData = Object.keys(dK.harianKini || {})
+            .filter(x => !isNaN(x))
+            .map(Number);
+        tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
     }
 
-});
+    let tk = 0, tgmMTD = 0;
+    Object.keys(dK.harianKini || {}).forEach(tg => {
+        if(isNaN(tg)) return;
+        const data = dK.harianKini[tg];
+        if(data && data.total > 0){
+            tk += Number(data.total) || 0;
+            tgmMTD += (Number(data.total) || 0) * ((Number(data.gm_persen) || 0)/100);
+        }
+    });
 
-    let aB = dK.target > 0 ? (tk / dK.target) * 100 : 0;
-    let jmlH = new Date(yK, mK, 0).getDate();
-    let tfP = (tglIn/jmlH)*100;
-    let rGM_MTD = tk > 0 ? (tgmMTD / tk) * 100 : 0;
-    let gapGMRp = 
-    tgmMTD - (tk * (dK.targetGM / 100));
+    const aB = dK.target > 0 ? (tk / dK.target) * 100 : 0;
+    const jmlH = new Date(yK, mK, 0).getDate();
+    const tfP = jmlH > 0 ? (tglIn/jmlH)*100 : 0;
+    const rGM_MTD = tk > 0 ? (tgmMTD / tk) * 100 : 0;
+    const gapGMRp = tgmMTD - (tk * (dK.targetGM/100));
 
-    let status = ""; let warna = ""; let saran = "";
+    let status = "", warna = "", saran = "";
 
-    // LOGIKA PREDIKSI IKT DASHBOARD
+    if(aB >= 100 && rGM_MTD >= dK.targetGM){
+        status = "🏆 TARGET IKT TERCAPAI";
+        warna = "#27ae60";
+        saran =
+            "✅ Sales mencapai target<br>" +
+            "✅ GM% mencapai target<br>" +
+            "✅ GM Rupiah aman<br><br>" +
+            "Seluruh indikator utama IKT telah terpenuhi. Tinggal menunggu hasil perhitungan Net Profit dari sistem pusat.";
+    } else if(aB >= 100 && gapGMRp > 0){
+        status = "🥇 TINGGAL MENUNGGU NET PROFIT";
+        warna = "#f1c40f";
+        saran =
+            "✅ Sales mencapai target<br>" +
+            "✅ GM Rupiah surplus<br><br>" +
+            "GM% belum mencapai target namun masih tertolong GM Rupiah. Hasil akhir akan ditentukan oleh Net Profit.";
+    } else if(aB >= 95 && gapGMRp > 0){
+        status = "🟢 BERPELUANG BESAR MENANG IKT";
+        warna = "#27ae60";
+        saran =
+            "✅ GM% aman<br>" +
+            "✅ GM Rupiah surplus<br>" +
+            "✅ Posisi toko kompetitif<br><br>" +
+            "Tutup kekurangan sales Rp " + Math.abs(dK.target - tk).toLocaleString() +
+            " sebelum closing. Jika target sales tercapai maka peluang menang IKT sangat besar.";
+    } else if(aB >= 90){
+        status = "🟡 MASIH BISA DIKEJAR";
+        warna = "#f39c12";
+        saran =
+            "Achievement masih cukup baik namun belum aman. Fokus percepatan transaksi, basket size, dan program promo untuk mengejar target.";
+    } else {
+        status = "🔴 TERANCAM GAGAL IKT";
+        warna = "#e74c3c";
+        saran =
+            "Gap sales masih cukup besar. Dibutuhkan recovery signifikan melalui transaksi besar, keranjang belanja, dan tebus murah.";
+    }
 
-if (aB >= 100 && rGM_MTD >= dK.targetGM) {
-
-    status = "🏆 TARGET IKT TERCAPAI";
-    warna = "#27ae60";
-
-    saran =
-    "✅ Sales mencapai target<br>" +
-    "✅ GM% mencapai target<br>" +
-    "✅ GM Rupiah aman<br><br>" +
-    "Seluruh indikator utama IKT telah terpenuhi. Tinggal menunggu hasil perhitungan Net Profit dari sistem pusat.";
-
-} else if (aB >= 100 && gapGMRp > 0) {
-
-    status = "🥇 TINGGAL MENUNGGU NET PROFIT";
-    warna = "#f1c40f";
-
-    saran =
-    "✅ Sales mencapai target<br>" +
-    "✅ GM Rupiah surplus<br><br>" +
-    "GM% belum mencapai target namun masih tertolong GM Rupiah. Hasil akhir akan ditentukan oleh Net Profit.";
-
-} else if (aB >= 95 && gapGMRp > 0) {
-
-    status = "🟢 BERPELUANG BESAR MENANG IKT";
-    warna = "#27ae60";
-
-    saran =
-    "✅ GM% aman<br>" +
-    "✅ GM Rupiah surplus<br>" +
-    "✅ Posisi toko kompetitif<br><br>" +
-    "Tutup kekurangan sales Rp " +
-    Math.abs(dK.target - tk).toLocaleString() +
-    " sebelum closing. Jika target sales tercapai maka peluang menang IKT sangat besar.";
-
-} else if (aB >= 90) {
-
-    status = "🟡 MASIH BISA DIKEJAR";
-    warna = "#f39c12";
-
-    saran =
-    "Achievement masih cukup baik namun belum aman. Fokus percepatan transaksi, basket size, dan program promo untuk mengejar target.";
-
-} else {
-
-    status = "🔴 TERANCAM GAGAL IKT";
-    warna = "#e74c3c";
-
-    saran =
-    "Gap sales masih cukup besar. Dibutuhkan recovery signifikan melalui transaksi besar, keranjang belanja, dan tebus murah.";
-
-}
-
-    // PENGISIAN KE HTML (DENGAN PENGECEKAN AGAR TIDAK ERROR)
+    // Render ke HTML (Dashboard & Pop Up)
     const stEl = document.getElementById('aiStatusIKT');
     const ntEl = document.getElementById('aiNote');
     const tgEl = document.getElementById('aiTargetKejar');
 
-    if (stEl && ntEl && tgEl) {
+    if(stEl && ntEl && tgEl){
         stEl.innerHTML = status;
         stEl.style.color = warna;
         ntEl.innerHTML = "Sales: " + aB.toFixed(1) + "% | Waktu: " + tfP.toFixed(1) + "% | GM: " + rGM_MTD.toFixed(2) + "%";
