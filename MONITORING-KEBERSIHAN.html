@@ -499,7 +499,13 @@ throw new Error('Koneksi gagal');
 
 let hasil=await respon.json();
 
-console.log('DATA DRIVE:',hasil);
+console.log(
+JSON.stringify(
+hasil,
+null,
+2
+)
+);
 
 console.log(
 'PEMBAGIAN RAK DRIVE:',
