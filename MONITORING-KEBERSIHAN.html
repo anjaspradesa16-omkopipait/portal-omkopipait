@@ -576,7 +576,14 @@ dbLocal.kunciLaporanUserHariIni||{}
 
 console.log('SETELAH PARSING:',globalDatabase[keyPeriode]);
 
-renderNotifikasiAlarmRH(databaseCloudToko.listActiveRH||[]);
+console.log(
+'JUMLAH RH DARI CLOUD =',
+(databaseCloudToko.listActiveRH||[]).length
+);
+
+renderNotifikasiAlarmRH(
+databaseCloudToko.listActiveRH||[]
+);
 
 refreshSemuaUI();
 
@@ -688,8 +695,15 @@ const s=Math.ceil(
 (expDate-today)/86400000
 );
 
-if(s>parseInt(item.kategori))
-return;
+console.log(
+'TEST RH',
+item.barang,
+s,
+item.kategori
+);
+
+// if(s>parseInt(item.kategori))
+// return;
 
 const d=document.createElement('div');
 
