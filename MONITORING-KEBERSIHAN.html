@@ -289,7 +289,7 @@ Belum Upload
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbzcZThnk3Y9s1TadvawYL57szVR0Y9xf2zOqwin8KQxW6vbALlXIx8QP7t434J9vUVi/exec"; 
+        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbxiRn0OR4ODhWJkJmnOLd9fVFh-4H47q3lGBqkmVVO-1G5A-vFfDXODp6jrAeHqLWzw/exec"; 
 
 let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
 
@@ -713,38 +713,31 @@ d.innerHTML=
 
 '<div class="overflow-hidden">'+
 
-'<span class="bg-red-600 text-white text-[8px] px-1 py-0.2 rounded font-black mr-1 uppercase">'+
+'<div class="font-black text-red-700">'+
+'🚨 '+item.barang+
+'</div>'+
 
+'<div class="text-[10px]">'+
+'Rak : '+item.rak+
+'</div>'+
 
-(
-item.periodeAsal
-&&
-item.periodeAsal===keyPeriode
-)
-?
-'Berjalan'
-:
-'Sisa Bulan Lalu'
+'<div class="text-[10px]">'+
+'Qty : '+item.qty+
+'</div>'+
 
-+'</span> '+
+'<div class="text-[10px]">'+
+'PIC : '+item.crew+
+'</div>'+
 
-'<b>[Rak '+item.rak+']</b> '+
+'<div class="text-[10px] text-red-600">'+
+'EXP : '+new Date(item.exp).toLocaleDateString('id-ID')+
+'</div>'+
 
-'<span class="text-gray-900 font-bold uppercase truncate">'+
+'</div>'+
 
-item.barang+
-
-'</span> '+
-
-'('+item.qty+' Pcs) - '+
-
-'<span class="text-red-500 font-bold">EXP: '+
-
-item.exp+
-
-'</span></div>'+
-
-'<button type="button" onclick="eksekusiTarikBarangFisikRH('+item.rowId+')" class="bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded shrink-0">TARIK</button>';
+'<button type="button" onclick="eksekusiTarikBarangFisikRH('+item.rowId+')" class="bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded shrink-0">'+
+'TARIK'+
+'</button>';
 
 c.appendChild(d);
 
