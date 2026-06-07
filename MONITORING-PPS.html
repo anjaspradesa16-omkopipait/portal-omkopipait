@@ -575,33 +575,69 @@ line-height:1.8;
 
 `;
 
-    arr.forEach((x,i)=>{
-    const real = x.real;
-    const gap = x.gap;
-    const pct = x.pct;
+arr.forEach((x,i)=>{
+
+const real = x.real;
+
+const pct =
+targetToko>0
+? (real/targetToko)*100
+: 0;
+
+const gap =
+Math.max(
+0,
+targetToko-real
+);
 
     // Medal/Ranking
     const medal = i==0?"🥇":i==1?"🥈":i==2?"🥉":(i+1)+".";
     
 
     // STATUS kejam
-if(pct>=120)
-status="🔥 DI ATAS TARGET";
+if(pct>=100){
 
-else if(pct>=100)
-status="🏆 TARGET TERCAPAI";
+    status="🏆 TARGET TOKO DILIBAS";
 
-else if(pct>=80)
-status="⚠️ HAMPIR TERCAPAI";
+}
+else if(pct>=75){
 
-else
-status="🚨 PERLU PERCEPATAN";
+    status="🔥 SIAP NAIK PODIUM";
+
+}
+else if(pct>=50){
+
+    status="⚡ MASIH ADA HARAPAN";
+
+}
+else if(pct>=25){
+
+    status="🚨 TERTINGGAL JAUH";
+
+}
+else{
+
+    status="💀 KONTRIBUSI MINIM";
+
+}
 
     // Warna GAP
-    let gapColor="#e74c3c";
-    if(gap<=20) gapColor="#27ae60";
-    else if(gap<=50) gapColor="#f1c40f";
-    else if(gap<=100) gapColor="#e67e22";
+let gapColor="#c0392b";
+
+if(pct>=100)
+gapColor="#27ae60";
+
+else if(pct>=75)
+gapColor="#3498db";
+
+else if(pct>=50)
+gapColor="#f39c12";
+
+else if(pct>=25)
+gapColor="#e67e22";
+
+else
+gapColor="#c0392b";
 
     html+=`
     <div style="margin:10px 0;padding:10px;background:#fff;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,.1);">
