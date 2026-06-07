@@ -1140,7 +1140,7 @@ info.innerHTML=
             }
         }
 
-        async function prosesGabungFotoOtomatis(){
+async function prosesGabungFotoOtomatis(){
 
 const fileRak=semuaFotoRak;
 const fileFull=document.getElementById('file-full').files;
@@ -1163,23 +1163,22 @@ const canvas=document.createElement('canvas');
 const ctx=canvas.getContext('2d');
 
 canvas.width=1200;
-canvas.height=1400;
+canvas.height=1600;
 
-ctx.fillStyle="#fff";
-ctx.fillRect(0,0,1200,1400);
+ctx.fillStyle="#ffffff";
+ctx.fillRect(0,0,1200,1600);
 
-const load=(f)=>new Promise(r=>{
+const load=(f)=>new Promise(resolve=>{
 
 const img=new Image();
 
-const url=
-URL.createObjectURL(f);
+const url=URL.createObjectURL(f);
 
 img.onload=()=>{
 
 URL.revokeObjectURL(url);
 
-r(img);
+resolve(img);
 
 };
 
@@ -1191,29 +1190,101 @@ try{
 
 const full=await load(fileFull[0]);
 
-ctx.drawImage(full,20,20,1160,650);
+ctx.drawImage(
+full,
+20,
+20,
+1160,
+700
+);
 
-let x=20;
+const checklist=await load(fotoChecklist[0]);
+
+ctx.drawImage(
+checklist,
+20,
+740,
+550,
+500
+);
 
 for(let i=0;i<5;i++){
 
 const img=await load(fileRak[i]);
 
-ctx.drawImage(img,x,700,215,300);
+let x=0;
+let y=0;
+let w=280;
+let h=240;
 
-ctx.fillStyle="#fff";
+if(i===0){
+x=600;
+y=740;
+}
+
+if(i===1){
+x=900;
+y=740;
+}
+
+if(i===2){
+x=600;
+y=1000;
+}
+
+if(i===3){
+x=900;
+y=1000;
+}
+
+if(i===4){
+x=600;
+y=1260;
+w=580;
+}
+
+ctx.drawImage(
+img,
+x,
+y,
+w,
+h
+);
+
+ctx.fillStyle="#000";
 ctx.font="bold 16px Arial";
-ctx.fillText(`Rak ${i+1}`,x+15,990);
-
-x+=235;
+ctx.fillText(
+"RAK "+(i+1),
+x+10,
+y-10
+);
 
 }
 
+ctx.fillStyle="#000";
+ctx.font="bold 20px Arial";
+
+ctx.fillText(
+"FULL DISPLAY TOKO",
+30,
+15
+);
+
+ctx.fillText(
+"BUKU CHECKLIST",
+20,
+730
+);
+
 const a=document.createElement('a');
 
-a.href=canvas.toDataURL('image/jpeg',0.8);
+a.href=canvas.toDataURL(
+'image/jpeg',
+0.85
+);
 
-a.download=`LAPORAN_${new Date().getDate()}.jpg`;
+a.download=
+`LAPORAN_${new Date().getDate()}.jpg`;
 
 a.click();
 
