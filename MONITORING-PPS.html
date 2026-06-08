@@ -103,6 +103,25 @@ input, select, textarea, button, input[type=file]{
 
 }
 
+@keyframes pulseDanger{
+
+0%{
+transform:scale(1);
+box-shadow:0 0 5px red;
+}
+
+50%{
+transform:scale(1.02);
+box-shadow:0 0 25px red;
+}
+
+100%{
+transform:scale(1);
+box-shadow:0 0 5px red;
+}
+
+}
+
         .card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; display: flex; flex-direction: column; }
         h3 { margin-top: 0; color: #8e44ad; font-size: 13px; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; }
         label { display: block; font-size: 11px; font-weight: bold; margin-top: 8px; color: #666; }
@@ -263,6 +282,30 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
             <button id="btnSimpanShift" class="btn-save" onclick="simpanReal()">✅ SIMPAN DATA SHIFT</button>
             <button onclick="bukaRapor()" style="width:100%; background:#8e44ad; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
             🔍 PERBESAR ANALISA KASIR
+            <button onclick="bukaAkumulasi()"
+style="width:100%;
+background:#16a085;
+color:white;
+padding:12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+margin-top:10px;
+font-weight:bold;">
+📊 LIHAT AKUMULASI TOKO
+</button>
+<button onclick="bukaVSBulan()"
+style="width:100%;
+background:#2980b9;
+color:white;
+padding:12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+margin-top:10px;
+font-weight:bold;">
+📈 VS BULAN LALU
+</button>
             <button onclick="bukaRanking()"
             style="width:100%;background:#f39c12;color:white;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;font-weight:bold;">
             🏆 RANKING PENJUALAN
@@ -275,8 +318,13 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
             <div id="labelWarning" class="warning-label"></div>
             <textarea id="noteWA" placeholder="Alasan jika item tidak target..." rows="2" style="margin-top:5px;"></textarea>
             <hr>
-            <div id="akumulasiArea"></div>
-            <div id="raporArea" style="margin-top:10px; background:#f0f3f4; padding:10px; border-radius:10px; overflow-y: auto; max-height: 400px;"></div>
+
+<div id="alertKasirArea"></div>
+
+<div id="vsBulanArea" hidden></div>
+<div id="akumulasiArea" hidden></div>
+<div id="raporArea" hidden></div>
+
             <a id="manualWA" target="_blank" href="#">⚠️ WA TIDAK TERBUKA? KLIK SINI</a>
         </div>
     </div>
@@ -297,7 +345,7 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbx-SbUWJNnopMWqThRUGLgS1w2RvVG4LyQsTn-bYoWskEmrPvax6qGHhD4bjy9-WFUUIg/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbx7ig6HmET2v2cJpK6EncYweZ6voyo9nmmLBlz9_6RHvuWIBSrLc7skmgGq55PBPTMRLw/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -422,6 +470,82 @@ p.innerHTML=`
 
 };
 
+}
+
+function tutupAkumulasi() {
+    const modal = document.getElementById('modalAkumulasi');
+    if(modal){
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+}
+
+function bukaAkumulasi() {
+    const areaAsli = document.getElementById('akumulasiArea');
+    if(!areaAsli) return;
+
+    let modal = document.getElementById('modalAkumulasi');
+    if(!modal){
+        modal = document.createElement('div');
+        modal.id = 'modalAkumulasi';
+        document.body.appendChild(modal);
+    }
+
+    modal.className = 'modal-rapor';
+    modal.style.display = 'block';
+    modal.style.pointerEvents = 'auto';
+    document.body.style.overflow = 'hidden';
+
+    modal.innerHTML = `
+        <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
+                <b style="font-size:18px;">📊 AKUMULASI TOKO</b>
+                <span onclick="tutupAkumulasi()" style="font-size:30px; cursor:pointer;">&times;</span>
+            </div>
+            <div style="padding:15px;">${areaAsli.innerHTML}</div>
+            <div style="padding:15px; border-top:1px solid #ddd; text-align:center;">
+                <button onclick="tutupAkumulasi()" style="width:100%; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">TUTUP</button>
+            </div>
+        </div>
+    `;
+}
+
+function tutupVSBulan(){
+    const modal=document.getElementById('modalVSBulan');
+    if(modal){
+        modal.style.display='none';
+        document.body.style.overflow='auto';
+    }
+}
+
+function bukaVSBulan(){
+
+    const area=document.getElementById('vsBulanArea');
+    if(!area) return;
+
+    let modal=document.getElementById('modalVSBulan');
+
+    if(!modal){
+        modal=document.createElement('div');
+        modal.id='modalVSBulan';
+        document.body.appendChild(modal);
+    }
+
+    modal.className='modal-rapor';
+    modal.style.display='block';
+
+    modal.innerHTML=`
+    <div class="modal-content">
+
+        <span class="btn-tutup"
+        onclick="tutupVSBulan()">
+        ×
+        </span>
+
+        ${area.innerHTML}
+
+    </div>
+    `;
 }
 
 function generateRanking(){
@@ -955,11 +1079,40 @@ ${status}
         fetch(`${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}`)
         .then(res => res.json())
         .then(data => {
+console.log("DATA CLOUD", data);
+console.log("BULAN LALU DARI CLOUD", data.bulanLalu);
             if(data && data.target) {
-                db[k.yr][k.mn][k.tk].target = data.target;
-                db[k.yr][k.mn][k.tk].harian = data.harian || {};
-                db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
-                db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+db[k.yr][k.mn][k.tk].target = data.target;
+db[k.yr][k.mn][k.tk].harian = data.harian || {};
+db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
+db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+
+db[k.yr][k.mn][k.tk].bulanLalu =
+data.bulanLalu || {};
+
+db[k.yr][k.mn][k.tk].bulanLaluDetail =
+data.bulanLaluDetail || {};
+
+db[k.yr][k.mn][k.tk].bulanLaluKasir =
+data.bulanLaluKasir || {};
+
+db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni =
+data.bulanLaluSampaiHariIni || {};
+
+console.log(
+"BULAN LALU KASIR",
+data.bulanLaluKasir
+);
+
+console.log(
+"BULAN LALU MTD",
+data.bulanLaluSampaiHariIni
+);
+
+console.log(
+"DETAIL BULAN LALU",
+data.bulanLaluDetail
+);
                 localStorage.setItem('dbPPS_v30', JSON.stringify(db));
                 document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
                 document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
@@ -969,6 +1122,11 @@ ${status}
                 updateUI();
             }
         }).catch(e => console.log("Cloud Pull Error"));
+
+        console.log(
+"DATA BULAN LALU",
+db[k.yr][k.mn][k.tk].bulanLalu
+);
     }
 
     function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
@@ -1065,6 +1223,424 @@ ${status}
             body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
         }
 
+let bulanLaluDetail =
+db[k.yr]?.[k.mn]?.[k.tk]?.bulanLaluDetail || {};
+
+let bulanIniDetail = {
+
+PWP_P1:0,
+PWP_P2:0,
+
+SERBA_P1:0,
+SERBA_P2:0,
+
+SUGER_P1:0,
+SUGER_P2:0,
+
+CEBAN_P1:0,
+CEBAN_P2:0,
+
+PSM_W1:0,
+PSM_W2:0,
+PSM_W3:0,
+PSM_W4:0
+
+};
+
+for(let tgl=1; tgl<=dM; tgl++){
+
+  const h = harianData[tgl] || {};
+
+  Object.keys(h).forEach(key=>{
+
+    if(
+      key.endsWith('_nama') ||
+      key.endsWith('_note') ||
+      key.endsWith('_jam')
+    ) return;
+
+    const row = h[key];
+
+    const pwp   = parseFloat(row.PWP)||0;
+    const psm   = parseFloat(row.PSM)||0;
+    const serba = parseFloat(row.SERBA_GRATIS)||0;
+    const suger = parseFloat(row.SUGER)||0;
+    const ceban = parseFloat(row.CEBAN)||0;
+
+    if(tgl<=15){
+
+      bulanIniDetail.PWP_P1 += pwp;
+      bulanIniDetail.SERBA_P1 += serba;
+      bulanIniDetail.SUGER_P1 += suger;
+      bulanIniDetail.CEBAN_P1 += ceban;
+
+    }else{
+
+      bulanIniDetail.PWP_P2 += pwp;
+      bulanIniDetail.SERBA_P2 += serba;
+      bulanIniDetail.SUGER_P2 += suger;
+      bulanIniDetail.CEBAN_P2 += ceban;
+
+    }
+
+    if(tgl<=7){
+
+      bulanIniDetail.PSM_W1 += psm;
+
+    }else if(tgl<=15){
+
+      bulanIniDetail.PSM_W2 += psm;
+
+    }else if(tgl<=23){
+
+      bulanIniDetail.PSM_W3 += psm;
+
+    }else{
+
+      bulanIniDetail.PSM_W4 += psm;
+
+    }
+
+  });
+
+}
+let targetVS = {
+
+PWP_P1:
+(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PWP)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PWP)||0),
+
+PWP_P2:
+(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PWP)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PWP)||0),
+
+SERBA_P1:
+(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SERBA_GRATIS)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SERBA_GRATIS)||0),
+
+SERBA_P2:
+(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SERBA_GRATIS)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SERBA_GRATIS)||0),
+
+SUGER_P1:
+(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SUGER)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SUGER)||0),
+
+SUGER_P2:
+(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SUGER)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SUGER)||0),
+
+CEBAN_P1:
+(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.CEBAN)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.CEBAN)||0),
+
+CEBAN_P2:
+(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.CEBAN)||0)+
+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.CEBAN)||0),
+
+PSM_W1:
+parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PSM)||0,
+
+PSM_W2:
+parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PSM)||0,
+
+PSM_W3:
+parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PSM)||0,
+
+PSM_W4:
+parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PSM)||0
+
+};
+
+let rankingVS = [
+
+{
+nama:"PWP P1",
+trend: pctGrowth(
+bulanIniDetail.PWP_P1,
+bulanLaluDetail.PWP_P1
+)
+},
+
+{
+nama:"PWP P2",
+trend: pctGrowth(
+bulanIniDetail.PWP_P2,
+bulanLaluDetail.PWP_P2
+)
+},
+
+{
+nama:"PSM W1",
+trend: pctGrowth(
+bulanIniDetail.PSM_W1,
+bulanLaluDetail.PSM_W1
+)
+},
+
+{
+nama:"PSM W2",
+trend: pctGrowth(
+bulanIniDetail.PSM_W2,
+bulanLaluDetail.PSM_W2
+)
+},
+
+{
+nama:"PSM W3",
+trend: pctGrowth(
+bulanIniDetail.PSM_W3,
+bulanLaluDetail.PSM_W3
+)
+},
+
+{
+nama:"PSM W4",
+trend: pctGrowth(
+bulanIniDetail.PSM_W4,
+bulanLaluDetail.PSM_W4
+)
+},
+
+{
+nama:"SERBA P1",
+trend: pctGrowth(
+bulanIniDetail.SERBA_P1,
+bulanLaluDetail.SERBA_P1
+)
+},
+
+{
+nama:"SERBA P2",
+trend: pctGrowth(
+bulanIniDetail.SERBA_P2,
+bulanLaluDetail.SERBA_P2
+)
+},
+
+{
+nama:"SUGER P1",
+trend: pctGrowth(
+bulanIniDetail.SUGER_P1,
+bulanLaluDetail.SUGER_P1
+)
+},
+
+{
+nama:"SUGER P2",
+trend: pctGrowth(
+bulanIniDetail.SUGER_P2,
+bulanLaluDetail.SUGER_P2
+)
+},
+
+{
+nama:"CEBAN P1",
+trend: pctGrowth(
+bulanIniDetail.CEBAN_P1,
+bulanLaluDetail.CEBAN_P1
+)
+},
+
+{
+nama:"CEBAN P2",
+trend: pctGrowth(
+bulanIniDetail.CEBAN_P2,
+bulanLaluDetail.CEBAN_P2
+)
+}
+
+];
+
+const terbaik =
+[...rankingVS]
+.sort((a,b)=>b.trend-a.trend)
+.slice(0,2);
+
+const terburuk =
+[...rankingVS]
+.sort((a,b)=>a.trend-b.trend)
+.slice(0,2);
+
+
+let summaryVS = `
+<div class="rapor-card">
+
+<div style="
+font-size:18px;
+font-weight:bold;
+margin-bottom:10px;">
+📊 RINGKASAN BULAN INI
+</div>
+
+<div style="margin-bottom:10px;">
+🏆 TERBAIK<br>
+1. ${terbaik[0].nama} (${terbaik[0].trend >= 999 ? 'NEW' : terbaik[0].trend + '%' })
+<br>
+2. ${terbaik[1].nama} (${terbaik[1].trend >= 999 ? 'NEW' : terbaik[1].trend + '%' })
+</div>
+
+<div>
+⚠️ PERLU PERHATIAN<br>
+1. ${terburuk[0].nama} (${terburuk[0].trend >= 999 ? 'NEW' : terburuk[0].trend + '%' })
+<br>
+2. ${terburuk[1].nama} (${terburuk[1].trend >= 999 ? 'NEW' : terburuk[1].trend + '%' })
+</div>
+
+</div>
+`;
+
+let vsHtml = summaryVS + `
+<div class="rapor-card">
+
+<div style="
+font-size:16px;
+font-weight:bold;
+margin-bottom:10px;">
+ACTUAL 📈 VS ACTUAL BULAN LALU
+</div>
+
+<table class="rapor-table">
+<tr>
+<th>ITEM</th>
+<th>BULAN LALU</th>
+<th>BULAN INI</th>
+<th>TARGET</th>
+<th>%</th>
+<th>SELISIH</th>
+<th>TREND</th>
+</tr>
+`;
+
+vsHtml += `
+
+<tr>
+<td>PWP (01-15)</td>
+<td>${bulanLaluDetail.PWP_P1||0}</td>
+<td>${bulanIniDetail.PWP_P1||0}</td>
+<td>${targetVS.PWP_P1}</td>
+<td>${renderPctVS(bulanIniDetail.PWP_P1,targetVS.PWP_P1)}</td>
+<td>${bulanIniDetail.PWP_P1-bulanLaluDetail.PWP_P1}</td>
+<td>${trendVS(bulanIniDetail.PWP_P1,bulanLaluDetail.PWP_P1)}</td>
+</tr>
+
+<tr>
+<td>PWP (16-AKHIR)</td>
+<td>${bulanLaluDetail.PWP_P2||0}</td>
+<td>${bulanIniDetail.PWP_P2||0}</td>
+<td>${targetVS.PWP_P2}</td>
+<td>${renderPctVS(bulanIniDetail.PWP_P2,targetVS.PWP_P2)}</td>
+<td>${bulanIniDetail.PWP_P2-bulanLaluDetail.PWP_P2}</td>
+<td>${trendVS(bulanIniDetail.PWP_P2,bulanLaluDetail.PWP_P2)}</td>
+</tr>
+
+<tr>
+<td>PSM WEEK 1</td>
+<td>${bulanLaluDetail.PSM_W1||0}</td>
+<td>${bulanIniDetail.PSM_W1||0}</td>
+<td>${targetVS.PSM_W1}</td>
+<td>${renderPctVS(bulanIniDetail.PSM_W1,targetVS.PSM_W1)}</td>
+<td>${bulanIniDetail.PSM_W1-bulanLaluDetail.PSM_W1}</td>
+<td>${trendVS(bulanIniDetail.PSM_W1,bulanLaluDetail.PSM_W1)}</td>
+</tr>
+
+<tr>
+<td>PSM WEEK 2</td>
+<td>${bulanLaluDetail.PSM_W2||0}</td>
+<td>${bulanIniDetail.PSM_W2||0}</td>
+<td>${targetVS.PSM_W2}</td>
+<td>${renderPctVS(bulanIniDetail.PSM_W2,targetVS.PSM_W2)}</td>
+<td>${bulanIniDetail.PSM_W2-bulanLaluDetail.PSM_W2}</td>
+<td>${trendVS(bulanIniDetail.PSM_W2,bulanLaluDetail.PSM_W2)}</td>
+</tr>
+
+<tr>
+<td>PSM WEEK 3</td>
+<td>${bulanLaluDetail.PSM_W3||0}</td>
+<td>${bulanIniDetail.PSM_W3||0}</td>
+<td>${targetVS.PSM_W3}</td>
+<td>${renderPctVS(bulanIniDetail.PSM_W3,targetVS.PSM_W3)}</td>
+<td>${bulanIniDetail.PSM_W3-bulanLaluDetail.PSM_W3}</td>
+<td>${trendVS(bulanIniDetail.PSM_W3,bulanLaluDetail.PSM_W3)}</td>
+</tr>
+
+<tr>
+<td>PSM WEEK 4</td>
+<td>${bulanLaluDetail.PSM_W4||0}</td>
+<td>${bulanIniDetail.PSM_W4||0}</td>
+<td>${targetVS.PSM_W4}</td>
+<td>${renderPctVS(bulanIniDetail.PSM_W4,targetVS.PSM_W4)}</td>
+<td>${bulanIniDetail.PSM_W4-bulanLaluDetail.PSM_W4}</td>
+<td>${trendVS(bulanIniDetail.PSM_W4,bulanLaluDetail.PSM_W4)}</td>
+</tr>
+
+<tr>
+<td>SERBA (01-15)</td>
+<td>${bulanLaluDetail.SERBA_P1||0}</td>
+<td>${bulanIniDetail.SERBA_P1||0}</td>
+<td>${targetVS.SERBA_P1}</td>
+<td>${renderPctVS(bulanIniDetail.SERBA_P1,targetVS.SERBA_P1)}</td>
+<td>${bulanIniDetail.SERBA_P1-bulanLaluDetail.SERBA_P1}</td>
+<td>${trendVS(bulanIniDetail.SERBA_P1,bulanLaluDetail.SERBA_P1)}</td>
+</tr>
+
+<tr>
+<td>SERBA (16-AKHIR)</td>
+<td>${bulanLaluDetail.SERBA_P2||0}</td>
+<td>${bulanIniDetail.SERBA_P2||0}</td>
+<td>${targetVS.SERBA_P2}</td>
+<td>${renderPctVS(bulanIniDetail.SERBA_P2,targetVS.SERBA_P2)}</td>
+<td>${bulanIniDetail.SERBA_P2-bulanLaluDetail.SERBA_P2}</td>
+<td>${trendVS(bulanIniDetail.SERBA_P2,bulanLaluDetail.SERBA_P2)}</td>
+</tr>
+
+<tr>
+<td>SUGER (01-15)</td>
+<td>${bulanLaluDetail.SUGER_P1||0}</td>
+<td>${bulanIniDetail.SUGER_P1||0}</td>
+<td>${targetVS.SUGER_P1}</td>
+<td>${renderPctVS(bulanIniDetail.SUGER_P1,targetVS.SUGER_P1)}</td>
+<td>${bulanIniDetail.SUGER_P1-bulanLaluDetail.SUGER_P1}</td>
+<td>${trendVS(bulanIniDetail.SUGER_P1,bulanLaluDetail.SUGER_P1)}</td>
+</tr>
+
+<tr>
+<td>SUGER (16-AKHIR)</td>
+<td>${bulanLaluDetail.SUGER_P2||0}</td>
+<td>${bulanIniDetail.SUGER_P2||0}</td>
+<td>${targetVS.SUGER_P2}</td>
+<td>${renderPctVS(bulanIniDetail.SUGER_P2,targetVS.SUGER_P2)}</td>
+<td>${bulanIniDetail.SUGER_P2-bulanLaluDetail.SUGER_P2}</td>
+<td>${trendVS(bulanIniDetail.SUGER_P2,bulanLaluDetail.SUGER_P2)}</td>
+</tr>
+
+<tr>
+<td>CEBAN (01-15)</td>
+<td>${bulanLaluDetail.CEBAN_P1||0}</td>
+<td>${bulanIniDetail.CEBAN_P1||0}</td>
+<td>${targetVS.CEBAN_P1}</td>
+<td>${renderPctVS(bulanIniDetail.CEBAN_P1,targetVS.CEBAN_P1)}</td>
+<td>${bulanIniDetail.CEBAN_P1-bulanLaluDetail.CEBAN_P1}</td>
+<td>${trendVS(bulanIniDetail.CEBAN_P1,bulanLaluDetail.CEBAN_P1)}</td>
+</tr>
+
+<tr>
+<td>CEBAN (16-AKHIR)</td>
+<td>${bulanLaluDetail.CEBAN_P2||0}</td>
+<td>${bulanIniDetail.CEBAN_P2||0}</td>
+<td>${targetVS.CEBAN_P2}</td>
+<td>${renderPctVS(bulanIniDetail.CEBAN_P2,targetVS.CEBAN_P2)}</td>
+<td>${bulanIniDetail.CEBAN_P2-bulanLaluDetail.CEBAN_P2}</td>
+<td>${trendVS(bulanIniDetail.CEBAN_P2,bulanLaluDetail.CEBAN_P2)}</td>
+</tr>
+
+`;
+
+vsHtml += `
+</table>
+</div>
+`;
+
      let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
 
 /* ITEM PERIODE */
@@ -1120,6 +1696,7 @@ for(let w=1; w<=4; w++) {
 
 akHtml += "</table>";
 document.getElementById('akumulasiArea').innerHTML = akHtml;
+document.getElementById('vsBulanArea').innerHTML = vsHtml;
 
         // --- AWAL BAGIAN COPY-PASTE ---
         let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
@@ -1184,12 +1761,374 @@ for(let w=1; w<=4; w++) {
         rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
 }
 
-rHtml += `</table></div>`; // tutup card personil
-} // tutup perulangan kasir
+rHtml += `</table></div>`; 
+} 
 
-// tampilkan hasil ke area rapor
-const rArea = document.getElementById('raporArea');
-if(rArea) rArea.innerHTML = rHtml;
+// =====================================
+// KARTU MEMATIKAN + JURU KUNCI
+// =====================================
+
+let kasirNol = [], semuaKasir = [];
+
+for(let nama in kStats){
+    let total = 0;
+    Object.values(kStats[nama].p).forEach(p=>{
+        if(!p.items) return;
+        Object.values(p.items).forEach(v=>{
+            total += parseFloat(v)||0;
+        });
+    });
+    semuaKasir.push({nama,total});
+    if(total===0) kasirNol.push(nama);
+}
+
+// --- Kartu merah untuk yang belum kontribusi ---
+let kartuMematikan = "";
+if(kasirNol.length){
+    kartuMematikan += `
+    <div class="rapor-card"
+    style="
+    background:linear-gradient(135deg,#ff0000,#8b0000);
+    color:white;
+    border:4px solid #ffcccc;
+    animation:pulseDanger 1.2s infinite;">
+    <div style="font-size:24px;font-weight:bold;text-align:center;margin-bottom:10px;">
+    🚨 ALERT PPS 🚨
+    </div>
+    <div style="font-size:18px;text-align:center;line-height:1.8;">
+    💀 KASIR TANPA PENJUALAN BULAN INI 💀
+    <br><br>
+    ${kasirNol.map(x=>`🔥 ${x}`).join("<br>")}
+    <br><br>
+    ⚠️ BELUM ADA KONTRIBUSI PPS SAMA SEKALI
+    </div>
+    </div>
+    `;
+}
+
+// --- Kartu juru kunci untuk yang paling bawah (total kontribusi terkecil) ---
+const kasirSorted = semuaKasir.sort((a,b)=>a.total-b.total);
+const juruKunci = kasirSorted[0];
+
+if(juruKunci && juruKunci.total > 0){
+
+    kartuMematikan += `
+    <div class="rapor-card"
+    style="background:linear-gradient(135deg,#ff9800,#e74c3c); color:white;">
+    <div style="font-size:20px; font-weight:bold; text-align:center;">
+    ⚠️ JURU KUNCI BULAN INI
+    </div>
+    <div style="text-align:center; font-size:16px; margin-top:10px;">
+    👤 ${juruKunci.nama}<br>
+    Total PPS: ${juruKunci.total}
+    </div>
+    </div>
+    `;
+}
+
+const alertArea = document.getElementById('alertKasirArea');
+if(alertArea){
+    alertArea.innerHTML = kartuMematikan;
+}
+
+// =====================================
+// TREND BULAN LALU VS BULAN INI
+// VERSI TANGGAL 1-SKRG VS 1-SKRG
+// =====================================
+
+let trendHtml = `
+<div class="rapor-card">
+
+<div style="
+font-size:18px;
+font-weight:bold;
+margin-bottom:10px;
+color:#2980b9;
+">
+
+📈 TREND KASIR BULAN LALU VS BULAN INI
+<br>
+<small style="color:#666;">
+(Tanggal 1-${new Date().getDate()} dibanding periode yang sama bulan lalu)
+</small>
+
+</div>
+`;
+
+let trendNow = {};
+// AMBIL DATA BULAN LALU DARI CLOUD (yang memang sudah tersimpan)
+const dataLalu = db[k.yr][k.mn][k.tk].bulanLaluKasir || {};  // ini tetap dari cloud, sudah bulan Mei
+const dataNow = trendNow;
+
+const today = new Date().getDate();
+
+for(let tgl=1; tgl<=today; tgl++){
+
+  const h = harianData[tgl] || {};
+
+  Object.keys(h).forEach(key=>{
+
+    if(!key.endsWith('_nama')) return;
+
+    const nama = h[key];
+
+    const dataKey = key.replace('_nama','');
+
+    const row = h[dataKey];
+
+    if(!row) return;
+
+    if(!trendNow[nama]){
+
+      trendNow[nama]={
+        PWP_P1:0,PWP_P2:0,
+        SERBA_P1:0,SERBA_P2:0,
+        SUGER_P1:0,SUGER_P2:0,
+        CEBAN_P1:0,CEBAN_P2:0,
+        PSM_W1:0,PSM_W2:0,
+        PSM_W3:0,PSM_W4:0
+      };
+
+    }
+
+    const pwp   = parseFloat(row.PWP)||0;
+    const psm   = parseFloat(row.PSM)||0;
+    const serba = parseFloat(row.SERBA_GRATIS)||0;
+    const suger = parseFloat(row.SUGER)||0;
+    const ceban = parseFloat(row.CEBAN)||0;
+
+    if(tgl<=15){
+
+      trendNow[nama].PWP_P1 += pwp;
+      trendNow[nama].SERBA_P1 += serba;
+      trendNow[nama].SUGER_P1 += suger;
+      trendNow[nama].CEBAN_P1 += ceban;
+
+    }else{
+
+      trendNow[nama].PWP_P2 += pwp;
+      trendNow[nama].SERBA_P2 += serba;
+      trendNow[nama].SUGER_P2 += suger;
+      trendNow[nama].CEBAN_P2 += ceban;
+
+    }
+
+    if(tgl<=7)
+      trendNow[nama].PSM_W1 += psm;
+
+    else if(tgl<=15)
+      trendNow[nama].PSM_W2 += psm;
+
+    else if(tgl<=23)
+      trendNow[nama].PSM_W3 += psm;
+
+    else
+      trendNow[nama].PSM_W4 += psm;
+
+  });
+
+}
+
+console.log("TREND DATA LALU", dataLalu);
+console.log("TREND DATA NOW", dataNow);
+
+for(let nama in dataLalu){
+
+let bl = dataLalu[nama] || {};
+let nw = dataNow[nama] || {};
+
+let bulanLaluTotal =
+
+(bl.PWP_P1||0)+
+(bl.PWP_P2||0)+
+(bl.PSM_W1||0)+
+(bl.PSM_W2||0)+
+(bl.PSM_W3||0)+
+(bl.PSM_W4||0)+
+(bl.SERBA_P1||0)+
+(bl.SERBA_P2||0)+
+(bl.SUGER_P1||0)+
+(bl.SUGER_P2||0)+
+(bl.CEBAN_P1||0)+
+(bl.CEBAN_P2||0);
+
+let bulanIniTotal =
+
+(nw.PWP_P1||0)+
+(nw.PWP_P2||0)+
+(nw.PSM_W1||0)+
+(nw.PSM_W2||0)+
+(nw.PSM_W3||0)+
+(nw.PSM_W4||0)+
+(nw.SERBA_P1||0)+
+(nw.SERBA_P2||0)+
+(nw.SUGER_P1||0)+
+(nw.SUGER_P2||0)+
+(nw.CEBAN_P1||0)+
+(nw.CEBAN_P2||0);
+
+let selisih =
+bulanIniTotal-bulanLaluTotal;
+
+let pct = 0;
+
+let status = "🟡 STABIL";
+
+if(bulanLaluTotal === 0){
+
+  status = "⚠️ DATA PEMBANDING BELUM TERSEDIA";
+
+}else{
+
+  pct =
+  Math.round(
+  (selisih/bulanLaluTotal)*100
+  );
+
+  if(pct>=20)
+  status="🔥 MELEJIT";
+
+  else if(pct>=5)
+  status="🟢 MENINGKAT";
+
+  else if(pct<=-20)
+  status="🔴 TURUN TAJAM";
+
+  else if(pct<0)
+  status="🟠 MENURUN";
+
+}
+
+trendHtml += `
+
+<div style="
+background:#fff;
+padding:10px;
+margin-bottom:10px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,.1);
+">
+
+<b>${nama}</b>
+
+<br><br>
+
+Bulan Lalu :
+<b>${bulanLaluTotal}</b>
+
+<br>
+
+Bulan Ini :
+<b>${bulanIniTotal}</b>
+
+<br>
+
+Selisih :
+<b style="
+color:${selisih>=0?'green':'red'};
+">
+${selisih>=0?'+':''}${selisih}
+</b>
+
+<br>
+
+${status}
+
+${bulanLaluTotal===0 ? '' : `(${pct}%)`}
+
+</div>
+`;
+
+}
+
+trendHtml += "</div>";
+
+rHtml += trendHtml;
+
+// tampilkan hasil
+const rArea =
+document.getElementById('raporArea');
+
+if(rArea)
+rArea.innerHTML = rHtml;
+}
+
+function pctVS(real,target){
+return target>0
+? Math.round((real/target)*100)
+: 0;
+}
+
+function warnaPctVS(pct){
+
+if(pct>=100){
+return "#27ae60";
+}
+
+if(pct>=50){
+return "#f1c40f";
+}
+
+return "#e74c3c";
+
+}
+
+function renderPctVS(real,target){
+
+const pct = pctVS(real,target);
+
+return `
+<span style="
+font-weight:bold;
+color:${warnaPctVS(pct)};
+">
+${pct}%
+</span>
+`;
+
+}
+
+function trendVS(sekarang,lalu){
+
+if(lalu<=0){
+
+if(sekarang>0) return "🟢 NEW";
+
+return "⚪ 0%";
+
+}
+
+const pct =
+Math.round(
+((sekarang-lalu)/lalu)*100
+);
+
+if(pct>0)
+return `🟢 +${pct}%`;
+
+if(pct<0)
+return `🔴 ${pct}%`;
+
+return "⚪ 0%";
+
+}
+
+function pctGrowth(sekarang,lalu){
+
+if(lalu<=0){
+
+if(sekarang>0){
+return 999;
+}
+
+return 0;
+
+}
+
+return Math.round(
+((sekarang-lalu)/lalu)*100
+);
+
 }
 
     function setInputState(bolehEdit, pesan = "") {
