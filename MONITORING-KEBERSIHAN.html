@@ -114,7 +114,7 @@
                     </h2>
                     <div class="flex items-center gap-1.5 w-full sm:w-auto">
                         <button type="button" onclick="openModalDashboard('USER_LOGIN')" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded border border-teal-700 text-[10px] font-black shadow-2xs transition-all flex items-center justify-center gap-1 uppercase">
-                            <i class="fa-solid fa-chart-pie text-yellow-300"></i> Pop-Up Progress Saya
+                            <i class="fa-solid fa-chart-pie text-yellow-300"></i> Pop-Up Progress Toko
                         </button>
                         <span id="status-gembok-crew" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] px-2 py-0.5 rounded font-black uppercase shrink-0 text-center">Ready</span>
                     </div>
@@ -564,7 +564,7 @@ databaseCloudToko.pembagianRak
 (dbLocal.pembagianRak||{}),
 
 statusRak:
-dbLocal.statusRak||{},
+databaseCloudToko.statusRak||{},
 
 historyLogHarian:
 dbLocal.historyLogHarian||{},
@@ -707,8 +707,11 @@ s,
 item.kategori
 );
 
-// if(s>parseInt(item.kategori))
-// return;
+const batasRH=parseInt(item.kategori)+7;
+
+if(s>batasRH){
+return;
+}
 
 const d=document.createElement('div');
 
@@ -912,6 +915,11 @@ list.push(i.value.trim());
 });
 
 if(list.length>0){
+
+if(dataBaru[nama]){
+alert('❌ Nama crew "'+nama+'" duplikat');
+throw new Error('DUPLIKAT_CREW');
+}
 
 dataBaru[nama]=list;
 
@@ -1509,8 +1517,15 @@ wrap.innerHTML=
 
 rakSaya.forEach(function(rk){
 
+const tanggalCari=
+new Date(
+parseInt(currentTahun),
+parseInt(currentBulan)-1,
+tglHariIni
+).toLocaleDateString('id-ID');
+
 const statusKey=
-`${rk}_${tglHariIni}_${userKey}`;
+`${rk}|${tanggalCari}|${userKey}`;
 
 const status=
 db.statusRak[statusKey]
@@ -1580,8 +1595,15 @@ let clean=0;
 
 rks.forEach(function(r){
 
+const tanggalCari=
+new Date(
+parseInt(currentTahun),
+parseInt(currentBulan)-1,
+tglHariIni
+).toLocaleDateString('id-ID');
+
 const keyStatus=
-`${r}_${tglHariIni}_${cr}`;
+`${r}|${tanggalCari}|${cr}`;
 
 if(
 db.statusRak[keyStatus]
@@ -1663,6 +1685,13 @@ confirm(
 )
 ){
 
+const tanggalCari =
+tglHariIni +
+"/" +
+parseInt(currentBulan) +
+"/" +
+currentTahun;
+
 if(
 !globalDatabase[keyPeriode]
 .kunciLaporanUserHariIni
@@ -1673,13 +1702,36 @@ globalDatabase[keyPeriode]
 
 }
 
-globalDatabase[keyPeriode]
-.kunciLaporanUserHariIni[lockKey]=false;
-
-
 //==================================
-// HAPUS HISTORY HARIAN
+// BUKA LOCK CHECKBOX
 //==================================
+
+fetch(
+URL_CLOUD_DRIVE,
+{
+method:'POST',
+body:JSON.stringify({
+
+action:'resetLaporanCrew',
+
+kodeToko:
+currentActiveUser.toko
+.toUpperCase(),
+
+periode:keyPeriode,
+
+crew:crewName,
+
+tanggal:tanggalCari
+
+})
+
+}
+)
+.then(r=>r.text())
+.then(res=>{
+
+if(res==="OK_RESET"){
 
 const tagKey=
 `TGL_${tglHariIni}`;
@@ -1701,25 +1753,20 @@ delete globalDatabase[keyPeriode]
 
 }
 
-
-//==================================
-// BUKA LOCK CHECKBOX
-//==================================
+delete globalDatabase[keyPeriode]
+.kunciLaporanUserHariIni[lockKey];
 
 Object.keys(
 globalDatabase[keyPeriode]
 .statusRak||{}
 )
-
 .forEach(key=>{
 
 const data=
 globalDatabase[keyPeriode]
 .statusRak[key];
 
-if(
-data.crew===crewName
-){
+if(data.crew===crewName){
 
 data.locked=false;
 
@@ -1732,9 +1779,26 @@ localStorage.setItem(
 JSON.stringify(globalDatabase)
 );
 
-alert('Gembok dibuka!');
+alert('✅ Gembok dibuka!');
+
+muatDatabaseDariCloudDrive();
 
 refreshSemuaUI();
+
+}else{
+
+alert('❌ Reset gagal di Drive');
+
+}
+
+})
+.catch(err=>{
+
+console.log(err);
+
+alert('❌ Koneksi Drive gagal');
+
+});
 
 }
 
@@ -1755,8 +1819,15 @@ window.tanggalMode
 ||
 new Date().getDate();
 
+const tanggalCari=
+new Date(
+parseInt(currentTahun),
+parseInt(currentBulan)-1,
+tgl
+).toLocaleDateString('id-ID');
+
 const key=
-`${rak}_${tgl}_${userKey}`;
+`${rak}|${tanggalCari}|${userKey}`;
 
 if(!db.statusRak)
 db.statusRak={};
@@ -1764,11 +1835,8 @@ db.statusRak={};
 db.statusRak[key]={
 
 rak:rak,
-
 crew:userKey,
-
-tanggal:tgl,
-
+tanggal:tanggalCari,
 isClean:isChecked,
 
 locked:
@@ -1854,9 +1922,11 @@ db.pembagianRak[n]
 
 function openModalDashboard(){
 
-const db=globalDatabase[keyPeriode]||{
-pembagianRak:{},
-statusRak:{}
+const db={
+pembagianRak:
+databaseCloudToko.pembagianRak||{},
+statusRak:
+databaseCloudToko.statusRak||{}
 };
 
 let htmlLog='';
@@ -1875,8 +1945,15 @@ window.tanggalMode
 ||
 new Date().getDate();
 
+const tanggalCari=
+new Date(
+parseInt(currentTahun),
+parseInt(currentBulan)-1,
+tglHariIni
+).toLocaleDateString('id-ID');
+
 const keyStatus=
-`${rak}_${tglHariIni}_${n}`;
+`${rak}|${tanggalCari}|${n}`;
 
 const status=db.statusRak[keyStatus]||{
 isClean:false,
@@ -2409,15 +2486,11 @@ waText+=
 waText+=
 stringRHUntukWA;
 
-window.open(
+console.log('WA OPEN');
 
+window.location.href=
 'https://wa.me/?text='+
-encodeURIComponent(waText),
-
-'_blank'
-
-);
-
+encodeURIComponent(waText);
 
 //==================================
 // RESET FORM
@@ -2466,6 +2539,13 @@ alert(
 catch(err){
 
 console.log(err);
+
+delete db.kunciLaporanUserHariIni[lockKey];
+
+localStorage.setItem(
+'db_omkopipait_v3',
+JSON.stringify(globalDatabase)
+);
 
 btn.disabled=false;
 
