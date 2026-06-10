@@ -532,6 +532,19 @@ hasil=hasil[0]||{};
 
 databaseCloudToko=hasil||{};
 
+console.log('RAW HASIL CLOUD');
+console.log(hasil);
+
+console.log('STATUS RAK CLOUD');
+console.log(hasil.statusRak);
+
+console.log('KEY STATUS');
+console.log(
+Object.keys(
+hasil.statusRak || {}
+).length
+);
+
 Object.keys(databaseCloudToko.pembagianRak||{}).forEach(function(key){
 
 let namaBaru=key.trim().toUpperCase();
