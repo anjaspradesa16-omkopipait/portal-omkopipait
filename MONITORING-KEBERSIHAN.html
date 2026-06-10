@@ -289,7 +289,7 @@ Belum Upload
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbw0AUGtiab2ywFHNo4vxaPNzdBSHnuHltxaCekOFAanFbxYnow12BNH8EZN6akfNWat/exec"; 
+        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbwi95_uyd88EF1d8GXTT3GU1j2dfnwUDBBhFtViji2j_11yKcYpKtG4vfCMA8_o0eFV/exec"; 
 
 let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
 
@@ -498,6 +498,11 @@ if(!respon.ok)
 throw new Error('Koneksi gagal');
 
 let hasil=await respon.json();
+
+console.log(
+'DATA CLOUD FULL =',
+JSON.stringify(hasil,null,2)
+);
 
 console.log(
 JSON.stringify(
