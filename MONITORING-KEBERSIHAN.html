@@ -695,6 +695,18 @@ c.innerHTML='';
 
 let jumlahAlarm=0;
 
+console.log('ITEM RH FULL =', item);
+
+const sisaHariEXP=s;
+const rhHari=parseInt(item.kategori);
+
+console.log(
+'DEBUG RH',
+item.barang,
+'kategori=', item.kategori,
+'rhHari=', rhHari
+);
+
 listActiveRH.forEach(function(item){
 
 const today=
@@ -729,7 +741,6 @@ return;
 }
 
 jumlahAlarm++;
-
 // lanjut buat card alarm di sini
 
 const d=document.createElement('div');
