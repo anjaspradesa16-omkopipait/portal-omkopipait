@@ -693,15 +693,7 @@ if(!c||!p)return;
 
 c.innerHTML='';
 
-if(!listActiveRH.length){
-
-p.classList.add('hidden');
-
-return;
-
-}
-
-p.classList.remove('hidden');
+let jumlahAlarm=0;
 
 listActiveRH.forEach(function(item){
 
@@ -726,11 +718,19 @@ s,
 item.kategori
 );
 
-const batasRH=parseInt(item.kategori)+7;
+const sisaHariEXP=s;
+const rhHari=parseInt(item.kategori);
 
-if(s>batasRH){
+const hariMenujuTarik=
+sisaHariEXP-rhHari;
+
+if(hariMenujuTarik>7){
 return;
 }
+
+jumlahAlarm++;
+
+// lanjut buat card alarm di sini
 
 const d=document.createElement('div');
 
@@ -769,6 +769,17 @@ d.innerHTML=
 c.appendChild(d);
 
 });
+
+if(jumlahAlarm===0){
+
+p.classList.add('hidden');
+
+}else{
+
+p.classList.remove('hidden');
+
+}
+
 
 }
 
