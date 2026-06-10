@@ -289,7 +289,7 @@ Belum Upload
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbx5WwC9ekkPAwC_O5uvUGI1qPuxI5aVdMSHFqWgKkLs7D-H5qZcvzC6PMirqLADAsIO/exec"; 
+        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbw0AUGtiab2ywFHNo4vxaPNzdBSHnuHltxaCekOFAanFbxYnow12BNH8EZN6akfNWat/exec"; 
 
 let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
 
@@ -601,12 +601,31 @@ initDatabasePeriodeIniLokal();
 databaseCloudToko={};
 
 console.log(
+'STATUS CLOUD:',
+Object.keys(databaseCloudToko.statusRak||{}).length
+);
+
+console.log(
+databaseCloudToko.statusRak
+);
+
+console.log(
 'Fallback ke database lokal'
 );
 
 refreshSemuaUI();
 
 }
+
+}
+
+function formatTanggalKey(tgl,bulan,tahun){
+
+return (
+parseInt(tgl) + "/" +
+parseInt(bulan) + "/" +
+tahun
+);
 
 }
 
@@ -2184,6 +2203,28 @@ btn.style.pointerEvents='none';
 btn.innerHTML=
 '⏳ MEMPROSES LAPORAN...';
 
+const db=
+globalDatabase[keyPeriode]
+||
+{
+pembagianRak:{},
+statusRak:{},
+historyLogHarian:{},
+kunciLaporanUserHariIni:{}
+};
+
+const userKey=
+currentActiveUser.nama
+.toUpperCase();
+
+const tglHariIni=
+window.tanggalMode
+||
+new Date().getDate();
+
+const lockKey=
+`${userKey}_TGL_${tglHariIni}`;
+
 try{
 
 const filesRak=semuaFotoRak;
@@ -2243,21 +2284,6 @@ throw new Error(
 );
 
 }
-
-const db=
-globalDatabase[keyPeriode];
-
-const userKey=
-currentActiveUser.nama
-.toUpperCase();
-
-const tglHariIni=
-window.tanggalMode
-||
-new Date().getDate();
-
-const lockKey=
-`${userKey}_TGL_${tglHariIni}`;
 
 if(
 
@@ -2540,7 +2566,13 @@ catch(err){
 
 console.log(err);
 
+if(
+db &&
+db.kunciLaporanUserHariIni &&
+lockKey
+){
 delete db.kunciLaporanUserHariIni[lockKey];
+}
 
 localStorage.setItem(
 'db_omkopipait_v3',
