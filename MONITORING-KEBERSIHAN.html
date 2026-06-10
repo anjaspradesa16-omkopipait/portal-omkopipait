@@ -679,35 +679,33 @@ window.tanggalMode
 }
 
 
-function renderNotifikasiAlarmRH(listActiveRH=[]){
+function renderNotifikasiAlarmRH(listActiveRH = []){
 
-console.log(
-'LIST RH MASUK =',
-JSON.stringify(listActiveRH)
+const container=
+document.getElementById(
+'list-warning-rh-nyata'
 );
 
-const c=document.getElementById('list-warning-rh-nyata');
-const p=document.getElementById('alert-rh-container');
+const alertBox=
+document.getElementById(
+'alert-rh-container'
+);
 
-if(!c||!p)return;
+if(!container||!alertBox)return;
 
-c.innerHTML='';
+container.innerHTML='';
 
 let jumlahAlarm=0;
 
-console.log('ITEM RH FULL =', item);
-
-const sisaHariEXP=s;
-const rhHari=parseInt(item.kategori);
-
-console.log(
-'DEBUG RH',
-item.barang,
-'kategori=', item.kategori,
-'rhHari=', rhHari
-);
-
 listActiveRH.forEach(function(item){
+
+if(
+!item.barang||
+!item.rak||
+!item.exp
+){
+return;
+}
 
 const today=
 new Date();
@@ -719,40 +717,78 @@ new Date(item.exp);
 
 expDate.setHours(0,0,0,0);
 
-const s=Math.ceil(
+const sisaHari=
+Math.ceil(
 (expDate-today)/86400000
 );
 
-console.log(
-'TEST RH',
-item.barang,
-s,
-item.kategori
-);
-
-const sisaHariEXP=s;
-const rhHari=parseInt(item.kategori);
+const rhHari=
+parseInt(item.kategori)||0;
 
 const hariMenujuTarik=
-sisaHariEXP-rhHari;
+sisaHari-rhHari;
 
+// hanya tampil mulai H-7 menuju RH
 if(hariMenujuTarik>7){
 return;
 }
 
 jumlahAlarm++;
-// lanjut buat card alarm di sini
 
-const d=document.createElement('div');
+let warnaCard=
+'bg-yellow-50 border-yellow-300 text-yellow-800';
 
-d.className='bg-white p-2 rounded border border-red-200 text-[11px] text-gray-700 flex justify-between items-center gap-2';
+let icon='🟡';
+let status='SIAP FOKUS JUAL';
+
+if(
+hariMenujuTarik<=3
+&&
+hariMenujuTarik>=0
+){
+
+warnaCard=
+'bg-orange-50 border-orange-300 text-orange-800';
+
+icon='🟠';
+status='SEGERA TARIK';
+
+}
+
+if(
+hariMenujuTarik<0
+){
+
+warnaCard=
+'bg-red-50 border-red-400 text-red-800 animate-pulse';
+
+icon='🔴';
+status='LEWAT BATAS RH';
+
+}
+
+const d=
+document.createElement('div');
+
+d.className=
+`p-2 rounded border flex justify-between items-center gap-2 ${warnaCard}`;
+
+if(
+hariMenujuTarik<=3
+&&
+hariMenujuTarik>=0
+){
+d.classList.add(
+'animate-bounce'
+);
+}
 
 d.innerHTML=
 
 '<div class="overflow-hidden">'+
 
-'<div class="font-black text-red-700">'+
-'🚨 '+item.barang+
+'<div class="font-black">'+
+icon+' '+item.barang+
 '</div>'+
 
 '<div class="text-[10px]">'+
@@ -764,11 +800,23 @@ d.innerHTML=
 '</div>'+
 
 '<div class="text-[10px]">'+
-'PIC : '+item.crew+
+'PIC : '+(item.crew||'-')+
 '</div>'+
 
-'<div class="text-[10px] text-red-600">'+
-'EXP : '+new Date(item.exp).toLocaleDateString('id-ID')+
+'<div class="text-[10px]">'+
+'EXP : '+
+expDate.toLocaleDateString('id-ID')+
+'</div>'+
+
+'<div class="text-[10px] font-black">'+
+status+
+'</div>'+
+
+'<div class="text-[10px]">'+
+'H-'+hariMenujuTarik+
+' menuju RH '+
+rhHari+
+' Hari'+
 '</div>'+
 
 '</div>'+
@@ -777,21 +825,23 @@ d.innerHTML=
 'TARIK'+
 '</button>';
 
-c.appendChild(d);
+container.appendChild(d);
 
 });
 
 if(jumlahAlarm===0){
 
-p.classList.add('hidden');
+alertBox.classList.add(
+'hidden'
+);
 
 }else{
 
-p.classList.remove('hidden');
+alertBox.classList.remove(
+'hidden'
+);
 
 }
-
-
 }
 
 
