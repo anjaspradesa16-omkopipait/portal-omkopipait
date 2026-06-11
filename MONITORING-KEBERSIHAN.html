@@ -289,7 +289,7 @@ Belum Upload
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbyTeDATxZJGTjvX2AJcDxpikcTDRhCRspdlo_cFUd5SvT-vqqrwT93lDdbyo6xjNCZg/exec"; 
+        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbxFb2KJ4uuwci_35HwRjxLU2GCDbBEuhmSMnBlvWB_D3UEpiPV3jq-bRtAnKMPsU6mf/exec"; 
 
 let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
 
@@ -825,10 +825,10 @@ icon+' '+item.barang+
 
 '<div class="text-[10px]">'+
 'EXP : '+
-expDate.formatTanggalKey(
-tglHariIni,
-currentBulan,
-currentTahun
+formatTanggalKey(
+expDate.getDate(),
+expDate.getMonth()+1,
+expDate.getFullYear()
 )+
 '</div>'+
 
@@ -1939,13 +1939,8 @@ const userKey=
 currentActiveUser.nama
 .toUpperCase();
 
-const tgl=
-window.tanggalMode
-||
-new Date().getDate();
-
 const tanggalCari =
-String(tglHariIni).padStart(2,'0') +
+String(tgl).padStart(2,'0') +
 '/' +
 String(currentBulan).padStart(2,'0') +
 '/' +
@@ -2546,6 +2541,16 @@ listRHBaru:
 listRHBaruPayload
 
 };
+
+console.log(
+'ARRAY RAK YANG AKAN DIKIRIM',
+arrayRakChecked
+);
+
+console.log(
+'PAYLOAD KIRIM',
+payload
+);
 
 const respon=
 await fetch(
