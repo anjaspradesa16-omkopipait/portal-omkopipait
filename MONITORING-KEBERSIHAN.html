@@ -289,7 +289,7 @@ Belum Upload
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbxFb2KJ4uuwci_35HwRjxLU2GCDbBEuhmSMnBlvWB_D3UEpiPV3jq-bRtAnKMPsU6mf/exec"; 
+        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbyG7lic6pIyIlGf-hG2kJA0lah2KhBcdYl6l4pF32uPlK00JpyVEnwk1zljv9UJ6Ri6/exec"; 
 
 let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
 
@@ -1811,9 +1811,9 @@ confirm(
 ){
 
 const tanggalCari =
-tglHariIni +
+String(tglHariIni).padStart(2,'0') +
 "/" +
-parseInt(currentBulan) +
+String(currentBulan).padStart(2,'0') +
 "/" +
 currentTahun;
 
@@ -1938,6 +1938,10 @@ globalDatabase[keyPeriode];
 const userKey=
 currentActiveUser.nama
 .toUpperCase();
+
+const tgl =
+window.tanggalMode ||
+new Date().getDate();
 
 const tanggalCari =
 String(tgl).padStart(2,'0') +
