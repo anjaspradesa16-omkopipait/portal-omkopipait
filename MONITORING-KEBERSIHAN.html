@@ -2,2736 +2,1492 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Kebersihan & RH - Omkopipait</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MONITORING KEBERSIHAN & RH TOKO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Optimasi Tampilan Mobile Touch Scroll */
-        .custom-scroll-x {
-            -webkit-overflow-scrolling: touch;
+        :root {
+          --primary-color: #00b4d8;
+          --secondary-color: #0077b6;
+          --success-color: #2ec4b6;
+          --warning-color: #ff9f1c;
+          --danger-color: #e63946;
+          --dark-color: #2b2d42;
+          --light-bg: #f8f9fa;
+          --card-bg: #ffffff;
+          --crew-color: #6c5ce7;
+          --admin-color: #d63031;
         }
+
+        * { box-shadow: none; box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--light-bg); color: var(--dark-color); padding-bottom: 30px; }
+
+        /* PORTAL HEADER */
+        .portal-header {
+          background: linear-gradient(135deg, #2c3e50, #2980b9);
+          color: white; padding: 10px 15px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .btn-back-portal { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-back-portal:hover { background: rgba(255,255,255,0.3); }
+        
+        .meta-selectors { display: flex; flex-wrap: wrap; gap: 6px; background: rgba(255, 255, 255, 0.15); padding: 8px; border-radius: 10px; font-size: 11px; align-items: center; width: 100%; }
+        .meta-selectors select, .meta-selectors input { background: white; border: 1px solid #ccc; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: bold; color: var(--dark-color); }
+        .store-badge-header { background: #ff9f1c; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+
+        .role-badge { padding: 4px 10px; border-radius: 12px; font-size: 10px; text-transform: uppercase; font-weight: bold;}
+        .role-badge.crew { background-color: var(--crew-color); color: white; }
+        .role-badge.kepala { background-color: var(--admin-color); color: white; }
+
+        .container { max-width: 1000px; margin: 10px auto; padding: 0 10px; }
+        .section-card { background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; overflow: hidden; border: 1px solid #e1e8ed; }
+        .section-header { padding: 12px 15px; color: white; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .bg-rekap { background-color: #d63031; }
+        .bg-checklist { background-color: #24292e; border-bottom: 2px solid #f39c12; }
+        .bg-matriks { background-color: #27ae60; }
+        .bg-horror { background: linear-gradient(45deg, #111, #440000); border: 1px solid #ff0000; }
+        .section-body { padding: 15px; }
+
+        /* DASHBOARD MATRIKS */
+        .matriks-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tabel-matriks { width: 100%; border-collapse: collapse; min-width: 850px; }
+        .tabel-matriks th { background-color: #2c3e50; color: white; padding: 8px 4px; font-size: 11px; font-weight: bold; border: 1px solid #34495e; text-align: center; }
+        .tabel-matriks td { padding: 8px 4px; font-size: 11px; border: 1px solid #e1e8ed; text-align: center; font-weight: bold; }
+        .tabel-matriks .crew-name-col { text-align: left; background-color: #f8f9fa; position: sticky; left: 0; z-index: 5; min-width: 110px; font-size: 11px; box-shadow: 2px 0 4px rgba(0,0,0,0.05); padding-left: 6px; }
+
+        /* REKAYASA GAYA RANKING HOROR */
+        .horror-rank-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 12px; }
+        .horror-rank-item.rajin { background-color: #e8f8f5; border-left: 4px solid #2ecc71; color: #111; }
+        .horror-rank-item.males { background-color: #fdf2f2; border-left: 4px solid #e74c3c; color: #7f1d1d; font-style: italic; }
+        .horror-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; color: white; }
+        .horror-badge.pujian { background-color: #2ecc71; }
+        .horror-badge.sindiran { background-color: #e74c3c; animation: blinker 1s linear infinite; }
+
+        /* PANEL KEPALA TOKO */
+        .admin-action-box { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #fff5f5; border-radius: 6px; margin-bottom: 12px; border: 1px dashed #e74c3c; }
+        .admin-action-box input { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+        .rak-badge { display: inline-flex; align-items: center; gap: 4px; background: #e2e8f0; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin: 2px; font-weight: bold; }
+        .rak-badge button { background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 11px; font-weight: bold; }
+
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; font-size: 12px; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-success { background-color: #27ae60; color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-disabled { background-color: #bdc3c7 !important; color: #7f8c8d !important; cursor: not-allowed; }
+
+        .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-top: 10px; }
+        .checklist-item { background: #f8f9fa; padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; border: 1px solid #e1e8ed; font-size: 12px; font-weight: bold; }
+
+        .upload-group { margin-top: 15px; background: #fff; border: 1px dashed var(--primary-color); padding: 12px; border-radius: 6px; }
+        .upload-field { margin-bottom: 12px; }
+        .upload-field label { display: block; font-weight: bold; font-size: 11px; margin-bottom: 4px; color: #555; }
+        .upload-field input[type="file"] { width: 100%; padding: 6px; background: #f1f2f6; border-radius: 4px; border: 1px solid #ccc; font-size: 11px; }
+        .upload-status { font-size: 11px; font-weight: bold; margin-top: 2px; }
+
+        /* ITEM ROWS UNTUK INPUT BARANG EXP / RH */
+        .item-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; background: #fff8f0; padding: 10px; border-radius: 6px; border-left: 3px solid var(--warning-color); }
+        .item-row input, .item-row select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; width: 100%; }
+        
+        /* ALERT KHUSUS H-7 TARIK BARANG */
+        .alert-tarik { background-color: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; text-align: center; display: block; animation: blinker 1.5s linear infinite; margin-top: 3px; }
+        @keyframes blinker { 50% { opacity: 0.3; } }
+
+        .lock-banner { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; border: 1px solid #ffeeba; font-size: 11px; }
+        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; font-weight: bold; color: var(--secondary-color); font-size: 14px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background: white; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid #27ae60; }
+        .modal-header { background: #27ae60; color: white; padding: 12px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 15px; max-height: 400px; overflow-y: auto; }
+        .progress-bar-container { background: #eee; border-radius: 8px; height: 12px; width: 100%; margin: 6px 0 12px 0; overflow: hidden; }
+        .progress-bar-fill { background: #27ae60; height: 100%; width: 0%; }
+        
+        .matriks-cell-aktif { background-color: #2ecc71 !important; color: white !important; }
+        canvas { display: none; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans pb-12 antialiased">
+<body>
 
-    <header class="bg-white text-gray-900 px-3 py-3 shadow-sm sticky top-0 z-40 border-b-4 border-amber-500">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <button onclick="window.location.href='index.html'" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-gray-300 transition-all shrink-0">
-                    <i class="fa-solid fa-arrow-left"></i> PORTAL
-                </button>
-                <div class="overflow-hidden">
-                    <h1 class="text-sm font-black tracking-wider text-amber-600 flex items-center gap-1 uppercase truncate">
-                        <i class="fa-solid fa-broom-ball text-amber-500"></i> CLEANING & RH TRACKER
-                    </h1>
-                    <div class="text-[10px] text-gray-500 font-bold flex flex-wrap items-center gap-1 mt-0.5">
-                        <span>TOKO: <b id="txt-kode-toko" class="text-gray-900">-</b></span>
-                        <span>• TIPE: 
-                            <select id="select-tipe-toko" onchange="saveTipeToko()" class="bg-gray-50 border border-gray-300 rounded text-[10px] px-1 font-black focus:outline-none">
-                                <option value="NON-24JAM">NON 24 JAM</option>
-                                <option value="24JAM">24 JAM</option>
-                            </select>
-                        </span>
-                        <span>• PERIODE: 
-                            <select id="filter-bulan" onchange="gantiPeriodeBulan()" class="bg-gray-50 border border-gray-300 rounded text-[10px] px-0.5 focus:outline-none"></select>
-                            <select id="filter-tahun" onchange="gantiPeriodeBulan()" class="bg-gray-50 border border-gray-300 rounded text-[10px] px-0.5 focus:outline-none"></select>
-                            <select id="admin-tanggal" onchange="gantiTanggalAdmin()" class="bg-gray-50 border border-gray-300 rounded text-[10px] px-0.5 focus:outline-none"></select>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="w-full md:w-auto text-right">
-                <span id="user-badge" class="bg-teal-50 text-teal-700 border border-teal-200 text-[10px] px-2.5 py-1 rounded-full font-black shadow-2xs block text-center md:inline-block">Memuat...</span>
+    <div id="loadingOverlay"><i class="fa-solid fa-spinner fa-spin"></i> &nbsp; Sinkronisasi Cloud Server...</div>
+    <canvas id="collageCanvas"></canvas>
+
+    <div class="portal-header">
+        <div class="header-top">
+            <a href="index.html" class="btn-back-portal"><i class="fa-solid fa-arrow-left"></i> Portal Utama</a>
+            <div>
+                <span class="role-badge" id="currentRoleBadge">-</span>
             </div>
         </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-3 mt-4 space-y-4">
-
-        <div id="alert-rh-container" class="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-xl shadow-xs hidden">
-            <div class="flex items-start">
-                <div class="flex-shrink-0 text-red-500 text-base pt-0.5 animate-bounce">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                </div>
-                <div class="ml-2 w-full">
-                    <h3 class="text-[11px] font-black text-red-700 uppercase tracking-wider" id="alert-rh-title">🚨 EMERGENCY: ITEM RH JATUH TEMPO!</h3>
-                    <div id="list-warning-rh-nyata" class="mt-2 space-y-1.5"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="meta-selectors">
+            <span class="store-badge-header" id="labelKodeToko">TOKO: -</span>
             
-            <section id="panel-kacab" class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 hidden space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h2 class="text-[11px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-user-tie text-amber-500"></i> PLOTTING KEPALA TOKO
-                    </h2>
-                    <div class="flex gap-1">
-                        <button type="button" onclick="resetTotalHalamanWeb()" class="bg-red-600 hover:bg-red-700 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-2xs transition-all">
-                            <i class="fa-solid fa-arrow-rotate-left"></i> Reset Web
-                        </button>
-                        <span class="text-[9px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded border border-purple-200 font-bold">ADMIN PANEL</span>
-                    </div>
-                </div>
+            <label>TGL:</label>
+            <select id="daySelector" onchange="syncWithCloud()"></select>
+            
+            <label>BLN:</label>
+            <select id="monthSelector" onchange="syncWithCloud()"></select>
+            
+            <label>THN:</label>
+            <select id="yearSelector" onchange="syncWithCloud()"></select>
+        </div>
+    </div>
 
-                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-[10px] font-black text-gray-600 uppercase"><i class="fa-solid fa-users text-blue-500 mr-1"></i> Atur Personil</h3>
-                        <button type="button" onclick="tambahFormPersonilBaru()" class="bg-amber-500 hover:bg-amber-600 text-white font-black text-[10px] px-2 py-1 rounded shadow-2xs transition-all">+ TAMBAH CREW</button>
-                    </div>
-                    <div id="container-form-kacab-dinamis" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
-                    
-                    <button onclick="simpanPlottingKacab()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-[11px] font-black py-2 rounded shadow-2xs transition-all uppercase tracking-wide">
-                        <i class="fa-solid fa-floppy-disk text-amber-400 mr-1"></i> SIMPAN & KUNCI DATA BARU
-                    </button>
-                </div>
+    <div class="container">
+        <div id="rhNotificationBox" class="section-card" style="display:none;">
+    <div class="section-header" style="background:#c0392b;">
+        <span>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            MONITORING RH AKTIF TOKO
+        </span>
+    </div>
 
-                <div class="space-y-2">
-                    <h3 class="text-[10px] font-black text-gray-600 uppercase"><i class="fa-solid fa-chart-pie text-teal-600 mr-1"></i> Total Rekap Progress Bulan Ini</h3>
-                    <div class="overflow-x-auto rounded-lg border border-gray-200 custom-scroll-x">
-                        <table class="w-full text-left text-xs border-collapse bg-white whitespace-nowrap">
-                            <thead>
-                                <tr class="bg-gray-100 text-gray-700 uppercase text-[9px] font-black border-b border-gray-200">
-                                    <th class="p-2">Nama</th>
-                                    <th class="p-2">Target</th>
-                                    <th class="p-2 text-emerald-600">Selesai</th>
-                                    <th class="p-2">%</th>
-                                    <th class="p-2 text-center">Aksi Hak Akses</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-rekap-kacab" class="divide-y divide-gray-200 text-[11px]"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <section id="panel-crew" class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-2">
-                    <h2 class="text-[11px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-clipboard-check text-teal-600"></i> CHECKLIST HARIAN CREW STORE
-                    </h2>
-                    <div class="flex items-center gap-1.5 w-full sm:w-auto">
-                        <button type="button" onclick="openModalDashboard('USER_LOGIN')" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded border border-teal-700 text-[10px] font-black shadow-2xs transition-all flex items-center justify-center gap-1 uppercase">
-                            <i class="fa-solid fa-chart-pie text-yellow-300"></i> Pop-Up Progress Toko
-                        </button>
-                        <span id="status-gembok-crew" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] px-2 py-0.5 rounded font-black uppercase shrink-0 text-center">Ready</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-[11px]">
-                    <div><span class="text-gray-400 block text-[9px] font-bold">NAMA CREW (AUTO):</span> <b id="lock-nama" class="text-gray-900 font-black uppercase">-</b></div>
-                    <div><span class="text-gray-400 block text-[9px] font-bold">JATAH TUGAS RAK:</span> <b id="lock-total-rak" class="text-blue-600 font-black">0 Rak</b></div>
-                </div>
-
-                <form id="form-laporan" onsubmit="generateLaporanWA(event)" class="space-y-3">
-                    <div class="border border-gray-200 p-2.5 rounded-lg bg-white shadow-2xs">
-                        <h3 class="text-[11px] font-black text-gray-800 mb-1 uppercase flex items-center gap-1"><i class="fa-solid fa-circle-check text-emerald-500"></i> 1. Centang Rak Selesai Hari Ini</h3>
-                        <div id="wrapper-checkbox-rak" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs pt-1"></div>
-                    </div>
-
-                    <div class="border border-gray-200 p-2.5 rounded-lg bg-white shadow-2xs space-y-2">
-                        <h3 class="text-[11px] font-black text-gray-800 uppercase flex items-center gap-1">
-                            <i class="fa-solid fa-cloud-arrow-up text-blue-500"></i> 2. Upload Bukti Foto
-                        </h3>
-                       <div class="text-[11px] space-y-2">
-
-<div>
-
-<label class="block text-gray-500 text-[10px] font-bold mb-0.5">
-Foto Detail Rak (Minimal 5 Foto):
-</label>
-
-<input type="file"
-multiple
-required
-id="file-rak"
-onchange="cekJumlahFoto()"
-class="w-full bg-gray-50 p-1 border border-gray-300 rounded text-xs file:bg-gray-200 file:text-[10px] file:px-2 file:py-0.5 file:rounded file:font-black">
-
-<div id="info-foto"
-class="text-[10px] text-blue-600 mt-1">
-0/5 Foto Upload (kurang 5)
+    <div
+        id="rhNotificationContent"
+        class="section-body">
+    </div>
 </div>
-
-</div>
-
-<div>
-
-<label class="block text-gray-500 text-[10px] font-bold mb-0.5">
-Foto Full Display Toko (1 Foto):
-</label>
-
-<input type="file"
-required
-id="file-full"
-onchange="cekUploadFullDisplay()"
-class="w-full bg-gray-50 p-1 border border-gray-300 rounded text-xs file:bg-gray-200 file:text-[10px] file:px-2 file:py-0.5 file:rounded file:font-black">
-
-<div id="info-full"
-class="text-[10px] text-green-600 mt-1">
-Belum Upload
-</div>
-
-</div>
-
-<div>
-
-<label class="block text-gray-500 text-[10px] font-bold mb-0.5">
-Foto Buku Checklist:
-</label>
-
-<input type="file"
-id="fotoChecklist"
-onchange="cekUploadChecklist()"
-class="w-full bg-gray-50 p-1 border border-gray-300 rounded text-xs file:bg-gray-200 file:text-[10px] file:px-2 file:py-0.5 file:rounded file:font-black">
-
-<div id="info-checklist"
-class="text-[10px] text-blue-600 mt-1">
-Belum Upload
-</div>
-
-</div>
-
-                        <p class="text-[9px] text-amber-600 font-bold italic">*Saat klik kirim, foto otomatis digabung & terdownload langsung ke galeri HP.</p>
-                    </div>
-
-                    <div class="border border-gray-200 p-2.5 rounded-lg bg-white shadow-2xs">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-[11px] font-black text-gray-800 uppercase flex items-center gap-1"><i class="fa-solid fa-calendar-times text-red-500"></i> 3. Input Temuan Item RH</h3>
-                            <button type="button" onclick="tambahBarisRH()" id="btn-tambah-rh" class="bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-black px-2 py-0.5 rounded shadow-2xs">+ TAMBAH ITEM</button>
-                        </div>
-                        <div id="container-rh" class="space-y-1.5 max-h-48 overflow-y-auto pr-0.5"></div>
-                    </div>
-
-                    <button type="submit" id="btn-submit-laporan" class="w-full bg-emerald-600 text-white font-black p-2.5 rounded-lg shadow-xs hover:bg-emerald-700 text-xs tracking-wider transition-all flex justify-center items-center gap-1.5 uppercase">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Kirim & Buka WhatsApp Otomatis
-                    </button>
-                </form>
-            </section>
+        <div id="lockNotification" class="lock-banner" style="display: none;">
+          <i class="fa-solid fa-lock"></i>
+          <span>SISTEM TERKUNCI: Laporan real hari ini sudah tersimpan aman di Cloud Spreadsheet.</span>
         </div>
 
-        <section class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 space-y-2">
-            <div class="border-b pb-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
-                <h2 class="text-[11px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                    <i class="fa-solid fa-calendar-days text-teal-600"></i> MATRIKS MONITORING HARIAN (<span id="txt-matriks-periode">-</span>)
-                </h2>
-                <span class="text-[9px] text-gray-400 font-bold">*Geser ke kanan untuk melihat tanggal berikutnya jika di HP</span>
+        <div class="section-card" id="adminSectionCard" style="display: none;">
+            <div class="section-header bg-rekap">
+                <span><i class="fa-solid fa-user-gear"></i> KONTROL PERSONIL & REVISI RAK</span>
             </div>
-            <div class="overflow-x-auto rounded-lg border border-gray-200 custom-scroll-x">
-                <table class="w-full text-left text-xs border-collapse bg-white whitespace-nowrap">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-700 uppercase text-[9px] font-black border-b border-gray-200 text-center" id="tr-header-tanggal"></tr>
-                    </thead>
-                    <tbody id="tbody-matriks-harian" class="text-[11px] divide-y divide-gray-200"></tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <div id="modal-dashboard" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 hidden animate-fade-in">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-gray-200 flex flex-col max-h-[85vh]">
-            <div class="bg-teal-700 text-white p-3 font-black text-xs flex justify-between items-center tracking-wide shrink-0">
-                <span class="flex items-center gap-1 uppercase"><i class="fa-solid fa-chart-pie text-yellow-300"></i> POP-UP PROGRESS MONITORING SAYA</span>
-                <button type="button" onclick="closeModalDashboard()" class="text-white font-black text-lg hover:text-gray-200">&times;</button>
-            </div>
-            <div class="p-4 overflow-y-auto space-y-3 text-xs flex-1 bg-gray-50/50">
-                <div class="grid grid-cols-3 gap-2 bg-white p-3 rounded-xl border border-gray-200 text-center shadow-2xs">
-                    <div class="border-r">
-                        <span class="text-gray-400 font-bold block text-[9px] uppercase">CREW STORE</span>
-                        <b id="modal-nama-personil" class="text-gray-900 font-black text-[11px] uppercase">-</b>
-                    </div>
-                    <div class="border-r">
-                        <span class="text-gray-400 font-bold block text-[9px] uppercase">TARGET BULANAN</span>
-                        <b id="modal-target-rak" class="text-blue-600 font-black text-[11px]">-</b>
-                    </div>
-                    <div>
-                        <span class="text-gray-400 font-bold block text-[9px] uppercase">PROGRESS KMPTF</span>
-                        <b id="modal-persen" class="text-emerald-600 font-black text-[12px]">0%</b>
-                    </div>
+            <div class="section-body">
+                <div class="admin-action-box">
+                    <strong style="font-size: 11px; color: var(--admin-color);"><i class="fa-solid fa-user-plus"></i> DAFTARKAN KRU BARU TOKO:</strong>
+                    <input type="text" id="newCrewName" placeholder="Nama Lengkap Personil">
+                    <button class="btn btn-success" style="padding: 6px 10px; font-size: 11px; justify-content: center;" onclick="addNewCrewCloud()"><i class="fa-solid fa-plus"></i> DAFTARKAN</button>
                 </div>
-                <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-wider pl-1"><i class="fa-solid fa-list-check text-teal-600 mr-1"></i> Rincian Status Jatah Rak Anda Bulan Ini:</h4>
-                <div id="modal-list-rak" class="space-y-1.5 max-h-60 overflow-y-auto pr-0.5"></div>
+
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; text-align: left; font-size: 11px; border-collapse: collapse;">
+                        <thead>
+                          <tr style="background: #f1f2f6;">
+                            <th style="padding: 6px; border: 1px solid #ddd;">NAMA</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">PLOTTING RAK</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">TAMBAH RAK</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">AKSI</th>
+                          </tr>
+                        </thead>
+                        <tbody id="adminManageTableBody"></tbody>
+                    </table>
+                </div>
             </div>
-            <div class="p-2.5 bg-white border-t text-right shrink-0">
-                <button type="button" onclick="closeModalDashboard()" class="bg-gray-800 hover:bg-gray-900 text-white text-[10px] font-black px-4 py-1.5 rounded-lg shadow-2xs uppercase">TUTUP POP-UP</button>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header bg-checklist">
+                <span><i class="fa-solid fa-clipboard-list"></i> CEKLIS HARIAN CREW</span>
+                <button class="btn btn-success" style="padding: 4px 8px; font-size: 10px;" onclick="openProgressPopup()">
+                    <i class="fa-solid fa-chart-simple"></i> LIVE PROGRESS
+                </button>
+            </div>
+            <div class="section-body">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 12px; background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 11px; border:1px solid #eee;">
+                    <div>PIC AKTIF:<br><strong id="activeCrewName">-</strong></div>
+                    <div style="text-align: right;">TARGET BEBAN:<br><strong id="activeCrewTarget" style="color: var(--secondary-color);">0 Rak</strong></div>
+                </div>
+
+                <h4 style="font-size: 11px; margin-bottom: 5px; color:#555;">1. CENTANG RAK JALAN SELESAI</h4>
+                <div class="checklist-grid" id="checklistGridContainer"></div>
+
+                <div class="upload-group">
+    <h4 style="font-size: 11px; margin-bottom: 8px; color: var(--secondary-color);"><i class="fa-solid fa-camera"></i> 2. UPLOAD BUKTI DOKUMENTASI</h4>
+    
+    <div class="upload-field">
+        <label>Foto Detail Rak (Minimal 5 Foto - Bisa Sekaligus / Dicicil):</label>
+        <!-- Diubah onchange-nya menjadi cicilFotoRak() -->
+        <input type="file" id="uploadRak" multiple accept="image/*" onchange="cicilFotoRak()">
+        <div class="upload-status" id="statusRak" style="color: #e63946;">Belum ada file dipilih (Minimal harus 5 foto!)</div>
+        
+        <!-- Ditambahkan tombol reset kecil di bawahnya jika kru ingin mengosongkan antrean foto -->
+        <button type="button" class="btn" style="padding: 2px 6px; font-size: 10px; margin-top: 4px; background-color: #e63946; color: white;" onclick="resetFotoRak()">
+            <i class="fa-solid fa-trash-can"></i> Reset Foto Rak
+        </button>
+    </div>
+    
+    <div class="upload-field">
+        <label>Foto Full Display Toko (1 Foto):</label>
+        <input type="file" id="uploadDisplay" accept="image/*" onchange="handleFileStatus('uploadDisplay', 'statusDisplay', 1)">
+        <div class="upload-status" id="statusDisplay" style="color: #e63946;">Belum Upload</div>
+    </div>
+    
+    <div class="upload-field">
+        <label>Foto Buku Checklist (1 Foto):</label>
+        <input type="file" id="uploadBuku" accept="image/*" onchange="handleFileStatus('uploadBuku', 'statusBuku', 1)">
+        <div class="upload-status" id="statusBuku" style="color: #e63946;">Belum Upload</div>
+    </div>
+</div>
+
+                <div style="margin-top: 15px;">
+                    <h4 style="font-size: 11px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>3. INPUT TEMUAN BARANG EXP / RH</span>
+                        <button class="btn btn-primary" id="btnTambahItem" style="padding: 4px 8px; font-size:10px;" onclick="addExpRow()"><i class="fa-solid fa-plus"></i> TAMBAH ITEM</button>
+                    </h4>
+                    <div id="expContainer"></div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-primary" id="btnSimpanChecklist" style="background-color: #2c3e50; padding: 12px; font-size: 13px; justify-content: center;" onclick="saveChecklistToCloud()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN & KUNCI DATA KE CLOUD
+                    </button>
+                    <button class="btn btn-disabled" id="btnKirimWA" style="padding: 12px; font-size: 13px; justify-content: center; background-color: #27ae60 !important; color: white !important;" onclick="generateCollageAndWA()" disabled>
+                        <i class="fa-brands fa-whatsapp"></i> KIRIM & BUKA WA OTOMATIS
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header bg-horror">
+                <span><i class="fa-solid fa-skull-crossbones"></i> PAPAN KEDISIPLINAN PERSONIL HARI INI</span>
+            </div>
+            <div class="section-body" style="padding:0;" id="mainHorrorLeaderboard"></div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header bg-matriks">
+                <span><i class="fa-solid fa-calendar-days"></i> DASHBOARD MATRIKS HARIAN (<span id="matriksMonthLabel">-</span>)</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <div class="matriks-container">
+                    <table class="tabel-matriks">
+                        <thead>
+                            <tr id="matriksHeaderRow">
+                                <th class="crew-name-col">NAMA CREW</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matriksTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-penarikan" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 hidden">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-gray-200">
-            <div class="bg-red-600 text-white p-2.5 font-black text-xs flex justify-between items-center">
-                <span>📦 FORM KONFIRMASI AMBIL ITEM</span>
-                <button type="button" onclick="closeFormPenarikan()" class="text-white font-bold text-sm">&times;</button>
+    <div id="progressModal" class="modal">
+        <div class="modal-content" style="border: 3px solid #7f1d1d;">
+            <div class="modal-header" style="background: #7f1d1d;">
+                <span><i class="fa-solid fa-eye"></i> PENGINTAIAN PROGRESS ONLINE</span>
+                <button style="background:none; border:none; color:white; font-size:18px; cursor:pointer;" onclick="closeProgressPopup()">&times;</button>
             </div>
-            <div class="p-3 space-y-2 text-xs">
-                <div>
-                    <label class="block text-gray-500 font-bold text-[10px] mb-0.5">Detail Barang & Periode:</label>
-                    <input type="text" id="input-tarik-nama" readonly class="w-full p-1.5 border border-gray-300 bg-gray-50 text-amber-600 font-black rounded focus:outline-none">
-                    <input type="hidden" id="input-tarik-index"><input type="hidden" id="input-tarik-bulan-asal">
+            <div class="modal-body">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: #555;">
+                    <span>PROGRESS TOTAL TOKO</span>
+                    <span id="modalTotalStoreProgressText">0%</span>
                 </div>
-                <div>
-                    <label class="block text-gray-500 font-bold text-[10px] mb-0.5">Nama Crew Penarik (Nama Anda):</label>
-                    <input type="text" id="input-tarik-oleh" class="w-full p-1.5 border border-gray-300 bg-white text-gray-900 font-black uppercase rounded">
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="modalTotalStoreProgressFill" style="background:#7f1d1d;"></div>
                 </div>
-                <div>
-                    <label class="block text-gray-400 font-bold text-[10px] mb-0.5">Upload Foto Bukti Penarikan Fisik:</label>
-                    <input type="file" required class="w-full p-1 border border-gray-300 bg-gray-50 rounded text-[10px]">
-                </div>
-                <button type="button" onclick="prosesSelesaiTarik()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black p-2 rounded mt-1 transition-all text-xs uppercase">
-                    Amankan Barang & Hapus Alarm
-                </button>
+                <h5 style="font-size: 11px; border-bottom: 2px solid #eee; padding-bottom: 4px; margin-bottom: 8px; color:#333;"><i class="fa-solid fa-ranking-star"></i> DAFTARKAN STATUS DOSA/AMAL PERSONIL:</h5>
+                <div id="modalCrewListContainer"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const URL_CLOUD_DRIVE = "https://script.google.com/macros/s/AKfycbyG7lic6pIyIlGf-hG2kJA0lah2KhBcdYl6l4pF32uPlK00JpyVEnwk1zljv9UJ6Ri6/exec"; 
-
-let globalDatabase=JSON.parse(localStorage.getItem('db_omkopipait_v3'))||{};
-
-let currentActiveUser={
-nama:'GUEST',
-toko:'UNKNOWN',
-role:'locked'
-};
-
-const now=new Date();
-
-let currentBulan=String(now.getMonth()+1).padStart(2,'0');
-let currentTahun=String(now.getFullYear());
-
-let keyPeriode=`${currentTahun}-${currentBulan}`;
-
-let databaseCloudToko={};
-
-const namaBulanIndo={
-"01":"Januari",
-"02":"Februari",
-"03":"Maret",
-"04":"April",
-"05":"Mei",
-"06":"Juni",
-"07":"Juli",
-"08":"Agustus",
-"09":"September",
-"10":"Oktober",
-"11":"November",
-"12":"Desember"
-};
-
-window.onload=function(){
-
-const u=sessionStorage.getItem('userArea');
-
-if(!u){
-
-alert('⚠️ Login dulu');
-
-location.href='index.html';
-
-return;
-
-}
-
-currentActiveUser=JSON.parse(u);
-
-if(
-!currentActiveUser.nama
-||
-!currentActiveUser.toko
-||
-!currentActiveUser.role
-){
-
-sessionStorage.clear();
-
-alert('Session rusak');
-
-location.href='index.html';
-
-return;
-
-}
-
-const n=currentActiveUser.nama.toUpperCase();
-
-txtKode=document.getElementById('txt-kode-toko');
-txtNama=document.getElementById('lock-nama');
-
-txtKode.innerText=currentActiveUser.toko;
-txtNama.innerText=n;
-
-document.getElementById('input-tarik-oleh').value=n;
-
-setupDropdownBulanTahun();
-
-initDatabasePeriodeIni();
-
-if(currentActiveUser.role==="admin"){
-
-document.getElementById('user-badge').innerText='Kepala Toko';
-
-document.getElementById('panel-kacab').classList.remove('hidden');
-
-renderFormPlottingAdmin();
-
-isiTanggalAdmin();
-
-bersihkanDataLama();
-
-}else{
-
-document.getElementById('user-badge').innerText='Crew Store';
-
-document.getElementById('panel-kacab').classList.add('hidden');
-
-// KUNCI FILTER CREW
-document.getElementById('select-tipe-toko').disabled=true;
-document.getElementById('filter-bulan').disabled=true;
-document.getElementById('filter-tahun').disabled=true;
-
-// TAMPILKAN TANGGAL
-isiTanggalAdmin();
-
-// KUNCI TANGGAL
-document.getElementById('admin-tanggal').disabled=true;
-
-}
-
-};
-
-
-function setupDropdownBulanTahun(){
-
-const fb=
-document.getElementById(
-'filter-bulan'
-);
-
-const ft=
-document.getElementById(
-'filter-tahun'
-);
-
-fb.innerHTML='';
-ft.innerHTML='';
-
-const sekarang=
-new Date();
-
-const tahunNow=
-sekarang.getFullYear();
-
-const bulanNow=
-String(
-sekarang.getMonth()+1
-).padStart(2,'0');
-
-currentTahun=
-String(tahunNow);
-
-currentBulan=
-bulanNow;
-
-Object.keys(
-namaBulanIndo
-).forEach(k=>{
-
-fb.innerHTML+=
-`<option value="${k}" ${k===currentBulan?'selected':''}>
-${namaBulanIndo[k]}
-</option>`;
-
-});
-
-for(
-let t=tahunNow-1;
-t<=tahunNow+3;
-t++
-){
-
-ft.innerHTML+=
-`<option value="${t}" ${t===tahunNow?'selected':''}>
-${t}
-</option>`;
-
-}
-
-keyPeriode=
-`${currentTahun}-${currentBulan}`;
-
-}
-
-        function initDatabasePeriodeIni() {
-            const elemenMatriks = document.getElementById('txt-matriks-periode');
-            if (elemenMatriks) {
-                elemenMatriks.innerText = `${namaBulanIndo[currentBulan]} ${currentTahun}`;
-            }
-            muatDatabaseDariCloudDrive();
-        }
-
-        function initDatabasePeriodeIniLokal() {
-            if(!globalDatabase[keyPeriode]) {
-                globalDatabase[keyPeriode] = { pembagianRak: {}, statusRak: {}, historyLogHarian: {}, kunciLaporanUserHariIni: {} };
-            }
-            refreshSemuaUI();
-        }
-
-async function muatDatabaseDariCloudDrive(){
-
-const kodeTokoAktif=currentActiveUser.toko.toUpperCase();
-const periodeBulanAktif=keyPeriode;
-
-try{
-
-const respon=await fetch(
-URL_CLOUD_DRIVE+
-'?kodeToko='+kodeTokoAktif+
-'&periode='+periodeBulanAktif
-);
-
-if(!respon.ok)
-throw new Error('Koneksi gagal');
-
-let hasil=await respon.json();
-
-console.log(
-'DATA CLOUD FULL =',
-JSON.stringify(hasil,null,2)
-);
-
-console.log(
-JSON.stringify(
-hasil,
-null,
-2
-)
-);
-
-console.log(
-'PEMBAGIAN RAK DRIVE:',
-JSON.stringify(
-hasil.pembagianRak
-)
-);
-
-console.log(
-'USER LOGIN:',
-currentActiveUser.nama.toUpperCase()
-);
-
-if(hasil.data)
-hasil=hasil.data;
-
-if(Array.isArray(hasil))
-hasil=hasil[0]||{};
-
-databaseCloudToko=hasil||{};
-
-console.log('RAW HASIL CLOUD');
-console.log(hasil);
-
-console.log('STATUS RAK CLOUD');
-console.log(hasil.statusRak);
-
-console.log('KEY STATUS');
-console.log(
-Object.keys(
-hasil.statusRak || {}
-).length
-);
-
-Object.keys(databaseCloudToko.pembagianRak||{}).forEach(function(key){
-
-let namaBaru=key.trim().toUpperCase();
-
-if(namaBaru!==key){
-
-databaseCloudToko.pembagianRak[namaBaru]=databaseCloudToko.pembagianRak[key];
-
-delete databaseCloudToko.pembagianRak[key];
-
-}
-
-});
-
-const dbLocal=
-globalDatabase[keyPeriode]
-||
-{
-statusRak:{},
-historyLogHarian:{},
-kunciLaporanUserHariIni:{}
-};
-
-globalDatabase[keyPeriode]={
-
-pembagianRak:
-databaseCloudToko.pembagianRak
-&&
-Object.keys(
-databaseCloudToko.pembagianRak
-).length
-?
-databaseCloudToko.pembagianRak
-:
-(dbLocal.pembagianRak||{}),
-
-statusRak:
-databaseCloudToko.statusRak||{},
-
-historyLogHarian:
-dbLocal.historyLogHarian||{},
-
-kunciLaporanUserHariIni:
-dbLocal.kunciLaporanUserHariIni||{}
-
-};
-
-console.log('SETELAH PARSING:',globalDatabase[keyPeriode]);
-
-console.log(
-'JUMLAH RH DARI CLOUD =',
-(databaseCloudToko.listActiveRH||[]).length
-);
-
-renderNotifikasiAlarmRH(
-databaseCloudToko.listActiveRH||[]
-);
-
-refreshSemuaUI();
-
-}
-
-catch(error){
-
-console.log(
-'Cloud gagal:',
-error
-);
-
-initDatabasePeriodeIniLokal();
-
-databaseCloudToko={};
-
-console.log(
-'STATUS CLOUD:',
-Object.keys(databaseCloudToko.statusRak||{}).length
-);
-
-console.log(
-databaseCloudToko.statusRak
-);
-
-console.log(
-'Fallback ke database lokal'
-);
-
-refreshSemuaUI();
-
-}
-
-}
-
-function formatTanggalKey(tgl,bulan,tahun){
-
-return (
-String(tgl).padStart(2,'0') +
-"/" +
-String(bulan).padStart(2,'0') +
-"/" +
-tahun
-);
-
-}
-
-
-function isiTanggalAdmin(){
-
-let h='';
-
-for(let i=1;i<=31;i++){
-
-h+=`<option value="${i}">TGL ${i}</option>`;
-
-}
-
-const tgl=
-new Date().getDate();
-
-document.getElementById(
-'admin-tanggal'
-).innerHTML=h;
-
-document.getElementById(
-'admin-tanggal'
-).value=tgl;
-
-// ADMIN & CREW SAMA-SAMA PUNYA TANGGAL AKTIF
-window.tanggalMode=tgl;
-
-document.getElementById(
-'admin-tanggal'
-).classList.remove(
-'hidden'
-);
-
-}
-
-
-function gantiTanggalAdmin(){
-
-window.tanggalMode=parseInt(
-document.getElementById('admin-tanggal').value
-);
-
-refreshSemuaUI();
-
-alert(
-'Mode cek bug TGL '+
-window.tanggalMode
-);
-
-}
-
-
-function renderNotifikasiAlarmRH(listActiveRH = []){
-
-const container=
-document.getElementById(
-'list-warning-rh-nyata'
-);
-
-const alertBox=
-document.getElementById(
-'alert-rh-container'
-);
-
-if(!container||!alertBox)return;
-
-container.innerHTML='';
-
-let jumlahAlarm=0;
-
-listActiveRH.forEach(function(item){
-
-if(
-!item.barang||
-!item.rak||
-!item.exp
-){
-return;
-}
-
-const today=
-new Date();
-
-today.setHours(0,0,0,0);
-
-const expDate=
-new Date(item.exp);
-
-expDate.setHours(0,0,0,0);
-
-const sisaHari=
-Math.ceil(
-(expDate-today)/86400000
-);
-
-const rhHari=
-parseInt(item.kategori)||0;
-
-const hariMenujuTarik=
-sisaHari-rhHari;
-
-// hanya tampil mulai H-7 menuju RH
-if(hariMenujuTarik>7){
-return;
-}
-
-jumlahAlarm++;
-
-let warnaCard=
-'bg-yellow-50 border-yellow-300 text-yellow-800';
-
-let icon='🟡';
-let status='SIAP FOKUS JUAL';
-
-if(
-hariMenujuTarik<=3
-&&
-hariMenujuTarik>=0
-){
-
-warnaCard=
-'bg-orange-50 border-orange-300 text-orange-800';
-
-icon='🟠';
-status='SEGERA TARIK';
-
-}
-
-if(
-hariMenujuTarik<0
-){
-
-warnaCard=
-'bg-red-50 border-red-400 text-red-800 animate-pulse';
-
-icon='🔴';
-status='LEWAT BATAS RH';
-
-}
-
-const d=
-document.createElement('div');
-
-d.className=
-`p-2 rounded border flex justify-between items-center gap-2 ${warnaCard}`;
-
-if(
-hariMenujuTarik<=3
-&&
-hariMenujuTarik>=0
-){
-d.classList.add(
-'animate-bounce'
-);
-}
-
-d.innerHTML=
-
-'<div class="overflow-hidden">'+
-
-'<div class="font-black">'+
-icon+' '+item.barang+
-'</div>'+
-
-'<div class="text-[10px]">'+
-'Rak : '+item.rak+
-'</div>'+
-
-'<div class="text-[10px]">'+
-'Qty : '+item.qty+
-'</div>'+
-
-'<div class="text-[10px]">'+
-'PIC : '+(item.crew||'-')+
-'</div>'+
-
-'<div class="text-[10px]">'+
-'EXP : '+
-formatTanggalKey(
-expDate.getDate(),
-expDate.getMonth()+1,
-expDate.getFullYear()
-)+
-'</div>'+
-
-'<div class="text-[10px] font-black">'+
-status+
-'</div>'+
-
-'<div class="text-[10px]">'+
-'H-'+hariMenujuTarik+
-' menuju RH '+
-rhHari+
-' Hari'+
-'</div>'+
-
-'</div>'+
-
-'<button type="button" onclick="eksekusiTarikBarangFisikRH('+item.rowId+')" class="bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded shrink-0">'+
-'TARIK'+
-'</button>';
-
-container.appendChild(d);
-
-});
-
-if(jumlahAlarm===0){
-
-alertBox.classList.add(
-'hidden'
-);
-
-}else{
-
-alertBox.classList.remove(
-'hidden'
-);
-
-}
-}
-
-
-        async function eksekusiTarikBarangFisikRH(rowIdDiSheets) {
-            if(!confirm("Apakah Anda yakin barang RH ini beneran sudah ditarik bersih dari rak?")) return;
-            const payload = { action: "eksekusiTarikRH", rowId: rowIdDiSheets, penarik: currentActiveUser.nama.toUpperCase() };
-
-            try {
-                const respon = await fetch(URL_CLOUD_DRIVE, { method: "POST", body: JSON.stringify(payload) });
-                if((await respon.text()) === "OK_DITARIK") {
-                    alert("🎯 Alarm Berhasil Dijinakkan!");
-                    muatDatabaseDariCloudDrive();
-                }
-            } catch (e) { alert("Gagal koneksi cloud."); }
-        }
-
-        function gantiPeriodeBulan() {
-            currentBulan = document.getElementById('filter-bulan').value;
-            currentTahun = document.getElementById('filter-tahun').value;
-            keyPeriode = `${currentTahun}-${currentBulan}`;
-            initDatabasePeriodeIni();
-            if (currentActiveUser.role === "admin") renderFormPlottingAdmin();
-        }
-
-        function saveTipeToko() {
-            localStorage.setItem('db_omkopipait_v3', JSON.stringify(globalDatabase));
-        }
-
-        function renderFormPlottingAdmin() {
-            const container = document.getElementById('container-form-kacab-dinamis');
-            container.innerHTML = "";
-            const db = globalDatabase[keyPeriode] || { pembagianRak: {} };
-            const seluruhCrew = Object.keys(db.pembagianRak || {})
-
-            if(seluruhCrew.length === 0) {
-                tambahFormPersonilBaru();
+        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbynZ66L4L5a7ShR_MnfNECrtyz2T4e-kvlK7wcBjbMyTUWocK5zJ0H3Es5_MciKZeND_A/exec"; 
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const userRole = urlParams.get('mode') || 'locked'; 
+        const userToko = (urlParams.get('toko') || 'CB09').toUpperCase().trim();
+        const userNama = urlParams.get('nama') || '';
+
+        let isSavedAndLocked = false; 
+        let cloudPlottingData = [];
+        let rhAktifGlobal = []; 
+
+        window.onload = function() {
+            document.getElementById('labelKodeToko').innerText = `TOKO: ${userToko}`;
+            buildDynamicSelectors();
+            
+            const badge = document.getElementById('currentRoleBadge');
+            if (userRole === 'admin') {
+                badge.className = "role-badge kepala"; badge.innerText = "Kepala Toko";
+                document.getElementById('adminSectionCard').style.display = "block"; 
             } else {
-                seluruhCrew.forEach(crew => { tambahFormPersonilBaru(crew, db.pembagianRak[crew]); });
+                badge.className = "role-badge crew"; badge.innerText = "Crew Store";
+                document.getElementById('daySelector').disabled = true;
+                document.getElementById('monthSelector').disabled = true;
+                document.getElementById('yearSelector').disabled = true;
+            }
+
+            buildMatriksHeaders();
+            syncWithCloud();
+        }
+
+        function buildDynamicSelectors() {
+            const now = new Date();
+            const daySel = document.getElementById('daySelector');
+            for(let d=1; d<=31; d++) {
+                let opt = document.createElement('option'); opt.value = d; opt.innerText = d;
+                if(d === now.getDate()) opt.selected = true;
+                daySel.appendChild(opt);
+            }
+            const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+            const monthSel = document.getElementById('monthSelector');
+            months.forEach((m, idx) => {
+                let opt = document.createElement('option'); opt.value = m; opt.innerText = m;
+                if(idx === now.getMonth()) opt.selected = true;
+                monthSel.appendChild(opt);
+            });
+            const yearSel = document.getElementById('yearSelector');
+            const currentYear = now.getFullYear();
+            for(let y = currentYear; y <= currentYear + 3; y++) {
+                let opt = document.createElement('option'); opt.value = y; opt.innerText = y;
+                yearSel.appendChild(opt);
             }
         }
 
-        function tambahFormPersonilBaru(namaDefault = "", arrayRakDefault = []) {
-            const container = document.getElementById('container-form-kacab-dinamis');
-            const uid = "uid_" + Date.now() + Math.floor(Math.random() * 100);
-            const divBox = document.createElement('div');
-            divBox.id = uid;
-            divBox.className = "bg-white p-2 rounded-lg border border-gray-200 class-box-personil-induk space-y-1 text-[11px]";
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
 
-            let htmlRak = "";
-            if(arrayRakDefault.length === 0) {
-                htmlRak = generateInputRakHtml();
-            } else {
-                arrayRakDefault.forEach(r => { htmlRak += generateInputRakHtml(r); });
+        function buildMatriksHeaders() {
+            const headerRow = document.getElementById('matriksHeaderRow');
+            while(headerRow.children.length > 1) { headerRow.removeChild(headerRow.lastChild); }
+            for(let i=1; i<=31; i++) {
+                let th = document.createElement('th'); th.innerText = i < 10 ? '0' + i : i; headerRow.appendChild(th);
             }
+        }
 
-            divBox.innerHTML = `
-                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between border-b pb-1">
-                    <div class="flex gap-1 items-center w-full sm:w-auto">
-                        <span class="text-gray-400 font-bold">👤 CREW:</span>
-                        <input type="text" value="${namaDefault}" placeholder="NAMA" class="p-1 border border-gray-300 rounded bg-gray-50 font-black uppercase text-xs w-28 class-input-nama-crew">
-                    </div>
-                    <div class="flex gap-2 items-center shrink-0">
-                        <button type="button" onclick="tambahBarisRakKeKru('${uid}')" class="text-blue-600 hover:underline font-black text-[10px]">+ Jatah Rak</button>
-                        <button type="button" onclick="hapusCrew('${uid}')" class="text-red-500 hover:text-red-700 font-bold text-[10px]">× Hapus</button>
-                    </div>
-                </div>
-                <div class="container-list-rak-anak flex flex-wrap gap-1 pt-1">${htmlRak}</div>
+function syncWithCloud() {
+  showLoading(true);
+
+  const tgl =
+    `${document.getElementById('daySelector').value}-${document.getElementById('monthSelector').value}-${document.getElementById('yearSelector').value}`;
+
+  document.getElementById('matriksMonthLabel').innerText =
+    `${document.getElementById('monthSelector').value.toUpperCase()} ${document.getElementById('yearSelector').value}`;
+
+  fetch(`${CLOUD_API_URL}?action=getLatestData&storeCode=${userToko}&tanggal=${tgl}`)
+  .then(res => res.json())
+  .then(res => {
+    console.log("RESPON SERVER");
+    console.log(res);
+
+      if(res.status === "success") {
+
+          cloudPlottingData =
+            JSON.parse(JSON.stringify(res.plotting || []));
+
+            rhAktifGlobal =
+            JSON.parse(JSON.stringify(res.rhAktif || []));
+
+          console.log("=== CEK DATA CREW ===");
+          cloudPlottingData.forEach(c=>{
+              console.log(
+                  c.name,
+                  "DONE=", c.isDone,
+                  "RAK=", c.savedRaks
+              );
+          });
+
+          console.log("DATA DARI DRIVE:", res);
+
+          isSavedAndLocked = !!res.isLocked;
+
+            renderAdminManagementTable();
+            renderCrewFormLayout();
+            renderMatriksBulananLayout();
+            renderHorrorLeaderboard();
+            renderRHNotification(res.rhAktif || []);
+      }
+
+      showLoading(false);
+
+  })
+  .catch(err => {
+      alert("Koneksi Cloud Spreadsheet Bermasalah.");
+      showLoading(false);
+  });
+}
+
+        function dapatkanKataHororSindiran() {
+            const kataKata = [
+                "BEBAN TOKO! Sengaja nunda jatah kerjaan biar numpuk ya?",
+                "MATA DI BUTAKAN HATI DI MATIKAN! Rak berdebu dibiarin aja!",
+                "MENGERIKAN! Nama Anda dicatat Malaikat pencari item Expired!",
+                "GAJI MAU UTUH, KERJAAN MAU LUPUT? Buruan isi laporan woi!",
+                "MANUSIA PURBA! Belum laporan sama sekali hari ini, awas disidak!",
+                "SANG JUARA TIDUR! Kerjaan ditinggal, HP dimainin terus!",
+                "BURONAN INVESTIGASI! Dicari Kepala Toko karena belum sentuh rak!"
+            ];
+            return kataKata[Math.floor(Math.random() * kataKata.length)];
+        }
+
+        function dapatkanKataPujian() {
+            const pujian = [
+                "AMALAN BERSIH! Idaman Kepala Toko, bonus menanti!",
+                "PAHLAWAN DISPLAY! Rak kinclong anti-expired, mantap!",
+                "CREW ELITE! Disiplin tinggi, kerja tuntas anti tunda!"
+            ];
+            return pujian[Math.floor(Math.random() * pujian.length)];
+        }
+
+        function renderHorrorLeaderboard() {
+    const mainBox = document.getElementById('mainHorrorLeaderboard');
+    mainBox.innerHTML = "";
+
+    if(cloudPlottingData.length === 0) {
+        mainBox.innerHTML =
+        `<div style="padding:15px;color:#aaa;text-align:center;">
+            Data kosong.
+        </div>`;
+        return;
+    }
+
+    let ranking = [...cloudPlottingData];
+
+    ranking.sort((a,b)=>{
+        return (b.savedRaks?.length || 0) - (a.savedRaks?.length || 0);
+    });
+
+    ranking.forEach((crew,index)=>{
+
+        const totalRak = crew.raks ? crew.raks.length : 0;
+        const rakJalan = crew.savedRaks ? crew.savedRaks.length : 0;
+        const sisaRak = Math.max(0,totalRak-rakJalan);
+
+        const progress =
+            totalRak > 0
+            ? Math.round((rakJalan/totalRak)*100)
+            : 0;
+
+        let medal =
+            index===0 ? "🥇" :
+            index===1 ? "🥈" :
+            index===2 ? "🥉" : "🏅";
+
+        let div = document.createElement('div');
+
+        if(progress >= 100){
+
+            div.className = "horror-rank-item rajin";
+
+            div.innerHTML = `
+                <span>
+                    ${medal} <b>${crew.name}</b><br>
+
+                    <small>
+                        Jatah : ${totalRak} Rak |
+                        Jalan : ${rakJalan} Rak |
+                        Sisa : ${sisaRak} Rak |
+                        Progress : ${progress}%
+                    </small><br>
+
+                    <small style="color:#27ae60;">
+                        ${dapatkanKataPujian()}
+                    </small>
+                </span>
+
+                <span class="horror-badge pujian">
+                    SELESAI
+                </span>
             `;
-            container.appendChild(divBox);
-        }
 
-function hapusCrew(uid){
+        } else {
 
-if(!confirm('Hapus personil ini?'))
-return;
+            div.className = "horror-rank-item males";
 
-const box=document.getElementById(uid);
+            div.innerHTML = `
+                <span>
+                    ${medal} <b>${crew.name}</b><br>
 
-const nama=box
-.querySelector('.class-input-nama-crew')
-.value
-.trim()
-.toUpperCase();
+                    <small>
+                        Jatah : ${totalRak} Rak |
+                        Jalan : ${rakJalan} Rak |
+                        Sisa : ${sisaRak} Rak |
+                        Progress : ${progress}%
+                    </small><br>
 
-const db=globalDatabase[keyPeriode]||{
-pembagianRak:{},
-historyLogHarian:{},
-statusRak:{}
-};
+                    <small style="color:#e74c3c;">
+                        🚨 ${dapatkanKataHororSindiran()}
+                    </small>
+                </span>
 
-delete db.pembagianRak[nama];
-
-Object.keys(db.historyLogHarian||{}).forEach(t=>{
-
-delete db.historyLogHarian[t]?.[nama];
-
-});
-
-box.remove();
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-}
-
-        function generateInputRakHtml(val = "") {
-            return `
-                <div class="flex items-center class-row-rak-tunggal bg-gray-100 px-1 py-0.5 rounded border border-gray-200">
-                    <input type="text" value="${val}" placeholder="001" class="w-12 text-center text-[11px] p-0.5 bg-white font-bold rounded border border-gray-300 class-val-rak-input">
-                    <button type="button" onclick="this.closest('.class-row-rak-tunggal').remove()" class="text-red-400 hover:text-red-600 text-[10px] pl-1 font-bold">×</button>
-                </div>
+                <span class="horror-badge sindiran">
+                    ${progress}%
+                </span>
             `;
         }
 
-        function tambahBarisRakKeKru(id) {
-            const child = document.querySelector(`#${id} .container-list-rak-anak`);
-            const div = document.createElement('div');
-            div.className = "flex gap-0.5 items-center class-row-rak-tunggal";
-            div.innerHTML = generateInputRakHtml();
-            child.appendChild(div);
-        }
-
-async function simpanPlottingKacab(){
-
-const btn=document.querySelector(
-'button[onclick="simpanPlottingKacab()"]'
-);
-
-if(btn){
-
-btn.disabled=true;
-btn.innerHTML='⏳ MENYIMPAN...';
-
+        mainBox.appendChild(div);
+    });
 }
 
-const boxes=document.querySelectorAll('.class-box-personil-induk');
-
-let dataBaru={};
-let listCrewAktifSaatIni=[];
-
-boxes.forEach(box=>{
-
-const nama=box
-.querySelector('.class-input-nama-crew')
-.value
-.trim()
-.toUpperCase();
-
-const inputs=box.querySelectorAll('.class-val-rak-input');
-
-if(!nama)return;
-
-let list=[];
-
-inputs.forEach(i=>{
-
-if(i.value.trim())
-list.push(i.value.trim());
-
-});
-
-if(list.length>0){
-
-if(dataBaru[nama]){
-alert('❌ Nama crew "'+nama+'" duplikat');
-throw new Error('DUPLIKAT_CREW');
-}
-
-dataBaru[nama]=list;
-
-listCrewAktifSaatIni.push(nama);
-
-}
-
-});
-
-const db=globalDatabase[keyPeriode]||{
-historyLogHarian:{},
-statusRak:{}
-};
-
-Object.keys(db.historyLogHarian||{}).forEach(t=>{
-
-Object.keys(db.historyLogHarian[t]||{}).forEach(n=>{
-
-if(!dataBaru[n])
-delete db.historyLogHarian[t][n];
-
-});
-
-});
-
-Object.keys(db.statusRak||{}).forEach(key=>{
-
-const dataStatus=
-db.statusRak[key];
-
-const nomorRak=
-dataStatus.rak;
-
-let masihDipakai=false;
-
-Object.values(dataBaru).forEach(list=>{
-
-if(list.includes(nomorRak))
-masihDipakai=true;
-
-});
-
-if(!masihDipakai)
-delete db.statusRak[key];
-
-});
-
-db.pembagianRak=dataBaru;
-
-const payload={
-
-action:'simpanPlotting',
-
-kodeToko:currentActiveUser.toko.toUpperCase(),
-
-periode:keyPeriode,
-
-pembagianRak:dataBaru
-
-};
-
-try{
-
-const respon=await fetch(
-URL_CLOUD_DRIVE,
-{
-method:'POST',
-body:JSON.stringify(payload)
-}
-);
-
-if((await respon.text())==='OK_PLOTTING'){
-
-globalDatabase[keyPeriode].pembagianRak=dataBaru;
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-alert('✅ BERHASIL DISIMPAN!');
-
-databaseCloudToko={};
-
-refreshSemuaUI();
-
-renderFormPlottingAdmin();
-
-setTimeout(
-()=>muatDatabaseDariCloudDrive(),
-1000
-);
-
-}
-
-}
-
-catch(e){
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-alert('🚨 DRIVE OFFLINE!');
-
-refreshSemuaUI();
-
-}
-
-finally{
-
-if(btn){
-
-btn.innerHTML='✅ TERSIMPAN';
-
-setTimeout(()=>{
-
-btn.disabled=false;
-
-btn.innerHTML=
-'<i class="fa-solid fa-floppy-disk text-amber-400 mr-1"></i> SIMPAN & KUNCI DATA BARU';
-
-},2000);
-
-}
-
-}
-
-}
-
-function bersihkanDataLama(){
-
-const sekarang=
-new Date();
-
-Object.keys(globalDatabase).forEach(key=>{
-
-const parts=key.split('-');
-
-if(parts.length!==2)return;
-
-const tahun=parseInt(parts[0]);
-const bulan=parseInt(parts[1])-1;
-
-const tglData=
-new Date(tahun,bulan);
-
-const selisihBulan=
-(sekarang.getFullYear()-tglData.getFullYear())*12
-+
-(sekarang.getMonth()-tglData.getMonth());
-
-if(selisihBulan>2){
-
-delete globalDatabase[key];
-
-}
-
-});
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-}
-
-function cekUploadFullDisplay(){
-
-const file=
-document.getElementById(
-'file-full'
-).files;
-
-const info=
-document.getElementById(
-'info-full'
-);
-
-if(file.length){
-
-info.innerHTML=
-'✅ Upload Berhasil';
-
-}else{
-
-info.innerHTML=
-'Belum Upload';
-
-}
-
-}
-
-function cekUploadChecklist(){
-
-const file=
-document.getElementById(
-'fotoChecklist'
-).files;
-
-const info=
-document.getElementById(
-'info-checklist'
-);
-
-if(file.length){
-
-info.innerHTML=
-'✅ Upload Berhasil';
-
-}else{
-
-info.innerHTML=
-'Belum Upload';
-
-}
-
-}
-
-        function resetTotalHalamanWeb() {
-            if(confirm("🚨 RESET TOTAL DATABASE MONITORING TOKO INI?")) {
-                localStorage.removeItem('db_omkopipait_v3');
-                alert("Selesai! Memuat ulang.");
-                location.reload();
-            }
-        }
-
-async function prosesGabungFotoOtomatis(){
-
-const fileRak=semuaFotoRak;
-const fileFull=document.getElementById('file-full').files;
-const fotoChecklist=document.getElementById('fotoChecklist').files;
-
-let kurang=[];
-
-if(fileRak.length<5)kurang.push(`${5-fileRak.length} Foto Rak`);
-if(!fileFull.length)kurang.push("1 Foto Full Display");
-if(!fotoChecklist.length)kurang.push("1 Foto Buku Checklist");
-
-if(kurang.length){
-alert("⚠️ Kurang:\n\n"+kurang.join("\n"));
-return false;
-}
-
-alert("📸 Memproses Foto...");
-
-const canvas=document.createElement('canvas');
-const ctx=canvas.getContext('2d');
-
-canvas.width=1200;
-canvas.height=1600;
-
-ctx.fillStyle="#ffffff";
-ctx.fillRect(0,0,1200,1600);
-
-const load=(f)=>new Promise(resolve=>{
-
-const img=new Image();
-
-const url=URL.createObjectURL(f);
-
-img.onload=()=>{
-
-URL.revokeObjectURL(url);
-
-resolve(img);
-
-};
-
-img.src=url;
-
-});
-
-try{
-
-const full=await load(fileFull[0]);
-
-ctx.drawImage(
-full,
-20,
-20,
-1160,
-700
-);
-
-const checklist=await load(fotoChecklist[0]);
-
-ctx.drawImage(
-checklist,
-20,
-740,
-550,
-500
-);
-
-for(let i=0;i<5;i++){
-
-const img=await load(fileRak[i]);
-
-let x=0;
-let y=0;
-let w=280;
-let h=240;
-
-if(i===0){
-x=600;
-y=740;
-}
-
-if(i===1){
-x=900;
-y=740;
-}
-
-if(i===2){
-x=600;
-y=1000;
-}
-
-if(i===3){
-x=900;
-y=1000;
-}
-
-if(i===4){
-x=600;
-y=1260;
-w=580;
-}
-
-ctx.drawImage(
-img,
-x,
-y,
-w,
-h
-);
-
-ctx.fillStyle="#000";
-ctx.font="bold 16px Arial";
-ctx.fillText(
-"RAK "+(i+1),
-x+10,
-y-10
-);
-
-}
-
-ctx.fillStyle="#000";
-ctx.font="bold 20px Arial";
-
-ctx.fillText(
-"FULL DISPLAY TOKO",
-30,
-15
-);
-
-ctx.fillText(
-"BUKU CHECKLIST",
-20,
-730
-);
-
-const a=document.createElement('a');
-
-a.href=canvas.toDataURL(
-'image/jpeg',
-0.85
-);
-
-a.download=
-`LAPORAN_${new Date().getDate()}.jpg`;
-
-a.click();
-
-return true;
-
-}catch(e){
-
-console.log(e);
-
-alert("❌ Gagal proses foto");
-
-return false;
-
-}
-
-}
-
-let semuaFotoRak=[];
-
-function cekJumlahFoto(){
-
-const input=
-document.getElementById(
-'file-rak'
-);
-
-const fileBaru=
-Array.from(
-input.files
-);
-
-fileBaru.forEach(f=>{
-
-if(
-!semuaFotoRak.some(
-x=>
-
-x.name===f.name
-&&
-x.size===f.size
-
-)
-){
-semuaFotoRak.push(f);
-}
-
-});
-
-if(
-semuaFotoRak.length>5
-)
-semuaFotoRak=
-semuaFotoRak.slice(0,5);
-
-let teks="";
-
-if(
-semuaFotoRak.length<5
-){
-
-teks=
-semuaFotoRak.length+
-"/5 Foto Upload (kurang "+
-(5-semuaFotoRak.length)
-+")";
-
-}else{
-
-teks=
-"5/5 Foto Upload ✅ Lengkap";
-
-}
-
-document
-.getElementById(
-'info-foto'
-)
-.innerHTML=teks;
-
-}
-
-function refreshSemuaUI(){
-
-const userKey=
-currentActiveUser.nama
-.trim()
-.toUpperCase();
-
-const db=
-globalDatabase[keyPeriode]
-||
-{
-pembagianRak:{},
-statusRak:{},
-kunciLaporanUserHariIni:{}
-};
-
-const tglHariIni=
-window.tanggalMode
-||
-new Date().getDate();
-
-const lockKey=
-`${userKey}_TGL_${tglHariIni}`;
-
-const isLocked=
-
-currentActiveUser.role!=="admin"
-
-&&
-
-db.kunciLaporanUserHariIni
-
-&&
-
-db.kunciLaporanUserHariIni[lockKey]
-===true;
-
-const badge=
-document.getElementById(
-'status-gembok-crew'
-);
-
-const btn=
-document.getElementById(
-'btn-submit-laporan'
-);
-
-if(
-badge
-&&
-btn
-&&
-currentActiveUser.role!=="admin"
-){
-
-
-if(isLocked){
-
-badge.innerHTML=
-'<i class="fa-solid fa-lock text-red-500"></i> TERKUNCI';
-
-badge.className=
-'bg-red-50 text-red-700 border border-red-200 text-[9px] px-2 py-0.5 rounded font-black uppercase';
-
-btn.disabled=true;
-
-btn.className=
-'w-full bg-gray-300 text-gray-500 font-bold p-2.5 rounded-lg text-xs text-center cursor-not-allowed uppercase';
-
-btn.innerText=
-'Laporan Terkunci';
-
-}else{
-
-badge.innerHTML=
-'<i class="fa-solid fa-unlock text-emerald-500"></i> Siap Diisi';
-
-badge.className=
-'bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] px-2 py-0.5 rounded font-black uppercase';
-
-btn.disabled=false;
-
-btn.className=
-'w-full bg-emerald-600 text-white font-black p-2.5 rounded-lg shadow-xs hover:bg-emerald-700 text-xs tracking-wider transition-all flex justify-center items-center gap-1.5 uppercase';
-
-btn.innerText=
-'Kirim & Buka WhatsApp Otomatis';
-
-}
-
-}
-
-console.log(
-'LOGIN USER:',
-JSON.stringify(userKey)
-);
-
-console.log(
-'KEY PEMBAGIAN:',
-JSON.stringify(
-db.pembagianRak
-)
-);
-
-console.log(
-'RAK USER:',
-JSON.stringify(
-db.pembagianRak[userKey]
-)
-);
-
-const rakSaya=
-db.pembagianRak[userKey]
-||
-[];
-
-const totalRak=
-document.getElementById(
-'lock-total-rak'
-);
-
-if(totalRak)
-totalRak.innerText=
-`${rakSaya.length} Rak`;
-
-const wrap=
-document.getElementById(
-'wrapper-checkbox-rak'
-);
-
-if(wrap){
-
-wrap.innerHTML="";
-
-if(!rakSaya.length){
-
-wrap.innerHTML=
-'<p class="text-gray-400 text-[10px] col-span-2 italic text-center py-2">Nama anda belum didaftarkan bulan ini.</p>';
-
-}else{
-
-rakSaya.forEach(function(rk){
-
-const tanggalCari =
-String(tglHariIni).padStart(2,'0') +
-'/' +
-String(currentBulan).padStart(2,'0') +
-'/' +
-currentTahun;
-
-const statusKey=
-`${rk}|${tanggalCari}|${userKey}`;
-
-console.log(
-'CEK STATUS KEY =',
-statusKey
-);
-
-console.log(
-'ADA =',
-db.statusRak[statusKey]
-);
-
-const status=
-db.statusRak[statusKey]
-||
-{
-isClean:false,
-locked:false
-};
-
-wrap.innerHTML+=`
-
-<label class="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-200 ${isLocked?'pointer-events-none opacity-60':'cursor-pointer hover:border-amber-500'} transition-all text-gray-800 text-[11px] font-bold">
-
-<input
-type="checkbox"
-value="${rk}"
-${status.isClean?'checked':''}
-${currentActiveUser.role!=="admin"&&(isLocked||status.locked)?'disabled':''}
-onchange="toggleStatusClean('${rk}',this.checked)"
-class="mr-1.5 accent-amber-600 w-3.5 h-3.5">
-
-<span class="truncate">
-${rk}
-</span>
-
-</label>
-
-`;
-
-});
-
-}
-
-}
-
-renderDropdownFormRH(rakSaya);
-
-const tbody=
-document.getElementById(
-'tbody-rekap-kacab'
-);
-
-if(tbody){
-
-tbody.innerHTML="";
-
-const seluruhCrew=
-Object.keys(
-db.pembagianRak||{}
-);
-
-if(!seluruhCrew.length){
-
-tbody.innerHTML=
-'<tr><td colspan="5" class="p-3 text-center text-gray-400 bg-gray-50 italic text-[10px]">Belum ada data crew aktif.</td></tr>';
-
-}else{
-
-seluruhCrew.forEach(function(cr){
-
-const rks=
-db.pembagianRak[cr]
-||
-[];
-
-let clean=0;
-
-rks.forEach(function(r){
-
-const tanggalCari =
-String(tglHariIni).padStart(2,'0') +
-'/' +
-String(currentBulan).padStart(2,'0') +
-'/' +
-currentTahun;
-
-const keyStatus=
-`${r}|${tanggalCari}|${cr}`;
-
-if(
-db.statusRak[keyStatus]
-&&
-db.statusRak[keyStatus].isClean
-){
-clean++;
-}
-
-});
-
-const pct=
-rks.length
-?
-Math.round((clean/rks.length)*100)
-:
-0;
-
-tbody.innerHTML+=`
-
-<tr class="hover:bg-gray-50 border-b border-gray-100">
-
-<td class="p-2 font-black text-gray-900 uppercase truncate max-w-[80px]">
-${cr}
-</td>
-
-<td class="p-2 font-bold">
-${rks.length}R
-</td>
-
-<td class="p-2 text-emerald-600 font-black">
-${clean}R
-</td>
-
-<td class="p-2 font-black text-teal-600">
-${pct}%
-</td>
-
-<td class="p-2 text-center">
-
-<button
-onclick="resetGembokUser('${cr}')"
-class="bg-red-50 text-red-600 border border-red-200 px-1.5 py-0.5 rounded text-[9px] font-black hover:bg-red-100">
-
-RESET LOCK
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-}
-
-}
-
-renderMatriksKalenderBulanan();
-
-}
-
-
-function resetGembokUser(crewName){
-
-const tglHariIni=
-window.tanggalMode
-||
-new Date().getDate();
-
-const lockKey=
-`${crewName}_TGL_${tglHariIni}`;
-
-if(
-confirm(
-`Buka gembok laporan hari ini untuk ${crewName}?`
-)
-){
-
-const tanggalCari =
-String(tglHariIni).padStart(2,'0') +
-"/" +
-String(currentBulan).padStart(2,'0') +
-"/" +
-currentTahun;
-
-if(
-!globalDatabase[keyPeriode]
-.kunciLaporanUserHariIni
-){
-
-globalDatabase[keyPeriode]
-.kunciLaporanUserHariIni={};
-
-}
-
-//==================================
-// BUKA LOCK CHECKBOX
-//==================================
-
-fetch(
-URL_CLOUD_DRIVE,
-{
-method:'POST',
-body:JSON.stringify({
-
-action:'resetLaporanCrew',
-
-kodeToko:
-currentActiveUser.toko
-.toUpperCase(),
-
-periode:keyPeriode,
-
-crew:crewName,
-
-tanggal:tanggalCari
-
-})
-
-}
-)
-.then(r=>r.text())
-.then(res=>{
-
-if(res==="OK_RESET"){
-
-const tagKey=
-`TGL_${tglHariIni}`;
-
-if(
-
-globalDatabase[keyPeriode]
-.historyLogHarian
-
-&&
-
-globalDatabase[keyPeriode]
-.historyLogHarian[tagKey]
-
-){
-
-delete globalDatabase[keyPeriode]
-.historyLogHarian[tagKey][crewName];
-
-}
-
-delete globalDatabase[keyPeriode]
-.kunciLaporanUserHariIni[lockKey];
-
-Object.keys(
-globalDatabase[keyPeriode]
-.statusRak||{}
-)
-.forEach(key=>{
-
-const data=
-globalDatabase[keyPeriode]
-.statusRak[key];
-
-if(data.crew===crewName){
-
-data.locked=false;
-
-}
-
-});
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-alert('✅ Gembok dibuka!');
-
-muatDatabaseDariCloudDrive();
-
-refreshSemuaUI();
-
-}else{
-
-alert('❌ Reset gagal di Drive');
-
-}
-
-})
-.catch(err=>{
-
-console.log(err);
-
-alert('❌ Koneksi Drive gagal');
-
-});
-
-}
-
-}
-
-
-function toggleStatusClean(rak,isChecked){
-
-const db=
-globalDatabase[keyPeriode];
-
-const userKey=
-currentActiveUser.nama
-.toUpperCase();
-
-const tgl =
-window.tanggalMode ||
-new Date().getDate();
-
-const tanggalCari =
-String(tgl).padStart(2,'0') +
-'/' +
-String(currentBulan).padStart(2,'0') +
-'/' +
-currentTahun;
-
-const key=
-`${rak}|${tanggalCari}|${userKey}`;
-
-if(!db.statusRak)
-db.statusRak={};
-
-db.statusRak[key]={
-
-rak:rak,
-crew:userKey,
-tanggal:tanggalCari,
-isClean:isChecked,
-
-locked:
-currentActiveUser.role!=="admin"
-?
-isChecked
-:
-false
-
-};
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-refreshSemuaUI();
-
-}
-
-        function renderDropdownFormRH(rakSaya) {
-            const selects = document.querySelectorAll('.input-rh-rak');
-            selects.forEach(s => {
-                s.innerHTML = "";
-                if(rakSaya.length === 0) {
-                    s.innerHTML = "<option>Kosong</option>";
-                } else {
-                    rakSaya.forEach(rk => { s.innerHTML += `<option value="${rk}">${rk}</option>`; });
+        function renderAdminManagementTable() {
+            if (userRole !== 'admin') return;
+            const tbody = document.getElementById('adminManageTableBody'); tbody.innerHTML = "";
+            if(cloudPlottingData.length === 0) return;
+
+            cloudPlottingData.forEach((crew, idx) => {
+                let rakBadges = "";
+                if(crew.raks && Array.isArray(crew.raks)) {
+                    crew.raks.forEach(rak => { rakBadges += `<span class="rak-badge">${rak} <button onclick="deleteRakCloud('${crew.name}', '${rak}')">&times;</button></span>`; });
                 }
+                tbody.innerHTML += `<tr>
+                    <td style="padding:6px; border:1px solid #ddd;"><strong>${crew.name}</strong></td>
+                    <td style="padding:6px; border:1px solid #ddd;">${rakBadges || '<span style="color:#aaa;">Kosong</span>'}</td>
+                    <td style="padding:6px; border:1px solid #ddd;">
+                        <input type="text" placeholder="No" id="addRakInput_${idx}" style="width:35px; padding:2px; font-size:11px;">
+                        <button class="btn btn-primary" style="padding:2px 4px; font-size:10px;" onclick="addRakCloud('${crew.name}', ${idx})">➕</button>
+                    </td>
+                    <td style="padding:6px; border:1px solid #ddd;">
+                        <button class="btn btn-danger" style="padding:2px 4px; font-size:10px;" onclick="deleteCrewCloud('${crew.name}')">❌</button>
+                    </td>
+                </tr>`;
             });
         }
 
-        function renderMatriksKalenderBulanan() {
-            const trHeader = document.getElementById('tr-header-tanggal');
-            const tbody = document.getElementById('tbody-matriks-harian');
-            if(!trHeader || !tbody) return;
+        function renderRHNotification(dataRH) {
 
-            const jumlahHari = new Date(parseInt(currentTahun), parseInt(currentBulan), 0).getDate();
-            let htmlHeader = `<th class="p-2 text-left bg-gray-100 text-gray-700 font-black border border-gray-200 text-[10px]">Nama Crew</th>`;
-            for(let d=1; d<=jumlahHari; d++) { htmlHeader += `<th class="p-1 w-7 text-center border border-gray-200 text-[9px]">${d}</th>`; }
-            trHeader.innerHTML = htmlHeader;
+    const box =
+        document.getElementById(
+            "rhNotificationBox"
+        );
 
-            tbody.innerHTML = "";
-            const db = globalDatabase[keyPeriode] || { pembagianRak: {}, historyLogHarian: {} };
-            const seluruhCrew=
-Object.keys(
-db.pembagianRak||{}
-)
+    const content =
+        document.getElementById(
+            "rhNotificationContent"
+        );
 
-.filter(n=>
+    if (!dataRH || dataRH.length === 0) {
 
-db.pembagianRak[n]
+        box.style.display = "none";
+        return;
+    }
 
-&&
+    box.style.display = "block";
 
-db.pembagianRak[n]
-.length
+    let html = "";
 
-);
+    dataRH.forEach(item => {
 
-            if(seluruhCrew.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${jumlahHari+1}" class="p-3 text-center text-gray-400 italic text-[10px]">Matriks kosong.</td></tr>`;
+        let warna =
+            item.status === "RH_AKTIF"
+            ? "#e74c3c"
+            : "#f39c12";
+
+        let judul =
+            item.status === "RH_AKTIF"
+            ? "🚨 WAJIB TARIK / RETUR"
+            : "🟡 FOKUS JUAL";
+
+        html += `
+        <div style="
+            border-left:6px solid ${warna};
+            background:#fff;
+            margin-bottom:10px;
+            padding:10px;
+            border-radius:6px;
+        ">
+
+            <div style="
+                font-weight:bold;
+                color:${warna};
+                margin-bottom:5px;
+            ">
+                ${judul}
+            </div>
+
+            <div>
+                📦 Barang :
+                <b>${item.barang}</b>
+            </div>
+
+            <div>
+                🗂 Rak :
+                <b>${item.rak}</b>
+            </div>
+
+            <div>
+                📅 Exp :
+                <b>${item.exp}</b>
+            </div>
+
+            <div>
+                ⏳ RH :
+                <b>${item.rh} Hari</b>
+            </div>
+            <div style="margin-top:8px;">
+
+<button
+onclick="selesaikanRH('${item.idRH}')"
+style="
+background:#27ae60;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+">
+
+✅ SUDAH DITARIK
+
+</button>
+
+</div>
+
+        </div>
+        `;
+    });
+
+    content.innerHTML = html;
+}
+
+        function addNewCrewCloud() {
+            const name = document.getElementById('newCrewName').value.trim();
+            if(!name) return alert("Masukkan nama personil baru!");
+            showLoading(true);
+            fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify({ action: "addCrew", storeCode: userToko, crewName: name }) })
+            .then(res => res.json()).then(res => { alert(res.message); document.getElementById('newCrewName').value=""; syncWithCloud(); });
+        }
+
+        function deleteCrewCloud(crewName) {
+            if(!confirm(`Hapus crew ${crewName}?`)) return;
+            showLoading(true);
+            fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteCrew", storeCode: userToko, crewName: crewName }) })
+            .then(res => res.json()).then(res => { alert(res.message); syncWithCloud(); });
+        }
+
+        function addRakCloud(crewName, idx) {
+            const rakNum = document.getElementById(`addRakInput_${idx}`).value.trim();
+            if(!rakNum) return alert("Kosong!");
+            showLoading(true);
+            fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify({ action: "addRak", storeCode: userToko, crewName: crewName, rak: rakNum }) })
+            .then(res => res.json()).then(res => { alert(res.message); syncWithCloud(); });
+        }
+
+        function deleteRakCloud(crewName, rakNum) {
+            if(!confirm(`Hapus jatah rak ${rakNum}?`)) return;
+            showLoading(true);
+            fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteRak", storeCode: userToko, crewName: crewName, rak: rakNum }) })
+            .then(res => res.json()).then(res => { alert(res.message); syncWithCloud(); });
+        }
+
+        function renderCrewFormLayout() {
+    const grid = document.getElementById('checklistGridContainer');
+    grid.innerHTML = "";
+    
+    let expBox = document.getElementById('expContainer');
+    if(expBox.children.length === 0) {
+        addExpRow(); 
+    }
+
+    let activeCrew = cloudPlottingData.find(c => c.name.toUpperCase() === userNama.toUpperCase());
+    if (!activeCrew && cloudPlottingData.length > 0) activeCrew = cloudPlottingData[0];
+
+    if(!activeCrew) {
+        document.getElementById('activeCrewName').innerText = userNama || "-";
+        document.getElementById('activeCrewTarget').innerText = "0 Rak";
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#aaa; font-style:italic; font-size:11px;">Belum dipetakan oleh Kepala Toko.</div>`;
+        return;
+    }
+
+    document.getElementById('activeCrewName').innerText = activeCrew.name;
+    document.getElementById('activeCrewTarget').innerText = (activeCrew.raks ? activeCrew.raks.length : 0) + " Rak";
+
+    if(activeCrew.raks && activeCrew.raks.length > 0) {
+        activeCrew.raks.forEach(rak => {
+
+    const sudahDiceklis =
+        activeCrew.savedRaks &&
+        activeCrew.savedRaks.includes(rak);
+
+    let div = document.createElement('div');
+    div.className = "checklist-item";
+
+    div.innerHTML = `
+    <input
+        type="checkbox"
+        id="chk_${rak}"
+        ${sudahDiceklis ? 'checked' : ''}
+        ${(sudahDiceklis || isSavedAndLocked) ? 'disabled' : ''}>
+        <label for="chk_${rak}">${rak}</label>
+    `;
+
+    grid.appendChild(div);
+});
+    } else {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#aaa; font-style:italic;">Belum ada jatah rak.</div>`;
+    }
+
+    const crewLocked = isSavedAndLocked;
+    const lockBanner = document.getElementById('lockNotification');
+    const simpanBtn = document.getElementById('btnSimpanChecklist');
+    const waBtn = document.getElementById('btnKirimWA');
+    const tambahBtn = document.getElementById('btnTambahItem');
+    
+    // PENGUNCIAN ELEMENT TOTAL BERDASARKAN STATUS CLOUD
+    if (crewLocked) {
+        lockBanner.style.display = "flex";
+        simpanBtn.innerText = "LAPORAN SUDAH TERKUNCI ONLINE";
+        simpanBtn.className = "btn btn-disabled"; 
+        simpanBtn.disabled = true;
+        
+        if(tambahBtn) tambahBtn.style.display = "none";
+        waBtn.className = "btn btn-success"; 
+        waBtn.disabled = false;
+
+        // Matikan semua input file upload foto & tombol reset agar tidak bisa diganti
+        document.getElementById('uploadRak').disabled = true;
+        document.getElementById('uploadDisplay').disabled = true;
+        document.getElementById('uploadBuku').disabled = true;
+        
+        const btnResetRak = document.querySelector('button[onclick="resetFotoRak()"]');
+        if(btnResetRak) btnResetRak.style.display = "none";
+
+        // Matikan semua form input item EXP / RH yang terlanjur diketik biar tidak bisa diedit/diubah
+        document.querySelectorAll('#expContainer input, #expContainer select, #expContainer button').forEach(el => {
+            el.disabled = true;
+            if(el.tagName === 'BUTTON') el.style.display = 'none'; // Sembunyikan tombol "Hapus Item"
+        });
+    } else {
+        lockBanner.style.display = "none";
+        simpanBtn.innerText = "SIMPAN & KUNCI DATA KE CLOUD";
+        simpanBtn.className = "btn btn-primary"; 
+        simpanBtn.disabled = false;
+        
+        if(tambahBtn) tambahBtn.style.display = "inline-flex";
+        waBtn.className = "btn btn-disabled"; 
+        waBtn.disabled = true;
+
+        // Aktifkan kembali input apabila laporan belum terkunci
+        document.getElementById('uploadRak').disabled = false;
+        document.getElementById('uploadDisplay').disabled = false;
+        document.getElementById('uploadBuku').disabled = false;
+        
+        const btnResetRak = document.querySelector('button[onclick="resetFotoRak()"]');
+        if(btnResetRak) btnResetRak.style.display = "inline-block";
+    }
+}
+
+        function hitungOtomatisNotifRH(inputDateElem, selectOptionElem, alertContainerId) {
+            const tglVal = inputDateElem.value;
+            const targetRH = parseInt(selectOptionElem.value);
+            const alertBox = document.getElementById(alertContainerId);
+            
+            if(!tglVal || isNaN(targetRH)) { alertBox.style.display = "none"; return; }
+            
+            const tglBarang = new Date(tglVal);
+            const tglTargetRH = new Date(tglBarang.getTime() + (targetRH * 24 * 60 * 60 * 1000));
+            const hariIni = new Date();
+            
+            const selisihWaktu = tglTargetRH.getTime() - hariIni.getTime();
+            const sisaHari = Math.ceil(selisihWaktu / (24 * 60 * 60 * 1000));
+            
+            if(sisaHari <= 7) {
+                alertBox.style.display = "block";
+                alertBox.innerText = `⚠️ TARIK KE DISPLAY KHUSUS (Sisa ${sisaHari} Hari Lagi)`;
+            } else {
+                alertBox.style.display = "none";
+            }
+        }
+
+        function handleFileStatus(inputId, statusId, minCount) {
+            const input = document.getElementById(inputId);
+            const status = document.getElementById(statusId);
+            if (!input || !input.files) return;
+            
+            const fileCount = input.files.length;
+
+            if (fileCount >= minCount) {
+                status.innerText = `✔ ${fileCount} Foto Ready (Sudah Terpenuhi)`;
+                status.style.color = "#2ec4b6"; 
+            } else {
+                if (fileCount === 0) {
+                    status.innerText = `Belum ada file dipilih (Minimal harus ${minCount} foto!)`;
+                    status.style.color = "#e63946";
+                } else {
+                    let sisa = minCount - fileCount;
+                    status.innerText = `⚠️ Baru ${fileCount} foto, kurang ${sisa} foto lagi!`;
+                    status.style.color = "#ff9f1c";
+                }
+            }
+        }
+
+        function addExpRow() {
+            const container = document.getElementById('expContainer');
+            const rowId = "row_" + Date.now();
+            
+            let div = document.createElement('div'); div.className = "item-row"; div.id = rowId;
+            div.innerHTML = `
+                <div style="margin-bottom: 5px;">
+                    <label style="font-size: 11px; font-weight: bold; color: #2c3e50;">NAMA BARANG EXPIRED / RH:</label>
+                    <input type="text" placeholder="Contoh: Susu UHT Ultra 250ml" required style="width: 100%; padding: 6px;">
+                </div>
+                <div style="display: flex; gap: 6px; margin-bottom: 5px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; font-weight: bold; color: #555;">NO RAK:</label>
+                        <input type="text" placeholder="Contoh: 02" style="padding: 6px;">
+                    </div>
+                    <div style="flex: 2;">
+                        <label style="font-size: 10px; font-weight: bold; color: #555;">TANGGAL EXP DI KEMASAN:</label>
+                        <input type="date" id="tgl_${rowId}" required style="padding: 5px;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 5px;">
+                    <label style="font-size: 11px; font-weight: bold; color: #555;">KATEGORI JADWAL RH TOKO:</label>
+                    <select id="sel_${rowId}" style="width: 100%; padding: 6px;">
+                        <option value="7">RH 7 Hari</option>
+                        <option value="14">RH 14 Hari</option>
+                        <option value="30">RH 30 Hari</option>
+                        <option value="45">RH 45 Hari</option>
+                        <option value="60">RH 60 Hari</option>
+                        <option value="90">RH 90 Hari</option>
+                        <option value="120">RH 120 Hari</option>
+                        <option value="160">RH 160 Hari</option>
+                        <option value="180">RH 180 Hari</option>
+                        <option value="210">RH 210 Hari</option>
+                    </select>
+                </div>
+                <div id="alert_${rowId}" class="alert-tarik" style="display:none; margin-bottom: 5px;"></div>
+                <button class="btn btn-danger" style="padding:5px; font-size:11px; justify-content:center; background-color: #d63031; width:100%;" onclick="document.getElementById('${rowId}').remove()"><i class="fa-solid fa-trash"></i> Hapus Baris Temuan</button>
+            `;
+            container.appendChild(div);
+
+            const inpDate = document.getElementById(`tgl_${rowId}`);
+            const selRH = document.getElementById(`sel_${rowId}`);
+            inpDate.addEventListener('change', () => hitungOtomatisNotifRH(inpDate, selRH, `alert_${rowId}`));
+            selRH.addEventListener('change', () => hitungOtomatisNotifRH(inpDate, selRH, `alert_${rowId}`));
+        }
+
+        function renderMatriksBulananLayout() {
+
+    const tbody =
+        document.getElementById('matriksTableBody');
+
+    tbody.innerHTML = "";
+
+    if(cloudPlottingData.length === 0) return;
+
+    cloudPlottingData.forEach(crew => {
+
+        let tr = document.createElement('tr');
+
+        tr.innerHTML =
+            `<td class="crew-name-col">
+                <strong>${crew.name}</strong>
+            </td>`;
+
+        for(let tgl=1; tgl<=31; tgl++) {
+
+            let td = document.createElement('td');
+
+            td.innerText = "-";
+
+            if(crew.history){
+
+               Object.keys(crew.history).forEach(tanggalLapor => {
+
+let tglLapor =
+    parseInt(
+      tanggalLapor.split("-")[0]
+    ) || 0;
+
+    if(tglLapor === tgl){
+
+                        let jumlahRak =
+                            crew.history[tanggalLapor].jumlah || 0;
+
+                        let daftarRak =
+                            crew.history[tanggalLapor].rak || [];
+
+                        td.innerHTML =
+                            jumlahRak + "R<br>" +
+                            `<small>${daftarRak.join(",")}</small>`;
+
+                        td.className =
+                            "matriks-cell-aktif";
+                    }
+
+                });
+
+            }
+
+            tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+    });
+}
+
+function openProgressPopup() {
+
+    document.getElementById('progressModal').style.display = "flex";
+
+    const container =
+        document.getElementById('modalCrewListContainer');
+
+    container.innerHTML = "";
+
+    let totalRakToko = 0;
+    let totalRakJalan = 0;
+
+    cloudPlottingData.forEach(crew => {
+
+        const totalRak =
+            crew.raks ? crew.raks.length : 0;
+
+        const rakJalan =
+            crew.savedRaks ? crew.savedRaks.length : 0;
+
+        const sisaRak =
+            Math.max(0, totalRak - rakJalan);
+
+        const progress =
+            totalRak > 0
+            ? Math.round((rakJalan / totalRak) * 100)
+            : 0;
+
+        totalRakToko += totalRak;
+        totalRakJalan += rakJalan;
+
+        let daftarRak =
+            rakJalan > 0
+            ? crew.savedRaks.join(", ")
+            : "-";
+
+        container.innerHTML += `
+            <div style="
+                padding:10px 0;
+                border-bottom:1px dashed #ddd;
+                font-size:11px;
+            ">
+
+                <div style="
+                    font-weight:bold;
+                    margin-bottom:4px;
+                ">
+                    👤 ${crew.name}
+                </div>
+
+                <div>
+                    🎯 Target Rak : ${totalRak}
+                </div>
+
+                <div>
+                    ✅ Rak Jalan : ${rakJalan}
+                </div>
+
+                <div>
+                    ⏳ Sisa Rak : ${sisaRak}
+                </div>
+
+                <div>
+                    📊 Progress : ${progress}%
+                </div>
+
+                <div style="
+                    margin-top:4px;
+                    color:#666;
+                ">
+                    Rak Selesai :
+                    <b>${daftarRak}</b>
+                </div>
+
+            </div>
+        `;
+    });
+
+    const sisaToko =
+        Math.max(0, totalRakToko - totalRakJalan);
+
+    const persenToko =
+        totalRakToko > 0
+        ? Math.round(
+            (totalRakJalan / totalRakToko) * 100
+          )
+        : 0;
+
+    document.getElementById('modalTotalStoreProgressFill')
+        .style.width = persenToko + "%";
+
+    document.getElementById('modalTotalStoreProgressText')
+        .innerText =
+        `${persenToko}% (${totalRakJalan}/${totalRakToko} Rak)`;
+
+    const summary =
+        `
+        🎯 Total Rak : ${totalRakToko}<br>
+        ✅ Sudah Jalan : ${totalRakJalan}<br>
+        ⏳ Belum Jalan : ${sisaToko}
+        `;
+
+    const oldSummary =
+        document.getElementById('storeProgressSummary');
+
+    if(oldSummary){
+        oldSummary.innerHTML = summary;
+    }
+}
+
+function selesaikanRH(idRH) {
+
+    if (
+      !confirm(
+      "Barang sudah ditarik dari rak?"
+      )
+    ){
+      return;
+    }
+
+    showLoading(true);
+
+    fetch(
+      CLOUD_API_URL,
+      {
+        method:"POST",
+
+        body:JSON.stringify({
+
+          action:"selesaiRH",
+          idRH:idRH
+
+        })
+      }
+    )
+
+    .then(res=>res.json())
+
+    .then(res=>{
+
+        alert(res.message);
+
+        syncWithCloud();
+
+    })
+
+    .catch(()=>{
+
+        alert(
+          "Gagal update RH."
+        );
+
+        showLoading(false);
+
+    });
+}
+        function closeProgressPopup() { document.getElementById('progressModal').style.display = "none"; }
+
+        function saveChecklistToCloud() {
+            // 1. Membaca jumlah foto rak dari keranjang cicilan pintar
+            const totalFotoRak = listFotoRakDicicil.length;
+            const totalFotoDisplay = document.getElementById('uploadDisplay').files.length;
+            const totalFotoBuku = document.getElementById('uploadBuku').files.length;
+
+            if (totalFotoRak < 5) {
+                if (totalFotoRak === 0) {
+                    alert("⚠️ GAGAL SIMPAN:\nFoto Detail Rak masih kosong! Wajib upload minimal 5 foto.");
+                } else {
+                    let sisa = 5 - totalFotoRak;
+                    alert(`⚠️ GAGAL SIMPAN:\nFoto Detail Rak baru terupload ${totalFotoRak} foto.\nKurang ${sisa} foto lagi untuk memenuhi syarat minimal 5 foto!`);
+                }
+                return;
+            }
+            if (totalFotoDisplay !== 1) {
+                alert("⚠️ GAGAL SIMPAN:\nFoto Full Display Toko belum di-upload! Wajib upload 1 foto.");
+                return;
+            }
+            if (totalFotoBuku !== 1) {
+                alert("⚠️ GAGAL SIMPAN:\nFoto Buku Checklist Fisik belum di-upload! Wajib upload 1 foto.");
                 return;
             }
 
-            seluruhCrew.forEach(cr => {
-                let htmlRow = `<tr class="hover:bg-gray-50"><td class="p-2 border border-gray-200 font-black text-gray-900 uppercase bg-gray-50 text-[10px] sticky left-0 z-10 shadow-sm truncate max-w-[80px]">${cr}</td>`;
-                for(let d=1; d<=jumlahHari; d++) {
-                    const tagKey = `TGL_${d}`;
-                    const logHariIni = db.historyLogHarian && db.historyLogHarian[tagKey] && db.historyLogHarian[tagKey][cr];
-                    if(logHariIni) {
-                        const totalRakSelesai = logHariIni.rakSelesai || 0;
-                        const adaTemuanRH = logHariIni.listTemuan && logHariIni.listTemuan.length > 0;
-                        let color = adaTemuanRH ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800';
-                        htmlRow += `<td class="p-0.5 border border-gray-200 text-center"><span class="text-[8px] font-black p-0.5 rounded block ${color}">${totalRakSelesai}R${adaTemuanRH ? '🚨' : ''}</span></td>`;
-                    } else {
-                        htmlRow += `<td class="p-0.5 border border-gray-200 text-center text-gray-300 font-light">-</td>`;
+            showLoading(true);
+            const tgl = `${document.getElementById('daySelector').value}-${document.getElementById('monthSelector').value}-${document.getElementById('yearSelector').value}`;
+            const bln = document.getElementById('monthSelector').value;
+            const thn = document.getElementById('yearSelector').value;
+            const crew = document.getElementById('activeCrewName').innerText;
+            const target = document.getElementById('activeCrewTarget').innerText;
+
+            // Ambil semua daftar rak yang dicentang oleh crew saat ini
+            let checkedRaks = [];
+            document.querySelectorAll('#checklistGridContainer input[type="checkbox"]:checked').forEach(chk => {
+                // Mengambil nama rak (misal: AB1) dari ID chk_AB1
+                checkedRaks.push(chk.id.replace('chk_', ''));
+            });
+
+            let items = [];
+            document.querySelectorAll('#expContainer .item-row').forEach(row => {
+                let fields = row.querySelectorAll('input, select');
+                if(fields[0] && fields[0].value) {
+                    items.push({ 
+                        namaBarang: fields[0].value, 
+                        noRak: fields[1].value, 
+                        tglExp: fields[2].value, 
+                        kategori: "RH " + fields[3].value + " Hari" 
+                    });
+                }
+            });
+
+            // Menyusun payload laporan lengkap untuk dikirim ke Google Sheets
+            const payload = { 
+                action: "saveChecklist", 
+                tanggal: tgl, 
+                bulan: bln, 
+                tahun: thn, 
+                storeCode: userToko, 
+                crewName: crew, 
+                targetRak: target, 
+                checkedRaks: checkedRaks, // Menyertakan data rak yang berhasil diselesaikan
+                itemsEXP: items 
+            };
+            
+            fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(res => { 
+                alert(res.message); 
+                
+                // --- KUNCI TOTAL DI FRONTEND SECARA PAKSA ---
+                isSavedAndLocked = true; 
+                
+                // Set manual status "DONE" pada crew yang aktif di memori browser lokal
+                if (cloudPlottingData && cloudPlottingData.length > 0) {
+                    let indexCrew = cloudPlottingData.findIndex(c => c.name.toUpperCase() === crew.toUpperCase());
+                    if (indexCrew !== -1) {
+                        cloudPlottingData[indexCrew].isDone = true;
+                        cloudPlottingData[indexCrew].savedRaks = checkedRaks;
                     }
                 }
-                htmlRow += `</tr>`; tbody.innerHTML += htmlRow;
+
+                // Gambar ulang seluruh dashboard & form secara paksa menggunakan status TRUE
+                renderCrewFormLayout();
+                renderMatriksBulananLayout();
+                renderHorrorLeaderboard(); 
+                renderAdminManagementTable();
+
+                showLoading(false);
+            })
+            .catch(err => { 
+                alert("Laporan masuk ke Drive, gagal sinkronisasi tampilan lokal."); 
+                // Tetap paksa kunci demi kenyamanan tampilan jika server Apps Script lambat
+                isSavedAndLocked = true;
+                renderCrewFormLayout();
+                renderMatriksBulananLayout();
+                renderHorrorLeaderboard();
+                showLoading(false); 
             });
         }
 
-function openModalDashboard(){
-
-const db={
-pembagianRak:
-databaseCloudToko.pembagianRak||{},
-statusRak:
-databaseCloudToko.statusRak||{}
-};
-
-let htmlLog='';
-
-Object.keys(db.pembagianRak).forEach(n=>{
-
-const listRakCrew=db.pembagianRak[n]||[];
-
-let terhitungSelesai=0;
-let listRak='';
-
-listRakCrew.forEach(rak=>{
-
-const tglHariIni=
-window.tanggalMode
-||
-new Date().getDate();
-
-const tanggalCari =
-String(tglHariIni).padStart(2,'0') +
-'/' +
-String(currentBulan).padStart(2,'0') +
-'/' +
-currentTahun;
-
-const keyStatus=
-`${rak}|${tanggalCari}|${n}`;
-
-const status=db.statusRak[keyStatus]||{
-isClean:false,
-tanggal:''
-};
-
-if(status.isClean)
-terhitungSelesai++;
-
-listRak+=`
-
-<div class="p-2 rounded-lg flex justify-between items-center ${status.isClean?'bg-emerald-50 border border-emerald-200':'bg-red-50 border border-red-100'}">
-
-<span class="text-gray-800 font-bold text-[11px]">
-🧼 ${rak}
-</span>
-
-<div class="text-right flex flex-col items-end">
-
-<span class="text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase ${status.isClean?'bg-emerald-600 text-white':'bg-red-500 text-white'}">
-
-${status.isClean?'✓ SELESAI':'❌ BELUM'}
-
-</span>
-
-${status.tanggal
-?`<span class="text-[8px] text-gray-400 font-bold mt-0.5">${status.tanggal}</span>`
-:''}
-
-</div>
-
-</div>
-
-`;
-
-});
-
-if(!listRakCrew.length){
-
-listRak=`
-<p class="text-gray-400 text-center italic py-2 text-xs">
-Belum ada plotting.
-</p>
-`;
-
-}
-
-const hitungPersen=listRakCrew.length>0
-?
-Math.round(
-(terhitungSelesai/listRakCrew.length)*100
-)
-:
-0;
-
-htmlLog+=`
-
-<div class="p-2 border rounded mb-2">
-
-<b>${n}</b>
-
-<div class="text-xs mb-2">
-
-${terhitungSelesai}/${listRakCrew.length}
-(${hitungPersen}%)
-
-</div>
-
-${listRak}
-
-</div>
-
-`;
-
-});
-
-document.getElementById('modal-list-rak').innerHTML=htmlLog;
-
-document.getElementById('modal-dashboard').classList.remove('hidden');
-
-}
-
-
-function closeModalDashboard(){
-
-document.getElementById('modal-dashboard').classList.add('hidden');
-
-}
-
-
-function tambahBarisRH(){
-
-const userKey=currentActiveUser.nama.toUpperCase();
-
-const db=globalDatabase[keyPeriode]||{
-pembagianRak:{}
-};
-
-const rakSaya=db.pembagianRak[userKey]||[];
-
-let opsi='';
-
-rakSaya.forEach(rk=>{
-
-opsi+=`<option value="${rk}">${rk}</option>`;
-
-});
-
-if(!opsi)
-opsi='<option>Pilih</option>';
-
-const container=document.getElementById('container-rh');
-
-const div=document.createElement('div');
-
-div.className='grid grid-cols-12 gap-1 bg-gray-50 p-2 rounded border border-gray-200 items-center class-baris-rh';
-
-div.innerHTML=`
-
-<div class="col-span-2">
-
-<select class="w-full text-[10px] p-0.5 border border-gray-300 rounded bg-white input-rh-rak">
-
-${opsi}
-
-</select>
-
-</div>
-
-<div class="col-span-3">
-
-<input
-type="text"
-placeholder="Produk"
-class="w-full text-[10px] p-0.5 border border-gray-300 rounded bg-white input-rh-nama">
-
-</div>
-
-<div class="col-span-1">
-
-<input
-type="number"
-placeholder="Qty"
-class="w-full text-[10px] p-0.5 border border-gray-300 rounded bg-white input-rh-qty">
-
-</div>
-
-<div class="col-span-2">
-
-<input
-type="date"
-class="w-full text-[9px] p-0.5 border border-gray-300 rounded bg-white input-rh-tgl">
-
-</div>
-
-<div class="col-span-2">
-
-<select class="w-full text-[10px] p-0.5 border border-gray-300 rounded bg-white input-rh-kategori">
-
-<option value="7">RH 7 Hari</option>
-<option value="14">RH 14 Hari</option>
-<option value="30">RH 30 Hari</option>
-<option value="45">RH 45 Hari</option>
-<option value="60">RH 60 Hari</option>
-<option value="90">RH 90 Hari</option>
-<option value="120">RH 120 Hari</option>
-<option value="180">RH 180 Hari</option>
-
-</select>
-
-</div>
-
-<div class="col-span-1 text-right">
-
-<button
-type="button"
-onclick="this.closest('.class-baris-rh').remove()"
-class="text-red-500 font-bold text-xs">
-
-×
-
-</button>
-
-</div>
-
-`;
-
-container.appendChild(div);
-
-}
-
-        function openFormPenarikan(index, namaItem, rak, bulanAsal) {
-            document.getElementById('input-tarik-index').value = index;
-            document.getElementById('input-tarik-bulan-asal').value = bulanAsal;
-            document.getElementById('input-tarik-nama').value = `${namaItem.toUpperCase()} (${rak})`;
-            document.getElementById('modal-penarikan').classList.remove('hidden');
+        function lockInterface() {
+    // 1. Matikan semua input, select, dan textarea
+    document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+    
+    // 2. Sembunyikan semua tombol "Tambah Item" atau tombol aksi lainnya
+    document.querySelectorAll('button').forEach(btn => {
+        // Asumsi tombol tambah item mengandung kata "TAMBAH"
+        if (btn.innerText.toUpperCase().includes('TAMBAH') || btn.innerText.toUpperCase().includes('RESET')) {
+            btn.style.display = 'none';
         }
-        function closeFormPenarikan() { document.getElementById('modal-penarikan').classList.add('hidden'); }
-        function prosesSelesaiTarik() { closeFormPenarikan(); }
+    });
 
-
-async function generateLaporanWA(e){
-
-e.preventDefault();
-
-
-//==================================
-// ANTI DOUBLE CLICK SUPER LOCK
-//==================================
-
-if(window.submitSedangProses===true){
-
-alert('⏳ Laporan masih diproses...');
-return;
-
+    // 3. Matikan tombol Simpan dan Kirim WA agar tidak bisa diklik dobel
+    const submitBtn = document.querySelector('button[onclick="saveChecklistToCloud()"]');
+    if(submitBtn) submitBtn.disabled = true;
+    
+    console.log("UI Terkunci: Laporan sudah tersimpan.");
 }
 
-window.submitSedangProses=true;
+        // 1. Fungsi untuk menampung & menghitung sisa cicilan foto rak
+let listFotoRakDicicil = [];
 
-const btn=
-document.getElementById(
-'btn-submit-laporan'
-);
+function cicilFotoRak() {
+    const input = document.getElementById('uploadRak');
+    const status = document.getElementById('statusRak');
+    
+    if (!input.files || input.files.length === 0) return;
 
-btn.disabled=true;
-btn.style.pointerEvents='none';
+    // Masukkan file baru ke dalam keranjang
+    for (let i = 0; i < input.files.length; i++) {
+        if (listFotoRakDicicil.length < 5) {
+            listFotoRakDicicil.push(input.files[i]);
+        }
+    }
 
-btn.innerHTML=
-'⏳ MEMPROSES LAPORAN...';
+    const totalSekarang = listFotoRakDicicil.length;
 
-const db=
-globalDatabase[keyPeriode]
-||
-{
-pembagianRak:{},
-statusRak:{},
-historyLogHarian:{},
-kunciLaporanUserHariIni:{}
-};
+    if (totalSekarang >= 5) {
+        status.innerHTML = `<i class="fa-solid fa-circle-check"></i> ✔ ${totalSekarang} Foto Rak Ready! (Syarat Terpenuhi)`;
+        status.style.color = "#2ec4b6";
+    } else {
+        let kurangnya = 5 - totalSekarang;
+        status.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ⚠️ Baru ${totalSekarang} foto dimasukkan, kurang ${kurangnya} foto lagi!`;
+        status.style.color = "#ff9f1c";
+    }
 
-const userKey=
-currentActiveUser.nama
-.toUpperCase();
-
-const tglHariIni=
-window.tanggalMode
-||
-new Date().getDate();
-
-const lockKey=
-`${userKey}_TGL_${tglHariIni}`;
-
-try{
-
-const filesRak=semuaFotoRak;
-
-const fotoDisplay=
-document.getElementById(
-'file-full'
-).files;
-
-const fotoChecklist=
-document.getElementById(
-'fotoChecklist'
-).files;
-
-let kurang=[];
-
-if(filesRak.length<5)
-kurang.push(
-`${5-filesRak.length} Foto Rak`
-);
-
-if(!fotoDisplay.length)
-kurang.push(
-'1 Foto Full Display'
-);
-
-if(!fotoChecklist.length)
-kurang.push(
-'1 Foto Buku Checklist'
-);
-
-if(kurang.length){
-
-alert(
-'⚠️ Kurang:\n\n'+
-kurang.join('\n')
-);
-
-throw new Error(
-'VALIDASI_GAGAL'
-);
-
+    // Kosongkan value input agar browser bisa mendeteksi jika file yang sama di-klik lagi
+    input.value = "";
 }
 
-
-//==================================
-// PROSES FOTO
-//==================================
-
-const fotoSukses=
-await prosesGabungFotoOtomatis();
-
-if(!fotoSukses){
-
-throw new Error(
-'FOTO_GAGAL'
-);
-
+// Contoh logika di dalam fungsi update dashboard Bapak
+function updateDashboardMetrics(data) {
+    const statusText = document.getElementById('statusLaporan'); // Sesuaikan ID-nya
+    
+    // Logika ngecek apakah hari ini sudah ada data
+    const isTodayReported = data.some(item => item.tanggal === tglHariIni);
+    
+    if (isTodayReported) {
+        statusText.innerText = "✅ Laporan Hari Ini Sudah Masuk";
+        statusText.style.color = "green";
+    } else {
+        statusText.innerText = "⚠️ Laporan Belum Dibuat";
+        statusText.style.color = "red";
+    }
 }
 
-if(
-
-db.kunciLaporanUserHariIni
-
-&&
-
-db.kunciLaporanUserHariIni[lockKey]
-===true
-
-){
-
-alert(
-'⚠️ Laporan hari ini sudah terkunci'
-);
-
-throw new Error(
-'SUDAH_LOCK'
-);
-
+// 2. Fungsi Reset (Biang kerok yang bikin tombol tidak fungsi kalau belum di-paste)
+function resetFotoRak() {
+    listFotoRakDicicil = []; // Mengosongkan keranjang foto
+    const input = document.getElementById('uploadRak');
+    const status = document.getElementById('statusRak');
+    
+    if(input) input.value = ""; // Bersihkan element input
+    if(status) {
+        status.innerHTML = "Belum ada file dipilih (Minimal harus 5 foto!)";
+        status.style.color = "#e63946";
+    }
+    alert("Antrean foto rak berhasil dikosongkan!");
 }
 
-const tagKeyHarian=
-`TGL_${tglHariIni}`;
+        async function loadImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => resolve(img); img.src = e.target.result; }; reader.readAsDataURL(file);
+            });
+        }
 
-const checkedBoxes=
-document.querySelectorAll(
-'#wrapper-checkbox-rak input[type="checkbox"]:checked'
-);
+        async function generateCollageAndWA() {
+    showLoading(true);
+    const canvas = document.getElementById('collageCanvas'); const ctx = canvas.getContext('2d');
+    
+    // REVISI: Mengambil data dari array cicilan foto, bukan element input file asli yang kosong
+    const filesRak = listFotoRakDicicil;
+    const fileDisplay = document.getElementById('uploadDisplay').files[0];
+    const fileBuku = document.getElementById('uploadBuku').files[0];
 
-let arrayRakChecked=[];
+    if (!fileDisplay || !fileBuku || filesRak.length < 5) {
+        alert("Gagal memproses gambar kolase. Pastikan file dokumentasi lengkap!");
+        showLoading(false);
+        return;
+    }
 
-checkedBoxes.forEach(cb=>{
+    const imgDisplay = await loadImage(fileDisplay); const imgBuku = await loadImage(fileBuku);
+    let imgsRak = []; for(let i=0; i<5; i++) { imgsRak.push(await loadImage(filesRak[i])); }
 
-arrayRakChecked.push(
-cb.value
-);
+    canvas.width = 1200; canvas.height = 1600;
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0, canvas.width, canvas.height);
+    ctx.drawImage(imgDisplay, 15, 15, 575, 600); ctx.drawImage(imgBuku, 610, 15, 575, 600);
+
+    ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(15, 565, 575, 50); ctx.fillRect(610, 565, 575, 50);
+    ctx.fillStyle = "#ffffff"; ctx.font = "bold 22px Arial"; ctx.fillText("FOTO FULL DISPLAY TOKO", 40, 598); ctx.fillText("FOTO BUKU CEKLIS FISIK", 635, 598);
+
+    let startY = 640; let wRak = 375; let hRak = 440;
+    let positions = [{x: 15, y: startY}, {x: 412, y: startY}, {x: 810, y: startY}, {x: 215, y: startY + 470}, {x: 610, y: startY + 470}];
+
+    for(let j=0; j<5; j++) {
+        ctx.drawImage(imgsRak[j], positions[j].x, positions[j].y, wRak, hRak);
+        ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(positions[j].x, positions[j].y + hRak - 40, wRak, 40);
+        ctx.fillStyle = "#2ec4b6"; ctx.font = "bold 16px Arial"; ctx.fillText(`DETAIL FOTO RAK ${j+1}`, positions[j].x + 15, positions[j].y + hRak - 15);
+    }
+
+    const tgl = `${document.getElementById('daySelector').value}-${document.getElementById('monthSelector').value}-${document.getElementById('yearSelector').value}`;
+    ctx.fillStyle = "#2b2d42"; ctx.fillRect(0, 1560, 1200, 40);
+    ctx.fillStyle = "#ffffff"; ctx.font = "italic 16px Arial"; ctx.fillText(`Validasi Toko: ${userToko} | PIC: ${document.getElementById('activeCrewName').innerText} | Tanggal: ${tgl}`, 35, 1585);
+
+    const dataURL = canvas.toDataURL('image/jpeg', 0.85);
+    const downloadLink = document.createElement('a'); downloadLink.download = `BUKTI_${userToko}_${tgl}.jpg`; downloadLink.href = dataURL;
+    document.body.appendChild(downloadLink); downloadLink.click(); document.body.removeChild(downloadLink);
+
+    showLoading(false); kirimWhatsAppPesan();
+}
+
+        function kirimWhatsAppPesan() {
+
+    const crew =
+      document.getElementById(
+      'activeCrewName'
+      ).innerText;
+
+    const tanggal =
+      `${document.getElementById('daySelector').value} ${document.getElementById('monthSelector').value} ${document.getElementById('yearSelector').value}`;
+
+    let totalTarget = 0;
+    let totalJalan = 0;
+
+    let ranking = [];
+
+    cloudPlottingData.forEach(c => {
+
+        const target =
+          c.raks
+          ? c.raks.length
+          : 0;
+
+        const jalan =
+          c.savedRaks
+          ? c.savedRaks.length
+          : 0;
+
+        totalTarget += target;
+        totalJalan += jalan;
+
+        ranking.push({
+            nama:c.name,
+            target:target,
+            jalan:jalan,
+            sisa:Math.max(
+              0,
+              target-jalan
+            )
+        });
+
+    });
+
+    ranking.sort(
+      (a,b)=>
+      b.jalan-a.jalan
+    );
+
+    const totalSisa =
+      totalTarget-totalJalan;
+
+    const progress =
+      totalTarget > 0
+      ? Math.round(
+          (totalJalan/totalTarget)*100
+        )
+      : 0;
+
+    const rhAktif =
+      rhAktifGlobal.filter(
+      x=>x.status==="RH_AKTIF"
+      ).length;
+
+    const fokusJual =
+      rhAktifGlobal.filter(
+      x=>x.status==="FOKUS_JUAL"
+      ).length;
+
+    let message = "";
+
+    message += "🏪 *MONITORING KEBERSIHAN TOKO*\n\n";
+
+    message += `🏬 TOKO : ${userToko}\n`;
+    message += `📅 TANGGAL : ${tanggal}\n`;
+    message += `👤 PIC : ${crew}\n\n`;
+
+    message += "═══════════════\n";
+    message += "📊 *PROGRESS TOKO*\n";
+    message += "═══════════════\n";
+
+    message += `🎯 Target Rak : ${totalTarget}\n`;
+    message += `✅ Selesai : ${totalJalan}\n`;
+    message += `⏳ Sisa : ${totalSisa}\n`;
+    message += `📈 Progress : ${progress}%\n\n`;
+
+    message += "═══════════════\n";
+    message += "🏆 *RANKING PERSONIL*\n";
+    message += "═══════════════\n";
+
+    ranking.forEach((r,index)=>{
+
+    const medal =
+      index===0 ? "🥇" :
+      index===1 ? "🥈" :
+      index===2 ? "🥉" : "🏅";
+
+    let persen =
+      r.target > 0
+      ? Math.round((r.jalan / r.target) * 100)
+      : 0;
+
+    message +=
+      `${medal} ${r.nama}\n`;
+
+    message +=
+      `Target:${r.target} | Jalan:${r.jalan} | Sisa:${r.sisa}\n`;
+
+    message +=
+      `Progress:${persen}%\n\n`;
 
 });
 
+    message += "═══════════════\n";
+    message += "🚨 *MONITORING RH*\n";
+    message += "═══════════════\n";
 
-//==================================
-// LOCK LOCAL
-//==================================
+    message += `🔴 RH Aktif : ${rhAktif} Item\n`;
+    message += `🟡 Fokus Jual : ${fokusJual} Item\n\n`;
 
-if(!db.kunciLaporanUserHariIni)
-db.kunciLaporanUserHariIni={};
+    message += "═══════════════\n";
+    message += "📦 *TEMUAN PIC HARI INI*\n";
+    message += "═══════════════\n";
 
-db.kunciLaporanUserHariIni[lockKey]=true;
+    const rows =
+      document.querySelectorAll(
+      '#expContainer .item-row'
+      );
 
+    let adaItem = false;
 
-//==================================
-// PARSING RH
-//==================================
+    rows.forEach((row,index)=>{
 
-let listRHBaruPayload=[];
-let listTemuanLogDbd=[];
-let stringRHUntukWA='';
+        let fields =
+          row.querySelectorAll(
+          'input, select'
+          );
 
-document
-.querySelectorAll('.class-baris-rh')
-.forEach(function(row){
+        if(
+          fields[0] &&
+          fields[0].value
+        ){
 
-const rak=
-row.querySelector('.input-rh-rak').value;
+            adaItem = true;
 
-const barang=
-row.querySelector('.input-rh-nama')
-.value
-.trim();
+            message +=
+            `${index+1}. ${fields[0].value}\n`;
 
-const qty=
-row.querySelector('.input-rh-qty')
-.value;
+            message +=
+            `Rak : ${fields[1].value}\n`;
 
-const exp=
-row.querySelector('.input-rh-tgl')
-.value;
+            message +=
+            `EXP : ${fields[2].value}\n`;
 
-const kategori=
-row.querySelector('.input-rh-kategori')
-.value;
+            message +=
+            `RH : ${fields[3].value} Hari\n\n`;
+        }
 
-if(!barang||!qty||!exp)
-return;
+    });
 
-const rhData={
+    if(!adaItem){
 
-rak:rak,
-barang:barang,
-qty:qty,
-exp:exp,
-kategori:kategori,
-rh:kategori+' Hari'
+        message +=
+        "Tidak ada temuan RH/EXP hari ini.\n\n";
+    }
 
-};
+    message += "═══════════════\n";
+    message += "⚠️ *STATUS TOKO*\n";
+    message += "═══════════════\n";
 
-listRHBaruPayload.push(rhData);
+    message += "Rak yang belum dibersihkan masih menunggu eksekusi.\n";
+    message += "Display tidak akan bersih dengan sendirinya.\n";
+    message += "Barang mendekati expired tidak akan habis tanpa aksi.\n";
+    message += "Tetap gas sampai progress 100%.\n";
 
-listTemuanLogDbd.push({
+    let url =
+      "https://api.whatsapp.com/send?text=" +
+      encodeURIComponent(message);
 
-barang:barang,
-rak:rak
-
-});
-
-stringRHUntukWA+=
-`• ${barang} | ${rak} | EXP ${exp}\n`;
-
-});
-
-
-//==================================
-// SIMPAN HISTORY HARIAN
-//==================================
-
-if(!db.historyLogHarian)
-db.historyLogHarian={};
-
-if(!db.historyLogHarian[tagKeyHarian])
-db.historyLogHarian[tagKeyHarian]={};
-
-db.historyLogHarian[tagKeyHarian][userKey]={
-
-rakSelesai:
-arrayRakChecked.length,
-
-listTemuan:
-listTemuanLogDbd
-
-};
-
-
-//==================================
-// KIRIM CLOUD
-//==================================
-
-const payload={
-
-action:'kirimLaporanCrew',
-
-kodeToko:
-currentActiveUser.toko
-.toUpperCase(),
-
-periode:keyPeriode,
-
-crew:userKey,
-
-arrayRakChecked:
-arrayRakChecked,
-
-listRHBaru:
-listRHBaruPayload
-
-};
-
-console.log(
-'ARRAY RAK YANG AKAN DIKIRIM',
-arrayRakChecked
-);
-
-console.log(
-'PAYLOAD KIRIM',
-payload
-);
-
-const respon=
-await fetch(
-URL_CLOUD_DRIVE,
-{
-method:'POST',
-body:JSON.stringify(payload)
+    window.open(
+      url,
+      "_blank"
+    );
 }
-);
-
-const hasil=
-await respon.text();
-
-if(
-hasil!=='OK_LAPORAN'
-){
-
-throw new Error(
-'GAGAL_CLOUD'
-);
-
-}
-
-
-//==================================
-// SIMPAN LOCAL
-//==================================
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-
-//==================================
-// FORMAT WA
-//==================================
-
-if(!stringRHUntukWA){
-
-stringRHUntukWA=
-'🟢 _(Zero Temuan / Kondisi Aman)_\n';
-
-}
-
-let waText=
-`*📢 MONITORING KEBERSIHAN & RH TOKO [${currentActiveUser.toko}] 📢*\n`;
-
-waText+=
-`====================================\n\n`;
-
-waText+=
-`👤 *PERSONIL:* ${userKey}\n`;
-
-const sekarang = new Date();
-
-const tanggalWA =
-String(sekarang.getDate()).padStart(2,'0') +
-"/" +
-String(sekarang.getMonth()+1).padStart(2,'0') +
-"/" +
-sekarang.getFullYear();
-
-waText+=
-`📅 *TANGGAL:* ${tanggalWA}\n\n`;
-
-waText+=
-`✨ *STATUS KEBERSIHAN* ✨\n`;
-
-arrayRakChecked.forEach(rk=>{
-
-waText+=`✅ ${rk}\n`;
-
-});
-
-waText+=
-`\n🚨 *TEMUAN RH* 🚨\n`;
-
-waText+=
-stringRHUntukWA;
-
-console.log('WA OPEN');
-
-window.location.href=
-'https://wa.me/?text='+
-encodeURIComponent(waText);
-
-//==================================
-// RESET FORM
-//==================================
-
-document.getElementById(
-'container-rh'
-).innerHTML='';
-
-semuaFotoRak=[];
-
-document.getElementById(
-'file-rak'
-).value='';
-
-document.getElementById(
-'file-full'
-).value='';
-
-document.getElementById(
-'fotoChecklist'
-).value='';
-
-document.getElementById(
-'info-foto'
-).innerHTML=
-'0/5 Foto Upload (kurang 5)';
-
-document.getElementById(
-'info-full'
-).innerHTML=
-'Belum Upload';
-
-document.getElementById(
-'info-checklist'
-).innerHTML=
-'Belum Upload';
-
-muatDatabaseDariCloudDrive();
-
-alert(
-'✅ Laporan berhasil dikirim'
-);
-
-}
-catch(err){
-
-console.log(err);
-
-if(
-db &&
-db.kunciLaporanUserHariIni &&
-lockKey
-){
-delete db.kunciLaporanUserHariIni[lockKey];
-}
-
-localStorage.setItem(
-'db_omkopipait_v3',
-JSON.stringify(globalDatabase)
-);
-
-btn.disabled=false;
-
-btn.style.pointerEvents='auto';
-
-btn.innerHTML=
-'<i class="fa-brands fa-whatsapp text-sm"></i> Kirim & Buka WhatsApp Otomatis';
-
-window.submitSedangProses=false;
-
-return;
-
-}
-
-
-//==================================
-// FINAL LOCK TOTAL
-//==================================
-
-btn.innerHTML=
-'✅ SUDAH TERKIRIM';
-
-setTimeout(()=>{
-
-window.submitSedangProses=false;
-
-},5000);
-
-}
-
-</script>
+    </script>
 </body>
 </html>
