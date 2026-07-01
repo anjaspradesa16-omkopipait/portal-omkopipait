@@ -291,10 +291,15 @@
     <script>
         const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbynZ66L4L5a7ShR_MnfNECrtyz2T4e-kvlK7wcBjbMyTUWocK5zJ0H3Es5_MciKZeND_A/exec"; 
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const userRole = urlParams.get('mode') || 'locked'; 
-        const userToko = (urlParams.get('toko') || 'CB09').toUpperCase().trim();
-        const userNama = urlParams.get('nama') || '';
+const urlParams = new URLSearchParams(window.location.search);
+const loginData = JSON.parse(sessionStorage.getItem("userArea")) || {};
+const userRole = loginData.role || urlParams.get('mode') || 'locked';
+const userToko = (
+    loginData.toko ||
+    urlParams.get('toko') ||
+    ""
+).toUpperCase().trim();
+const userNama = loginData.nama || urlParams.get('nama') || "";
 
         let isSavedAndLocked = false; 
         let cloudPlottingData = [];
