@@ -6,41 +6,55 @@
     <title>Portal Area Omkopipait</title>
     <style>
         * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80');
-            background-size: cover; background-position: center; height: 100vh;
-            display: flex; align-items: center; justify-content: center; margin: 0; color: white; overflow: hidden;
-        }
-        .menu-box {
-            background: rgba(0,0,0,0.85); padding: 30px 20px; border-radius: 25px; 
-            border: 2px solid #f39c12; text-align: center; width: 90%; max-width: 380px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        #clock-container {
-            margin-bottom: 20px; padding: 15px; background: rgba(243,156,18,0.1);
-            border-radius: 15px; border: 1px solid rgba(243,156,18,0.3);
-        }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 30px 15px; color: white; overflow-x: hidden; }
+        
+        .menu-box { background: rgba(0,0,0,0.85); padding: 30px 20px; border-radius: 25px; border: 2px solid #f39c12; text-align: center; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: auto; }
+        #clock-container { margin-bottom: 20px; padding: 15px; background: rgba(243,156,18,0.1); border-radius: 15px; border: 1px solid rgba(243,156,18,0.3); }
         #jam { font-size: 36px; font-weight: bold; color: #f39c12; display: block; }
         #tanggal { font-size: 14px; color: #ecf0f1; margin-top: 5px; display: block; }
         .motivation { font-size: 14px; color: #ffeb3b; margin: 20px 0; font-style: italic; font-weight: bold; }
         
-        .btn-menu {
-            display: block; padding: 16px; margin: 12px 0; text-decoration: none; 
-            border-radius: 50px; font-weight: bold; color: white; font-size: 16px;
-            text-transform: uppercase; transition: all 0.3s ease;
-        }
+        .btn-menu { display: block; padding: 16px; margin: 12px 0; text-decoration: none; border-radius: 50px; font-weight: bold; color: white; font-size: 16px; text-transform: uppercase; transition: all 0.3s ease; }
         .btn-pps { background: linear-gradient(45deg, #8e44ad, #9b59b6); border-bottom: 4px solid #5e2d72; }
         .btn-sales { background: linear-gradient(45deg, #2980b9, #3498db); border-bottom: 4px solid #1c5a85; }
         .btn-menu:active { transform: translateY(2px); border-bottom: 0; }
+        
         .copyright { font-size: 11px; margin-top: 25px; color: #bdc3c7; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-
         .input-login { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:none; outline:none; font-size:16px; background: white; color: black; }
-        .btn-masuk { width:100%; padding:15px; background:#f39c12; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px; text-transform: uppercase; }
+        .btn-masuk { width:100%; padding:15px; background:#f39c12; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px; text-transform: uppercase; transition: 0.3s; }
+        .btn-masuk:active { transform: scale(0.98); }
+        .text-link { color: #f39c12; font-size: 13px; text-decoration: none; display: inline-block; cursor: pointer; transition: 0.3s; }
+        .text-link:hover { color: #fff; text-decoration: underline; }
+        
+        .password-container { position: relative; width: 100%; margin: 8px 0; }
+        .password-container input { margin: 0; padding-right: 45px; }
+        .toggle-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none; filter: grayscale(100%); }
+
+        /* CSS LAYAR LOADING */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.92); z-index: 9999;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .spinner {
+            width: 60px; height: 60px; border: 5px solid rgba(243,156,18,0.2);
+            border-top: 5px solid #f39c12; border-radius: 50%;
+            animation: puter 1s linear infinite; margin-bottom: 25px;
+        }
+        @keyframes puter { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading-text {
+            font-size: 16px; font-weight: bold; color: #f39c12; font-style: italic; 
+            text-align: center; max-width: 80%; line-height: 1.5;
+        }
     </style>
 </head>
 <body onclick="playMusic()">
+
+    <!-- LAYAR LOADING -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-text">Tunggu sebentar...</div>
+    </div>
 
     <div id="music-container" style="display:none;"></div>
 
@@ -62,9 +76,32 @@
     </div>
 
     <script>
-        // URL Apps Script Bapak yang sudah aktif
-        const urlAppsScript = "https://script.google.com/macros/s/AKfycbyMTQSyxHyRNqb0VaBT780GK67Lm-IS6QIXWl1AlC-BJi1vjxxenOSeYR0iQHUZAVJgVg/exec";
-        const PASS_VALIDASI = "targetharuskecapai"; 
+        // MASUKKAN URL DEPLOY BARU DI SINI
+        const urlAppsScript = "https://script.google.com/macros/s/AKfycbwvWbek3tcsEyoh_aS6HpTXoq44_G-vpoVszOkD9om7CI3684vLfuWz5SLyu_7zRAb4/exec";
+
+        let loadingTimer;
+        const kataMotivasi = [
+            "Tetap semangat... 💪", 
+            "Jangan lupa berdoa... 🤲", 
+            "Jangan lupa sholat... 🕌", 
+            "Jangan lupa makan... 🍛"
+        ];
+        
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            let index = 0;
+            document.getElementById('loading-text').innerText = kataMotivasi[index];
+            loadingTimer = setInterval(() => {
+                index++;
+                if (index >= kataMotivasi.length) index = 0;
+                document.getElementById('loading-text').innerText = kataMotivasi[index];
+            }, 1500);
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+            clearInterval(loadingTimer);
+        }
 
         function updateClock() {
             const now = new Date();
@@ -91,110 +128,279 @@
             }
         }
 
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text'; icon.innerText = '🙈'; 
+            } else {
+                input.type = 'password'; icon.innerText = '👁️'; 
+            }
+        }
+
         function showLogin() {
-            const saved = JSON.parse(localStorage.getItem("permanentUser")) || {nama:'', toko:''};
+            const saved = JSON.parse(localStorage.getItem("permanentUser")) || {email:''};
             document.getElementById('auth-ui').innerHTML = `
-                <h3 style="color:#f39c12; margin:0 0 10px 0; font-size:18px;">LOGIN AKSES AREA</h3>
-                <input type="text" id="regNama" value="${saved.nama}" placeholder="Nama Sesuai Database" class="input-login">
-                <input type="text" id="regToko" value="${saved.toko}" placeholder="Kode Toko (Contoh: CB09)" class="input-login">
-                <select id="regRole" class="input-login">
-                    <option value="locked">Crew Store (Laporan)</option>
-                    <option value="admin">Kepala Toko (Admin)</option>
-                </select>
-                <button id="btnAction" onclick="doLogin()" class="btn-masuk">CEK DATABASE KRU...</button>
+                <h3 style="color:#f39c12; margin:0 0 10px 0; font-size:18px;">PORTAL AREA OMKOPIPAIT</h3>
+                <input type="email" id="logEmail" value="${saved.email || ''}" placeholder="Alamat Email" class="input-login">
+                <div class="password-container">
+                    <input type="password" id="logPass" placeholder="Password" class="input-login">
+                    <span class="toggle-eye" onclick="togglePassword('logPass', this)">👁️</span>
+                </div>
+                <button id="btnAction" onclick="doLogin()" class="btn-masuk">MASUK AREA</button>
+                <div style="margin-top:15px; display:flex; justify-content:space-between; font-size:13px;">
+                    <span class="text-link" onclick="showLupaPassword()">Lupa Password?</span>
+                    <span class="text-link" onclick="showRegister()" style="color:#2ecc71;">Daftar Akun Baru</span>
+                </div>
             `;
             document.getElementById('menu-ui').style.display = 'none';
         }
 
-        async function doLogin() {
-    const nama = document.getElementById('regNama').value.trim();
-    const toko = document.getElementById('regToko').value.toUpperCase().trim();
-    const roleInput = document.getElementById('regRole').value; // Membaca dropdown Kepala/Crew
-    const btn = document.getElementById('btnAction');
-
-    if(!nama || !toko) return alert("Isi Nama & Toko!");
-    btn.innerText = "MENGHUBUNGKAN..."; btn.disabled = true;
-
-    try {
-        // Cek Nama & Toko ke database Drive asli Bapak
-        const urlPasti = `${urlAppsScript}?kodeToko=${toko}&nama=${nama}`;
-        const response = await fetch(urlPasti);
-        const hasil = await response.text();
-
-        if (hasil === "OK") {
-            // --- SAKLAR PENGUNCI JABATAN (LOKAL) ---
-            if (roleInput === "admin") {
-                // Jika memilih Kepala Toko, CEGAT pakai Password Area
-                const pass = prompt("Akses Admin Terdeteksi! Masukkan Password Area:");
-                if (pass === PASS_VALIDASI) {
-                    sessionStorage.setItem("userArea", JSON.stringify({nama, toko, role: "admin"}));
-                    localStorage.setItem("permanentUser", JSON.stringify({nama, toko}));
-                    localStorage.setItem("lastLoginDate", new Date().toDateString());
-                    alert("Login Admin Berhasil! Selamat Bekerja Pak.");
-                    location.reload();
-                } else { 
-                    alert("⚠️ PASSWORD SALAH! Akses Admin Ditolak."); 
-                    location.reload(); 
-                }
-            } else {
-                // Jika memilih Crew Store, langsung lolos TANPA password (tapi digembok)
-                sessionStorage.setItem("userArea", JSON.stringify({nama, toko, role: "locked"}));
-                localStorage.setItem("permanentUser", JSON.stringify({nama, toko}));
-                localStorage.setItem("lastLoginDate", new Date().toDateString());
-                alert("Login Crew Berhasil! Tetap Semangat Kejar Target.");
-                location.reload();
-            }
-        } else {
-            alert("DITOLAK!\nNama '" + nama + "' tidak ada di Toko " + toko + ".\nPeriksa penulisan di Drive Bapak.");
-            location.reload();
+        function showRegister() {
+            document.getElementById('auth-ui').innerHTML = `
+                <h3 style="color:#2ecc71; margin:0 0 10px 0; font-size:18px;">BUAT AKUN BARU</h3>
+                <input type="text" id="regNama" placeholder="Nama Lengkap" class="input-login">
+                <input type="text" id="regToko" placeholder="Kode Toko (Contoh: CB09)" class="input-login">
+                <select id="regRole" class="input-login">
+                    <option value="locked">Crew Store</option>
+                    <option value="admin">Kepala Toko</option>
+                </select>
+                <input type="email" id="regEmail" placeholder="Alamat Email Aktif" class="input-login">
+                <div class="password-container">
+                    <input type="password" id="regPass" placeholder="Buat Password" class="input-login">
+                    <span class="toggle-eye" onclick="togglePassword('regPass', this)">👁️</span>
+                </div>
+                <button id="btnReg" onclick="doRegister()" class="btn-masuk" style="background: linear-gradient(45deg, #27ae60, #2ecc71);">DAFTAR SEKARANG</button>
+                <span class="text-link" onclick="showLogin()" style="display:block; text-align:center; margin-top:15px;">« Batal & Kembali ke Login</span>
+            `;
         }
-    } catch (e) {
-        alert("Gagal konek Drive! Pastikan Izin Akses Apps Script adalah 'Anyone'.");
-        location.reload();
-    }
-}
+
+        function showLupaPassword() {
+            document.getElementById('auth-ui').innerHTML = `
+                <h3 style="color:#e74c3c; margin:0 0 10px 0; font-size:18px;">RESET PASSWORD</h3>
+                <p style="font-size:12px; color:#bdc3c7; margin-bottom:15px;">Masukkan email. Kami akan mengirimkan <b>6 Angka Keamanan (OTP)</b> ke email Anda.</p>
+                <input type="email" id="reqEmail" placeholder="Masukkan Email Terdaftar" class="input-login">
+                <button id="btnReq" onclick="doRequestOTP()" class="btn-masuk" style="background: linear-gradient(45deg, #c0392b, #e74c3c);">KIRIM KODE KE EMAIL</button>
+                <span class="text-link" onclick="showLogin()" style="display:block; text-align:center; margin-top:15px;">« Batal & Kembali ke Login</span>
+            `;
+        }
+
+        function showBikinSandiBaru(email) {
+            document.getElementById('auth-ui').innerHTML = `
+                <h3 style="color:#3498db; margin:0 0 10px 0; font-size:18px;">BUAT SANDI BARU</h3>
+                <p style="font-size:12px; color:#bdc3c7; margin-bottom:15px;">Cek Email Anda. Masukkan Kode Keamanan dan lengkapi data untuk membuat sandi baru.</p>
+                
+                <input type="email" id="updEmail" value="${email}" readonly class="input-login" style="background:#ecf0f1; color:#7f8c8d;">
+                <input type="text" id="updToko" placeholder="Masukkan Kode Toko Anda" class="input-login">
+                <input type="text" id="updOTP" placeholder="Masukkan 6 Angka dari Email" class="input-login" maxlength="6" style="text-align:center; font-weight:bold; letter-spacing:3px;">
+                
+                <div class="password-container">
+                    <input type="password" id="updPass1" placeholder="Sandi Baru" class="input-login">
+                    <span class="toggle-eye" onclick="togglePassword('updPass1', this)">👁️</span>
+                </div>
+                <div class="password-container">
+                    <input type="password" id="updPass2" placeholder="Ulangi Sandi Baru" class="input-login">
+                    <span class="toggle-eye" onclick="togglePassword('updPass2', this)">👁️</span>
+                </div>
+                
+                <button id="btnUpd" onclick="doUpdatePassword()" class="btn-masuk" style="background: linear-gradient(45deg, #2980b9, #3498db);">SIMPAN SANDI BARU</button>
+                <span class="text-link" onclick="showLogin()" style="display:block; text-align:center; margin-top:15px;">« Batal</span>
+            `;
+        }
+
+        async function doRequestOTP() {
+            const email = document.getElementById('reqEmail').value.trim().toLowerCase();
+            const btn = document.getElementById('btnReq');
+            if(!email) return alert("Masukkan alamat email Anda!");
+            
+            showLoading(); 
+            btn.disabled = true;
+
+            try {
+                const urlFetch = `${urlAppsScript}?action=reset_req&email=${encodeURIComponent(email)}`;
+                const response = await fetch(urlFetch);
+                const hasilText = await response.text();
+                
+                hideLoading(); 
+                
+                if (hasilText.startsWith("SUKSES")) {
+                    alert("✅ BERHASIL!\nKode Keamanan telah dikirim. Silakan cek Inbox/Spam email Anda.");
+                    showBikinSandiBaru(email); 
+                } else {
+                    alert(hasilText.replace("GAGAL|", ""));
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                hideLoading();
+                alert("Gagal terhubung ke sistem. Cek koneksi internet Anda.");
+                btn.disabled = false;
+            }
+        }
+
+        async function doUpdatePassword() {
+            const email = document.getElementById('updEmail').value.trim();
+            const toko = document.getElementById('updToko').value.trim().toUpperCase();
+            const otp = document.getElementById('updOTP').value.trim();
+            const pass1 = document.getElementById('updPass1').value;
+            const pass2 = document.getElementById('updPass2').value;
+            const btn = document.getElementById('btnUpd');
+
+            if(!toko || !otp || !pass1 || !pass2) return alert("Semua kolom wajib diisi!");
+            if(pass1 !== pass2) return alert("Sandi Baru dan Ulangi Sandi tidak sama! Cek lagi.");
+            
+            showLoading();
+            btn.disabled = true;
+
+            try {
+                const urlFetch = `${urlAppsScript}?action=update_pass&email=${encodeURIComponent(email)}&toko=${encodeURIComponent(toko)}&otp=${encodeURIComponent(otp)}&newpass=${encodeURIComponent(pass1)}`;
+                const response = await fetch(urlFetch);
+                const hasilText = await response.text();
+                
+                hideLoading();
+                
+                if (hasilText.startsWith("SUKSES")) {
+                    localStorage.removeItem('lockout_' + email);
+                    localStorage.removeItem('attempts_' + email);
+                    
+                    alert("✅ Ganti sandi sukses. Jangan lupa lagi. Coba dikopipaitin dulu ☕");
+                    showLogin();
+                } else {
+                    alert(hasilText.replace("GAGAL|", ""));
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                hideLoading();
+                alert("Gagal koneksi ke database. Cek sinyal Anda.");
+                btn.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // UPDATE BARU: HAPUS TILANG SAAT DAFTAR ULANG
+        // ==========================================
+        async function doRegister() {
+            const nama = document.getElementById('regNama').value.trim();
+            const toko = document.getElementById('regToko').value.trim().toUpperCase();
+            const role = document.getElementById('regRole').value;
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('regPass').value;
+            const btn = document.getElementById('btnReg');
+
+            if(!nama || !toko || !email || !pass) return alert("Semua kolom wajib diisi!");
+            
+            showLoading();
+            btn.disabled = true;
+
+            try {
+                const urlFetch = `${urlAppsScript}?action=register&nama=${encodeURIComponent(nama)}&toko=${encodeURIComponent(toko)}&role=${encodeURIComponent(role)}&email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`;
+                const response = await fetch(urlFetch);
+                const hasilText = await response.text();
+                
+                hideLoading();
+                
+                if (hasilText.startsWith("SUKSES")) {
+                    // PEMUTIHAN: Kalau pendaftaran tembus, otomatis blokirnya dihapus!
+                    localStorage.removeItem('lockout_' + email);
+                    localStorage.removeItem('attempts_' + email);
+                    
+                    alert("✅ Pendaftaran Berhasil!\nSilakan Login dengan Sandi yang barusan dibuat.");
+                    showLogin();
+                } else {
+                    alert(hasilText.replace("GAGAL|", ""));
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                hideLoading();
+                alert("Gagal koneksi. Jaringan jelek atau kuota menipis.");
+                btn.disabled = false;
+            }
+        }
+
+        async function doLogin() {
+            const email = document.getElementById('logEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('logPass').value;
+            const btn = document.getElementById('btnAction');
+
+            if(!email || !pass) return alert("Email dan Password tidak boleh kosong!");
+            
+            const lockoutKey = 'lockout_' + email;
+            const attemptsKey = 'attempts_' + email;
+            const lockoutUntil = localStorage.getItem(lockoutKey);
+
+            if (lockoutUntil && Date.now() < parseInt(lockoutUntil)) {
+                const sisaMenit = Math.ceil((parseInt(lockoutUntil) - Date.now()) / 60000);
+                return alert(`🚫 AKUN DIBLOKIR SEMENTARA!\n\nAnda salah password 3x. Tunggu ${sisaMenit} menit lagi, atau gunakan Lupa Password.`);
+            }
+
+            if (lockoutUntil && Date.now() >= parseInt(lockoutUntil)) {
+                localStorage.removeItem(lockoutKey); localStorage.removeItem(attemptsKey);
+            }
+            
+            showLoading();
+            btn.disabled = true;
+
+            try {
+                const urlFetch = `${urlAppsScript}?action=login&email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`;
+                const response = await fetch(urlFetch);
+                const hasilText = await response.text();
+                
+                hideLoading();
+                
+                if (hasilText.startsWith("SUKSES")) {
+                    localStorage.removeItem(attemptsKey);
+                    const data = hasilText.split("|");
+                    const userObj = { nama: data[1], toko: data[2], role: data[3], email: email };
+                    
+                    sessionStorage.setItem("userArea", JSON.stringify(userObj));
+                    localStorage.setItem("permanentUser", JSON.stringify({email: email}));
+                    localStorage.setItem("lastLoginDate", new Date().toDateString());
+                    
+                    alert(`Selamat datang, ${userObj.nama}!\nLogin berhasil.`);
+                    location.reload();
+                } else if (hasilText.includes("Email atau Password salah")) {
+                    let attempts = parseInt(localStorage.getItem(attemptsKey)) || 0;
+                    attempts++;
+                    if (attempts >= 3) {
+                        const oneHour = Date.now() + (60 * 60 * 1000);
+                        localStorage.setItem(lockoutKey, oneHour);
+                        alert("🚫 TILANG SISTEM!\n\nAnda salah 3x. Akun diblokir selama 1 Jam biar fokus! 🤣\nReset password kalau buru-buru.");
+                    } else {
+                        alert(`❌ PASSWORD SALAH!\n\nSisa percobaan: ${3 - attempts}x lagi sebelum diblokir.`);
+                        localStorage.setItem(attemptsKey, attempts);
+                    }
+                    btn.disabled = false;
+                } else {
+                    alert(hasilText.replace("GAGAL|", ""));
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                hideLoading();
+                alert("Gagal terhubung. Pastikan sinyal internet stabil.");
+                btn.disabled = false;
+            }
+        }
 
         function showMenu(user) {
-    // 1. Bersihkan area login
-    document.getElementById('auth-ui').innerHTML = '';
-    document.getElementById('menu-ui').style.display = 'block';
+            document.getElementById('auth-ui').innerHTML = '';
+            document.getElementById('menu-ui').style.display = 'block';
 
-    // 2. Bikin tampilan Menu yang lebih Mewah (Desain Asli Bapak)
-    document.getElementById('menu-ui').innerHTML = `
-        <div style="background: linear-gradient(135deg, rgba(243,156,18,0.2), rgba(0,0,0,0.5)); 
-                    padding: 20px; border-radius: 20px; border: 1px solid #f39c12; margin-bottom: 25px;
-                    box-shadow: inset 0 0 15px rgba(243,156,18,0.2);">
-            
-            <div style="font-size: 12px; color: #bdc3c7; text-transform: uppercase; letter-spacing: 2px;">Selamat Datang</div>
-            <div style="font-size: 24px; font-weight: bold; color: #f39c12; margin: 5px 0;">Halo, ${user.nama.toUpperCase()} [${user.toko}]</div>
-            <div style="font-size: 14px; color: #ecf0f1; opacity: 0.8;">Jabatan: <b>${user.role === 'admin' ? 'Kepala Toko' : 'Crew Store'}</b></div>
-            
-            <button onclick="sessionStorage.clear();location.reload();" 
-                    style="background: transparent; border: 1px solid #e74c3c; color: #e74c3c; 
-                           padding: 5px 15px; border-radius: 50px; font-size: 10px; 
-                           cursor: pointer; margin-top: 15px; font-weight: bold; transition: 0.3s; width: auto;">
-                LOGOUT
-            </button>
-        </div>
-
-    <div style="display: grid; gap: 15px;">
-    <a href="MONITORING-PPS.html?mode=${user.role}" class="btn-menu btn-pps" 
-       style="margin:0; display: flex; align-items: center; justify-content: center; gap: 10px;">
-       <span>📊</span> MONITORING PPS
-    </a>
-    
-    <a href="MONITORING-SALES.html?mode=${user.role}" class="btn-menu btn-sales" 
-       style="margin:0; display: flex; align-items: center; justify-content: center; gap: 10px;">
-       <span>💰</span> MONITORING SALES
-    </a>
-
-    <a href="MONITORING-KEBERSIHAN.html" class="btn-menu" 
-       style="margin:0; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(45deg, #27ae60, #2ecc71); border-bottom: 4px solid #1e7e43;">
-       <span>🧼</span> MONITORING KEBERSIHAN & RH
-    </a>
-</div>
-    `;
-}
+            document.getElementById('menu-ui').innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(243,156,18,0.2), rgba(0,0,0,0.5)); padding: 20px; border-radius: 20px; border: 1px solid #f39c12; margin-bottom: 25px; box-shadow: inset 0 0 15px rgba(243,156,18,0.2);">
+                    <div style="font-size: 12px; color: #bdc3c7; text-transform: uppercase; letter-spacing: 2px;">Selamat Datang</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #f39c12; margin: 5px 0;">Halo, ${user.nama.toUpperCase()} [${user.toko}]</div>
+                    <div style="font-size: 14px; color: #ecf0f1; opacity: 0.8;">Jabatan: <b>${user.role.toUpperCase() === 'ADMIN' ? 'KEPALA TOKO' : 'CREW STORE'}</b></div>
+                    <div style="font-size: 12px; color: #bdc3c7; margin-top: 5px;"><i>${user.email}</i></div>
+                    
+                    <button onclick="sessionStorage.clear();location.reload();" style="background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 15px; border-radius: 50px; font-size: 10px; cursor: pointer; margin-top: 15px; font-weight: bold; transition: 0.3s;">LOGOUT SISTEM</button>
+                </div>
+                <div style="display: grid; gap: 15px;">
+                    <a href="MONITORING-PPS.html?mode=${user.role}" class="btn-menu btn-pps" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px;"><span>📊</span> MONITORING PPS</a>
+                    <a href="MONITORING-SALES.html?mode=${user.role}" class="btn-menu btn-sales" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px;"><span>💰</span> MONITORING SALES</a>
+                    <a href="MONITORING-KEBERSIHAN.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #27ae60, #2ecc71); border-bottom:4px solid #1e7e43;"><span>🧼</span> MONITORING KEBERSIHAN</a>
+                    <a href="MONITORING-CEKLIS.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #d35400, #e67e22); border-bottom:4px solid #a04000;"><span>📋</span> CEKLIS SHIFT</a>
+                    <a href="MONITORING-LIBUR.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #e84393, #fd79a8); border-bottom:4px solid #b8326b;"><span>🏖️</span> MONITORING LIBUR</a>
+                </div>
+            `;
+        }
         init();
     </script>
 </body>
