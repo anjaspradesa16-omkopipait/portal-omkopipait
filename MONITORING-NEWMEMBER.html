@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Monitoring New Member - Auto Scan Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); color: #334155; min-height: 100vh; padding: 20px; overflow-x: hidden; }
+        .container { max-width: 1200px; margin: auto; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 1); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease; }
+        .glass-panel:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08); }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 15px 25px; border-radius: 20px; margin-bottom: 30px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); }
+        .live-clock { color: #0ea5e9; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        @keyframes pulse-dot { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        .live-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        h3.section-title { color: #475569; font-size: 15px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        label { display: block; font-size: 12px; color: #64748b; margin: 12px 0 5px 0; font-weight: 600; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px 15px; border-radius: 10px; background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; font-size: 14px; outline: none; transition: 0.3s; }
+        input:focus, select:focus { border-color: #0ea5e9; background: #fff; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        input[type="file"] { padding: 10px; background: #f0f9ff; border: 1px dashed #0ea5e9; cursor: pointer; color: #0ea5e9; font-weight: 600; }
+        .scan-indicator { font-size: 11px; color: #10b981; font-weight: bold; margin-top: 5px; display: none; }
+        .scan-indicator.active { display: block; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: all 0.3s ease; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-wa { background: #10b981; color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); }
+        .btn-wa:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); }
+        .btn-admin { background: #8b5cf6; color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); }
+        .btn-admin:hover { background: #7c3aed; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); }
+        .matrix-container { margin-top: 30px; overflow-x: auto; border-radius: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; text-align: left; }
+        th, td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; font-weight: 800; }
+        tr:hover { background: #f8fafc; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+        .badge-qty { background: #d1fae5; color: #059669; }
+        #loader { display: none; position: fixed; inset: 0; background: rgba(255, 255, 255, 0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner-ring { width: 60px; height: 60px; border: 4px solid #f1f5f9; border-top-color: #0ea5e9; border-right-color: #8b5cf6; border-radius: 50%; animation: spin-ring 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin-ring { 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .header-bar { flex-direction: column; gap: 15px; text-align: center; } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner-ring"></div>
+        <h3 style="color:#334155; letter-spacing: 2px;">SINKRONISASI CLOUD...</h3>
+    </div>
+
+    <div class="container" id="mainUI" style="display:none;">
+        
+        <div class="header-bar">
+            <div>
+                <h2 style="font-size: 20px; font-weight: 800; color: #0f172a;">
+                    <i class="fa-solid fa-id-card-clip" style="color: #0ea5e9;"></i> NEW MEMBER TRACKER
+                </h2>
+                <div style="font-size: 13px; color: #64748b; margin-top: 5px;">
+                    <i class="fa-solid fa-store" style="color: #0ea5e9;"></i> <span id="info-toko" style="color: #334155; font-weight: bold;">Memuat...</span> | 
+                    <i class="fa-solid fa-user-tie" style="color: #8b5cf6;"></i> <span id="info-nama" style="color: #334155; font-weight: bold;">Memuat...</span> 
+                    <span id="info-role" style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 5px; font-weight: 800;"></span>
+                </div>
+            </div>
+            <div class="live-clock">
+                <div class="live-dot"></div>
+                <span id="jam-realtime">Sinkronisasi Waktu...</span>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            
+            <div class="glass-panel" id="panel-admin" style="display: none; border-top: 4px solid #8b5cf6;">
+                <h3 class="section-title"><i class="fa-solid fa-crown" style="color: #8b5cf6;"></i> SETUP TARGET ADMIN</h3>
+                
+                <label>Target New Member Bulan Ini (Total)</label>
+                <input type="number" id="setup-target" placeholder="Contoh: 150">
+
+                <label>Sistem Jam Operasional</label>
+                <select id="setup-shift">
+                    <option value="3">Toko 24 Jam (3 Shift)</option>
+                    <option value="2">Toko Non-24 Jam (2 Shift)</option>
+                </select>
+
+                <button class="btn btn-admin" onclick="simpanSetupCloud()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Ke Spreadsheet
+                </button>
+            </div>
+
+            <div class="glass-panel" id="panel-crew" style="display: none; border-top: 4px solid #10b981;">
+                <h3 class="section-title"><i class="fa-solid fa-camera-retro" style="color: #10b981;"></i> INPUT NEW MEMBER</h3>
+                
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label>Tanggal</label>
+                        <input type="text" id="input-tgl" readonly style="background: #e2e8f0; text-align: center; font-weight: bold; color: #475569;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Shift Lapor</label>
+                        <select id="input-shift">
+                            <option value="1">Shift 1</option>
+                            <option value="2">Shift 2</option>
+                            <option value="3" id="opt-shift-3">Shift 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>1. Upload Foto Struk/Kartu Member</label>
+                <input type="file" id="input-foto" accept="image/*" onchange="autoScanNomorMember(event)">
+                <div id="scan-status" class="scan-indicator"><i class="fa-solid fa-robot"></i> Memindai foto untuk mencari Nomor Member...</div>
+
+                <label>2. Nomor Member (Auto-Scan / Manual)</label>
+                <input type="text" id="input-nomor-member" placeholder="Nomor akan terisi otomatis atau ketik di sini...">
+
+                <label>Jumlah Aktivasi</label>
+                <input type="number" id="input-qty" value="1" min="1">
+
+                <button class="btn btn-wa" id="btn-submit" onclick="prosesLaporanMember()">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> Proses & Lapor WA
+                </button>
+            </div>
+
+            <div class="glass-panel" style="border-top: 4px solid #0ea5e9;">
+                <h3 class="section-title"><i class="fa-solid fa-chart-pie" style="color: #0ea5e9;"></i> MATRIK PENCAPAIAN TOKO</h3>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0;">
+                    <div>
+                        <div style="font-size: 11px; color: #64748b; font-weight: 800;">TARGET BULAN INI</div>
+                        <div id="disp-target" style="font-size: 28px; font-weight: 800; color: #334155;">0</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11px; color: #64748b; font-weight: 800;">REALISASI TOTAL</div>
+                        <div id="disp-capai" style="font-size: 28px; font-weight: 800; color: #10b981;">0</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 11px; color: #64748b; margin-bottom: 5px; font-weight: 600;">Harus Masuk: <span id="disp-harian">0</span> per Shift</div>
+                <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                    <div id="progress-bar" style="width: 0%; height: 100%; background: #0ea5e9; transition: width 1s ease;"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="glass-panel matrix-container">
+            <h3 class="section-title"><i class="fa-solid fa-list-check" style="color: #64748b;"></i> DATA HISTORI MASUK (LIVE CLOUD)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal & Waktu</th>
+                        <th>Shift</th>
+                        <th>Personil (Crew)</th>
+                        <th>Nomor Member</th>
+                        <th style="text-align: center;">Qty</th>
+                    </tr>
+                </thead>
+                <tbody id="tabel-histori">
+                    </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="index.html" style="color: #64748b; text-decoration: none; font-size: 13px; font-weight: 800; padding: 10px 25px; border-radius: 50px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><i class="fa-solid fa-arrow-left"></i> KEMBALI KE PORTAL AREA</a>
+        </div>
+    </div>
+
+    <canvas id="canvas-grid" style="display:none;"></canvas>
+
+    <script>
+        // 🔴🔴🔴 PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI 🔴🔴🔴
+        const API_CLOUD = "https://script.google.com/macros/s/AKfycbzPw0AkNMnvKwP-MTfTQKFOcxTWH1Wgiy0cG4KhXOIGCK-fjdG0P_9FjgEG3i4FlgeG/exec"; 
+        
+        let userAktif = null;
+        let setupToko = { target: "", shift: 3 }; // No WA sudah dihapus
+        
+        const hariIni = new Date();
+        const tglSekarang = String(hariIni.getDate()).padStart(2, '0');
+        const blnSekarang = String(hariIni.getMonth() + 1).padStart(2, '0');
+        const thnSekarang = hariIni.getFullYear();
+
+        // -------------------------------------------------------------
+        // OCR TESSERACT (AUTO-SCAN NOMOR MEMBER DARI FOTO)
+        // -------------------------------------------------------------
+        async function autoScanNomorMember(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const inputNomor = document.getElementById('input-nomor-member');
+            const scanStatus = document.getElementById('scan-status');
+
+            inputNomor.value = "";
+            inputNomor.placeholder = "Memindai foto... mohon tunggu ⏳";
+            inputNomor.disabled = true;
+            scanStatus.classList.add('active');
+
+            try {
+                const result = await Tesseract.recognize(file, 'eng');
+                const teksTerbaca = result.data.text;
+                const cocokAngka = teksTerbaca.match(/\d{6,}/g); // Cari angka min 6 digit
+
+                if (cocokAngka && cocokAngka.length > 0) {
+                    const nomorTerpanjang = cocokAngka.reduce((a, b) => a.length > b.length ? a : b);
+                    inputNomor.value = nomorTerpanjang;
+                    scanStatus.innerHTML = `<i class="fa-solid fa-check-circle"></i> Nomor otomatis terdeteksi! (Cek kembali jika salah)`;
+                    scanStatus.style.color = "#0ea5e9";
+                } else {
+                    scanStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Nomor kurang jelas, silakan ketik manual.`;
+                    scanStatus.style.color = "#f59e0b";
+                    inputNomor.placeholder = "Ketik nomor member di sini...";
+                }
+            } catch (err) {
+                scanStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Gagal memindai. Ketik manual saja.`;
+                scanStatus.style.color = "#ef4444";
+                inputNomor.placeholder = "Ketik nomor member di sini...";
+            }
+            
+            inputNomor.disabled = false;
+            scanStatus.classList.remove('active');
+        }
+
+        async function fetchAPI(action, payload = {}) {
+            if(API_CLOUD === "URL_GOOGLE_APPS_SCRIPT_ANDA_DI_SINI") {
+                alert("⚠️ Anda belum memasukkan URL Google Apps Script ke dalam kode HTML!");
+                return null;
+            }
+            if (action.includes("save")) {
+                const req = await fetch(API_CLOUD, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: action, toko: userAktif.toko, ...payload })
+                });
+                return req.json();
+            } else {
+                const req = await fetch(`${API_CLOUD}?action=${action}&toko=${encodeURIComponent(userAktif.toko)}`);
+                return req.json();
+            }
+        }
+
+        function init() {
+            const sesiRaw = sessionStorage.getItem("userArea");
+            if (sesiRaw) {
+                userAktif = JSON.parse(sesiRaw);
+            } else {
+                userAktif = { nama: "Belum Login", toko: "Belum Set Toko", role: "crew" };
+            }
+
+            document.getElementById('info-toko').innerText = userAktif.toko;
+            document.getElementById('info-nama').innerText = userAktif.nama;
+            
+            if (userAktif.role.toLowerCase() === 'admin' || userAktif.role.toLowerCase() === 'kepala toko') {
+                document.getElementById('info-role').innerText = "KEPALA TOKO";
+                document.getElementById('panel-admin').style.display = "block";
+            } else {
+                document.getElementById('info-role').innerText = "CREW TOKO";
+            }
+            
+            document.getElementById('panel-crew').style.display = "block";
+            document.getElementById('input-tgl').value = `${tglSekarang}/${blnSekarang}/${thnSekarang}`;
+
+            jalankanJamRealTime();
+            muatDataCloud();
+            document.getElementById('mainUI').style.display = "block";
+        }
+
+        function jalankanJamRealTime() {
+            setInterval(() => {
+                const now = new Date();
+                const waktu = now.toLocaleTimeString('id-ID', { hour12: false });
+                document.getElementById('jam-realtime').innerHTML = `<i class="fa-regular fa-clock"></i> ${tglSekarang}/${blnSekarang}/${thnSekarang} - ${waktu} WIB`;
+            }, 1000);
+        }
+
+        async function muatDataCloud() {
+            document.getElementById('loader').style.display = 'flex';
+            
+            try {
+                const resSetup = await fetchAPI("getSetup");
+                if (resSetup && resSetup.data) {
+                    setupToko.target = resSetup.data.target || "";
+                    setupToko.shift = resSetup.data.shift || 3;
+
+                    if (setupToko.shift == 2) document.getElementById('opt-shift-3').style.display = 'none';
+
+                    if(userAktif.role.toLowerCase() === 'admin' || userAktif.role.toLowerCase() === 'kepala toko') {
+                        document.getElementById('setup-target').value = setupToko.target;
+                        document.getElementById('setup-shift').value = setupToko.shift;
+                    }
+                }
+
+                const resHistori = await fetchAPI("getHistori");
+                let historiCloud = resHistori ? resHistori.data : [];
+
+                renderHistoriDanMatrik(historiCloud);
+            } catch (err) {
+                console.error("Gagal koneksi cloud:", err);
+            }
+            
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function renderHistoriDanMatrik(histori) {
+            const tbody = document.getElementById('tabel-histori');
+            tbody.innerHTML = '';
+            let totalCapai = 0;
+
+            if(histori.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px; color:#94a3b8; font-style:italic;">Belum ada data pencapaian.</td></tr>`;
+            } else {
+                histori.forEach(item => {
+                    totalCapai += parseInt(item.qty);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="color:#64748b; font-size:12px;">${item.waktu}</td>
+                            <td>Shift ${item.shift}</td>
+                            <td style="color:#0ea5e9; font-weight:800;">${item.crew}</td>
+                            <td style="font-weight:600; color:#334155; letter-spacing: 1px;">${item.member}</td>
+                            <td style="text-align:center;"><span class="badge badge-qty">+${item.qty}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const hariDalamBulan = new Date(thnSekarang, hariIni.getMonth() + 1, 0).getDate();
+            const targetHarian = setupToko.target ? Math.ceil(setupToko.target / hariDalamBulan) : 0;
+            const targetPerShift = targetHarian ? Math.ceil(targetHarian / setupToko.shift) : 0;
+
+            document.getElementById('disp-target').innerText = setupToko.target || "0";
+            document.getElementById('disp-harian').innerText = targetPerShift || "0";
+            document.getElementById('disp-capai').innerText = totalCapai;
+            
+            let persentase = setupToko.target ? (totalCapai / setupToko.target) * 100 : 0;
+            if (persentase > 100) persentase = 100;
+            document.getElementById('progress-bar').style.width = persentase + "%";
+        }
+
+        async function simpanSetupCloud() {
+            const target = document.getElementById('setup-target').value;
+            const shift = document.getElementById('setup-shift').value;
+
+            if(!target) return alert("Target Bulanan tidak boleh kosong!");
+            document.getElementById('loader').style.display = 'flex';
+            
+            await fetchAPI("saveSetup", { target: target, shift: shift });
+            alert("✅ Pengaturan Berhasil Disimpan ke Spreadsheet!");
+            
+            muatDataCloud();
+        }
+
+        // -------------------------------------------------------------
+        // PROSES CANVAS GRID (AUTO-DOWNLOAD) & BUKA WHATSAPP
+        // -------------------------------------------------------------
+        async function prosesLaporanMember() {
+            const btn = document.getElementById('btn-submit');
+            const shift = document.getElementById('input-shift').value;
+            const nomorMember = document.getElementById('input-nomor-member').value.trim();
+            const qty = document.getElementById('input-qty').value;
+            const fileInput = document.getElementById('input-foto');
+            
+            if(fileInput.files.length === 0) return alert("WAJIB melampirkan foto bukti pendaftaran/struk!");
+            if(!nomorMember) return alert("Nomor Member kosong! Tunggu proses scan selesai atau ketik manual.");
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan ke Cloud...`;
+
+            const waktuKirim = `${tglSekarang}/${blnSekarang}/${thnSekarang} ` + new Date().toLocaleTimeString('id-ID', { hour12: false });
+
+            // 1. Simpan Teks Ke Cloud
+            await fetchAPI("saveHistori", {
+                waktu: waktuKirim, shift: shift, crew: userAktif.nama, member: nomorMember, qty: qty
+            });
+
+            // 2. PROSES GAMBAR (AUTO-GRID) DAN AUTO-DOWNLOAD
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas-grid');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const cWidth = 800;
+                    const cHeight = Math.round((img.height * cWidth) / img.width) + 120; 
+                    canvas.width = cWidth;
+                    canvas.height = cHeight;
+
+                    // Gambar foto asli
+                    ctx.drawImage(img, 0, 0, cWidth, cHeight - 120);
+
+                    // Gambar Footer Watermark Putih
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, cHeight - 120, cWidth, 120);
+                    
+                    ctx.fillStyle = "#0ea5e9";
+                    ctx.fillRect(0, cHeight - 120, cWidth, 5);
+
+                    // Penulisan Text ke dalam foto
+                    ctx.fillStyle = "#334155";
+                    ctx.font = "bold 32px Poppins, Arial";
+                    ctx.fillText(`NO. MEMBER: ${nomorMember.toUpperCase()} (Qty: ${qty})`, 25, cHeight - 65);
+                    
+                    ctx.fillStyle = "#64748b";
+                    ctx.font = "20px Poppins, Arial";
+                    ctx.fillText(`${userAktif.toko} | Crew: ${userAktif.nama} | ${waktuKirim}`, 25, cHeight - 25);
+
+                    // EKSEKUSI AUTO-DOWNLOAD FOTO YANG SUDAH DIGRID
+                    const linkDL = document.createElement('a');
+                    linkDL.download = `Member_${nomorMember}_S${shift}.jpg`;
+                    linkDL.href = canvas.toDataURL("image/jpeg", 0.85);
+                    linkDL.click(); // <--- BARIS INI YANG MEMBUAT FOTO OTOMATIS TERUNDUH KE HP CREW
+
+                    // 3. ARAHKAN KE WHATSAPP SECARA BEBAS (Tanpa nomor tujuan)
+                    const teksWA = `💎 *LAPORAN NEW MEMBER* 💎\n\n` +
+                                   `🏪 *Toko:* ${userAktif.toko}\n` +
+                                   `⏰ *Waktu:* ${waktuKirim}\n` +
+                                   `🦸‍♂️ *Kasir/Crew:* ${userAktif.nama} (Shift ${shift})\n` +
+                                   `━━━━━━━━━━━━━━━━━━━━\n` +
+                                   `🆔 *Nomor Member:* ${nomorMember}\n` +
+                                   `💳 *Total Aktivasi:* ${qty}\n\n` +
+                                   `_Catatan: Foto bukti sudah terunduh di perangkat, silakan lampirkan (paste/attach) di chat ini._`;
+
+                    // Beri jeda 1 detik agar browser selesai mendownload foto sebelum pindah ke WA
+                    setTimeout(() => {
+                        // Membuka WA secara universal (Meminta crew memilih grup/kontak)
+                        window.open(`https://wa.me/?text=${encodeURIComponent(teksWA)}`, '_blank');
+                        
+                        // Reset Form
+                        document.getElementById('input-nomor-member').value = "";
+                        document.getElementById('input-qty').value = "1";
+                        document.getElementById('input-foto').value = "";
+                        document.getElementById('scan-status').style.display = 'none';
+                        
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-brands fa-whatsapp fa-lg"></i> Proses & Lapor WA`;
+                        
+                        muatDataCloud(); // Refresh tabel histori
+                    }, 1000);
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
