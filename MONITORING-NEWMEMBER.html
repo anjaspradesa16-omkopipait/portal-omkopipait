@@ -251,7 +251,9 @@
             try {
                 const result = await Tesseract.recognize(file, 'eng');
                 const teksTerbaca = result.data.text;
-                const cocokAngka = teksTerbaca.match(/\d{6,}/g); 
+                // Memfilter HANYA deretan angka panjang (Minimal 12 sampai 20 digit) 
+                // Ini akan otomatis mengabaikan PLU, Harga, atau QTY di layar komputer!
+                const cocokAngka = teksTerbaca.match(/\d{12,20}/g); 
 
                 if (cocokAngka && cocokAngka.length > 0) {
                     const nomorTerpanjang = cocokAngka.reduce((a, b) => a.length > b.length ? a : b);
