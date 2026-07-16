@@ -164,8 +164,6 @@
                     </div>
                 </div>
                 
-                <!-- Input "Jumlah Aktivasi" sudah dihapus dari sini -->
-
                 <!-- TOMBOL TAMBAH FORM -->
                 <button class="btn btn-add-form" onclick="tambahFormMember()">
                     <i class="fa-solid fa-plus-circle"></i> Tambah Foto Member Lain
@@ -565,7 +563,7 @@
         }
 
         // ==============================================================================
-        // LOGIKA BARU: MULTI-FETCH KE CLOUD (TIAP MEMBER JADI BARIS BARU) & GRID 2 KOLOM
+        // LOGIKA PROSES GRID 2 KOLOM & JALUR WA ANTI-BUG (NATIVE DEEP LINK)
         // ==============================================================================
         async function prosesLaporanMember() {
             const btn = document.getElementById('btn-submit');
@@ -608,7 +606,7 @@
                     shift: shift, 
                     crew: userAktif.nama, 
                     member: listNomor[i], 
-                    qty: 1 // Kirim sebagai 1 qty per baris!
+                    qty: 1 // Kirim sebagai 1 qty per baris agar rapi di Spreadsheet!
                 });
             }
 
@@ -636,37 +634,32 @@
                 loadedImgs.push(img);
             }
 
-            // Samakan rasio tinggi semua kotak mengikuti foto pertama
             const baseRatio = loadedImgs[0].height / loadedImgs[0].width;
             const cellHeight = cellWidth * baseRatio;
 
-            // Logika Grid (Max 2 Kolom)
+            // Logika Grid Max 2 Kolom
             const cols = loadedImgs.length === 1 ? 1 : 2;
             const rows = Math.ceil(loadedImgs.length / cols);
 
             canvas.width = cols * cellWidth;
             canvas.height = (rows * cellHeight) + footerH;
 
-            // Gambar Background Putih
+            // Background Putih
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Gambar Foto-foto dalam bentuk Grid
             for(let i=0; i<loadedImgs.length; i++) {
                 let col = i % cols;
                 let row = Math.floor(i / cols);
                 let x = col * cellWidth;
                 let y = row * cellHeight;
 
-                // Tempel Foto
                 ctx.drawImage(loadedImgs[i], x, y, cellWidth, cellHeight);
                 
-                // Garis pembatas tebal antar foto
                 ctx.strokeStyle = "#ffffff";
                 ctx.lineWidth = 10;
                 ctx.strokeRect(x, y, cellWidth, cellHeight);
                 
-                // Beri Label (Misal: MEMBER 1) di sudut kiri bawah tiap foto
                 ctx.fillStyle = "rgba(0,0,0,0.6)";
                 ctx.fillRect(x, y + cellHeight - 50, 160, 50);
                 ctx.fillStyle = "#38bdf8";
@@ -674,16 +667,13 @@
                 ctx.fillText(`MEMBER ${i+1}`, x + 15, y + cellHeight - 16);
             }
 
-            // Gambar Footer di area paling bawah
             let footerY = rows * cellHeight;
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, footerY, canvas.width, footerH);
             
-            // Garis Biru pembatas atas footer
             ctx.fillStyle = "#0ea5e9";
             ctx.fillRect(0, footerY, canvas.width, 8); 
 
-            // Teks Footer
             ctx.fillStyle = "#334155";
             ctx.font = "bold 36px Poppins, Arial";
             ctx.fillText(`MEMBER MASUK: ${qtyTotal} AKTIVASI`, 30, footerY + 65);
@@ -711,9 +701,10 @@
                            `🆔 *Rincian Nomor:*\n${detailNomorText}\n` +
                            `_Catatan: Bukti foto struk gabungan sudah terunduh di HP Anda, silakan lampirkan._`;
 
-            // BUKA WHATSAPP & RESET FORM
+            // BUKA WHATSAPP DENGAN JALUR NATIVE DEEP LINK & RESET FORM
             setTimeout(() => {
-                window.open(`https://wa.me/?text=${encodeURIComponent(teksWA)}`, '_blank');
+                // INILAH SOLUSINYA AGAR EMOJI TIDAK PECAH & LANGSUNG BUKA APLIKASI WHATSAPP
+                window.location.href = `whatsapp://send?text=${encodeURIComponent(teksWA)}`;
                 
                 document.getElementById('wadah-form-member').innerHTML = `
                     <div class="member-item-box" id="member-box-1">
