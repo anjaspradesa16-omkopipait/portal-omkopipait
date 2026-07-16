@@ -115,6 +115,7 @@
 
         <div class="grid-layout">
             
+            <!-- PANEL ADMIN -->
             <div class="glass-panel" id="panel-admin" style="display: none; border-top: 4px solid #8b5cf6;">
                 <h3 class="section-title"><i class="fa-solid fa-crown" style="color: #8b5cf6;"></i> SETUP TOKO & PERSONIL</h3>
                 
@@ -133,6 +134,7 @@
                 </button>
             </div>
 
+            <!-- PANEL CREW (INPUT DINAMIS) -->
             <div class="glass-panel" id="panel-crew" style="display: none; border-top: 4px solid #10b981;">
                 <h3 class="section-title"><i class="fa-solid fa-camera-retro" style="color: #10b981;"></i> INPUT MEMBER BARU</h3>
                 
@@ -151,6 +153,7 @@
                     </div>
                 </div>
 
+                <!-- WADAH FORM DINAMIS -->
                 <div id="wadah-form-member">
                     <div class="member-item-box" id="member-box-1">
                         <label style="color: #0ea5e9;">💎 Data Member 1</label>
@@ -160,9 +163,12 @@
                         <input type="text" id="input-nomor-1" class="nomor-member" placeholder="Nomor otomatis / ketik manual..." style="margin-top: 8px;">
                     </div>
                 </div>
+                
+                <!-- Input "Jumlah Aktivasi" sudah dihapus dari sini -->
 
+                <!-- TOMBOL TAMBAH FORM -->
                 <button class="btn btn-add-form" onclick="tambahFormMember()">
-                    <i class="fa-solid fa-plus-circle"></i> Tambah Member Lainnya
+                    <i class="fa-solid fa-plus-circle"></i> Tambah Foto Member Lain
                 </button>
 
                 <button class="btn btn-wa" id="btn-submit" onclick="prosesLaporanMember()">
@@ -170,6 +176,7 @@
                 </button>
             </div>
 
+            <!-- GRID KANAN: MATRIK & KLASEMEN -->
             <div>
                 <div class="glass-panel" style="border-top: 4px solid #0ea5e9;">
                     <h3 class="section-title"><i class="fa-solid fa-chart-pie" style="color: #0ea5e9;"></i> MATRIK PENCAPAIAN TOKO</h3>
@@ -220,7 +227,8 @@
                     </tr>
                 </thead>
                 <tbody id="tabel-histori">
-                    </tbody>
+                    <!-- Dirender via Javascript -->
+                </tbody>
             </table>
         </div>
         
@@ -229,6 +237,7 @@
         </div>
     </div>
 
+    <!-- Canvas Tersembunyi -->
     <canvas id="canvas-grid" style="display:none;"></canvas>
 
     <script>
@@ -238,7 +247,7 @@
         let userAktif = null;
         let setupToko = { target: "", shift: 3, personil: "" }; 
         let historiGlobalSemuaBulan = []; 
-        let jumlahFormCounter = 1; // Penghitung jumlah form dinamis
+        let jumlahFormCounter = 1; 
         
         const hariIni = new Date();
         const tglSekarang = String(hariIni.getDate()).padStart(2, '0');
@@ -247,9 +256,7 @@
         
         document.getElementById('input-filter-bulan').value = `${thnSekarang}-${blnSekarang}`;
 
-        // -------------------------------------------------------------
         // FITUR TAMBAH FORM MEMBER DINAMIS
-        // -------------------------------------------------------------
         function tambahFormMember() {
             jumlahFormCounter++;
             const wadah = document.getElementById('wadah-form-member');
@@ -275,9 +282,7 @@
             if (elm) elm.remove();
         }
 
-        // -------------------------------------------------------------
-        // OCR TESSERACT (UPDATE: MENGABAIKAN ANGKA PENDEK SEPERTI PLU/HARGA)
-        // -------------------------------------------------------------
+        // OCR TESSERACT
         async function autoScanNomorMember(event, id) {
             const file = event.target.files[0];
             if (!file) return;
@@ -294,8 +299,6 @@
                 const result = await Tesseract.recognize(file, 'eng');
                 const teksTerbaca = result.data.text;
                 
-                // KUNCI UTAMA: Hanya cari deretan angka antara 12 hingga 20 digit.
-                // Mengabaikan angka Qty, Harga, atau PLU yang pendek-pendek di layar monitor.
                 const cocokAngka = teksTerbaca.match(/\d{12,20}/g); 
 
                 if (cocokAngka && cocokAngka.length > 0) {
@@ -561,14 +564,13 @@
             muatDataCloud();
         }
 
-        // -------------------------------------------------------------
-        // LOGIKA PROSES & PENGGABUNGAN FOTO (STRUK PANJANG)
-        // -------------------------------------------------------------
+        // ==============================================================================
+        // LOGIKA BARU: MULTI-FETCH KE CLOUD (TIAP MEMBER JADI BARIS BARU) & GRID 2 KOLOM
+        // ==============================================================================
         async function prosesLaporanMember() {
             const btn = document.getElementById('btn-submit');
             const shift = document.getElementById('input-shift').value;
             
-            // Mengumpulkan data dari semua form member yang ada
             let listNomor = [];
             let listFile = [];
             let adaError = false;
@@ -597,23 +599,25 @@
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan ke Cloud...`;
 
             const waktuKirim = `${tglSekarang}/${blnSekarang}/${thnSekarang} ` + new Date().toLocaleTimeString('id-ID', { hour12: false });
-            
-            // Gabungkan nomor jadi 1 string pakai koma (Contoh: "99901..., 99902...")
-            const nomorGabungan = listNomor.join(', ');
             const qtyTotal = listNomor.length;
 
-            // 1. Simpan ke Cloud (TIDAK PERLU RUBAH SPREADSHEET SAMA SEKALI!)
-            await fetchAPI("saveHistori", {
-                waktu: waktuKirim, shift: shift, crew: userAktif.nama, member: nomorGabungan, qty: qtyTotal
-            });
+            // 1. SIMPAN KE CLOUD SEBAGAI BARIS BARU (MULTI-FETCH)
+            for(let i = 0; i < listNomor.length; i++) {
+                await fetchAPI("saveHistori", {
+                    waktu: waktuKirim, 
+                    shift: shift, 
+                    crew: userAktif.nama, 
+                    member: listNomor[i], 
+                    qty: 1 // Kirim sebagai 1 qty per baris!
+                });
+            }
 
-            // 2. PROSES BIKIN STRUK PANJANG (Vertikal Canvas)
+            // 2. PROSES GRID CANVAS 2 KOLOM (TIDAK MEMANJANG)
             const canvas = document.getElementById('canvas-grid');
             const ctx = canvas.getContext('2d');
-            const cWidth = 800;
+            const cellWidth = 600; // Lebar standar per kotak foto
             const footerH = 150;
             
-            // Fungsi helper untuk load image
             const loadImg = (file) => {
                 return new Promise((res) => {
                     const reader = new FileReader();
@@ -626,57 +630,75 @@
                 });
             };
 
-            // Hitung total tinggi yang dibutuhkan
             let loadedImgs = [];
-            let totalTinggiFoto = 0;
-
             for(let i=0; i<listFile.length; i++) {
                 let img = await loadImg(listFile[i]);
-                // Sesuaikan tinggi secara proporsional dengan lebar 800px
-                let h = Math.round((img.height * cWidth) / img.width);
-                loadedImgs.push({img: img, h: h, nomor: listNomor[i]});
-                totalTinggiFoto += h;
+                loadedImgs.push(img);
             }
 
-            // Set ukuran canvas
-            canvas.width = cWidth;
-            canvas.height = totalTinggiFoto + footerH;
+            // Samakan rasio tinggi semua kotak mengikuti foto pertama
+            const baseRatio = loadedImgs[0].height / loadedImgs[0].width;
+            const cellHeight = cellWidth * baseRatio;
 
-            // Gambar foto bertumpuk ke bawah
-            let currentY = 0;
-            for(let i=0; i<loadedImgs.length; i++) {
-                let item = loadedImgs[i];
-                ctx.drawImage(item.img, 0, currentY, cWidth, item.h);
-                
-                // Beri garis pembatas antar foto (jika lebih dari 1)
-                if(i > 0) {
-                    ctx.fillStyle = "#0ea5e9";
-                    ctx.fillRect(0, currentY, cWidth, 5);
-                }
-                currentY += item.h;
-            }
+            // Logika Grid (Max 2 Kolom)
+            const cols = loadedImgs.length === 1 ? 1 : 2;
+            const rows = Math.ceil(loadedImgs.length / cols);
 
-            // Gambar Footer di paling bawah
+            canvas.width = cols * cellWidth;
+            canvas.height = (rows * cellHeight) + footerH;
+
+            // Gambar Background Putih
             ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, currentY, cWidth, footerH);
-            ctx.fillStyle = "#0ea5e9";
-            ctx.fillRect(0, currentY, cWidth, 5);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Gambar Foto-foto dalam bentuk Grid
+            for(let i=0; i<loadedImgs.length; i++) {
+                let col = i % cols;
+                let row = Math.floor(i / cols);
+                let x = col * cellWidth;
+                let y = row * cellHeight;
+
+                // Tempel Foto
+                ctx.drawImage(loadedImgs[i], x, y, cellWidth, cellHeight);
+                
+                // Garis pembatas tebal antar foto
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 10;
+                ctx.strokeRect(x, y, cellWidth, cellHeight);
+                
+                // Beri Label (Misal: MEMBER 1) di sudut kiri bawah tiap foto
+                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                ctx.fillRect(x, y + cellHeight - 50, 160, 50);
+                ctx.fillStyle = "#38bdf8";
+                ctx.font = "bold 22px Poppins, Arial";
+                ctx.fillText(`MEMBER ${i+1}`, x + 15, y + cellHeight - 16);
+            }
+
+            // Gambar Footer di area paling bawah
+            let footerY = rows * cellHeight;
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, footerY, canvas.width, footerH);
+            
+            // Garis Biru pembatas atas footer
+            ctx.fillStyle = "#0ea5e9";
+            ctx.fillRect(0, footerY, canvas.width, 8); 
+
+            // Teks Footer
             ctx.fillStyle = "#334155";
-            ctx.font = "bold 32px Poppins, Arial";
-            ctx.fillText(`MEMBER MASUK: ${qtyTotal} AKTIVASI`, 25, currentY + 55);
+            ctx.font = "bold 36px Poppins, Arial";
+            ctx.fillText(`MEMBER MASUK: ${qtyTotal} AKTIVASI`, 30, footerY + 65);
             
             ctx.fillStyle = "#64748b";
-            ctx.font = "20px Poppins, Arial";
-            ctx.fillText(`${userAktif.toko} | Crew: ${userAktif.nama} | ${waktuKirim}`, 25, currentY + 95);
+            ctx.font = "24px Poppins, Arial";
+            ctx.fillText(`${userAktif.toko} | Crew: ${userAktif.nama} | ${waktuKirim}`, 30, footerY + 115);
 
-            // 3. Download Otomatis Gambar Panjang Tersebut
+            // 3. DOWNLOAD FOTO GRID SECARA OTOMATIS
             const linkDL = document.createElement('a');
             linkDL.download = `Member_${qtyTotal}Aktivasi_S${shift}.jpg`;
             linkDL.href = canvas.toDataURL("image/jpeg", 0.85);
             linkDL.click();
 
-            // 4. Siapkan format teks WA
+            // 4. SIAPKAN TEKS UNTUK WHATSAPP
             let detailNomorText = "";
             listNomor.forEach((no, idx) => { detailNomorText += `  ${idx+1}. ${no}\n`; });
 
@@ -689,10 +711,10 @@
                            `🆔 *Rincian Nomor:*\n${detailNomorText}\n` +
                            `_Catatan: Bukti foto struk gabungan sudah terunduh di HP Anda, silakan lampirkan._`;
 
+            // BUKA WHATSAPP & RESET FORM
             setTimeout(() => {
                 window.open(`https://wa.me/?text=${encodeURIComponent(teksWA)}`, '_blank');
                 
-                // Reset form kembali ke 1 kotak saja
                 document.getElementById('wadah-form-member').innerHTML = `
                     <div class="member-item-box" id="member-box-1">
                         <label style="color: #0ea5e9;">💎 Data Member 1</label>
