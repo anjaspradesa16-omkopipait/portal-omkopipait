@@ -38,6 +38,13 @@
         .btn-wa:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); }
         .btn-admin { background: #8b5cf6; color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); }
         
+        /* TOMBOL TAMBAH MEMBER */
+        .btn-add-form { background: #f1f5f9; color: #0ea5e9; border: 2px dashed #0ea5e9; box-shadow: none; margin-top: 15px; padding: 12px;}
+        .btn-add-form:hover { background: #e0f2fe; }
+
+        .member-item-box { background: #ffffff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;}
+        .hapus-form-btn { position: absolute; top: 15px; right: 15px; color: #ef4444; cursor: pointer; font-size: 16px; background: #fee2e2; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
         .matrix-container { overflow-x: auto; border-radius: 20px; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; text-align: left; }
         th, td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
@@ -49,7 +56,6 @@
         #loader { display: none; position: fixed; inset: 0; background: rgba(255, 255, 255, 0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
         .spinner-ring { width: 60px; height: 60px; border: 4px solid #f1f5f9; border-top-color: #0ea5e9; border-right-color: #8b5cf6; border-radius: 50%; animation: spin-ring 1s linear infinite; margin-bottom: 20px; }
         
-        /* CSS KLASEMEN (GACOR VS KUSUT) */
         .rank-card { display: flex; align-items: center; gap: 15px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; position: relative; overflow: hidden; }
         .rank-card:hover { transform: scale(1.02); border-color: #cbd5e1; }
         .rank-medal { font-size: 28px; min-width: 45px; text-align: center; }
@@ -130,7 +136,7 @@
             <div class="glass-panel" id="panel-crew" style="display: none; border-top: 4px solid #10b981;">
                 <h3 class="section-title"><i class="fa-solid fa-camera-retro" style="color: #10b981;"></i> INPUT MEMBER BARU</h3>
                 
-                <div style="display: flex; gap: 15px;">
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
                     <div style="flex: 1;">
                         <label>Tanggal</label>
                         <input type="text" id="input-tgl" readonly style="background: #e2e8f0; text-align: center; font-weight: bold; color: #475569;">
@@ -145,15 +151,19 @@
                     </div>
                 </div>
 
-                <label>1. Upload Foto Struk / Kartu</label>
-                <input type="file" id="input-foto" accept="image/*" onchange="autoScanNomorMember(event)">
-                <div id="scan-status" class="scan-indicator"><i class="fa-solid fa-robot"></i> Memindai foto untuk mencari Nomor...</div>
+                <div id="wadah-form-member">
+                    <div class="member-item-box" id="member-box-1">
+                        <label style="color: #0ea5e9;">💎 Data Member 1</label>
+                        <input type="file" id="input-foto-1" class="foto-member" accept="image/*" onchange="autoScanNomorMember(event, 1)">
+                        <div id="scan-status-1" class="scan-indicator"><i class="fa-solid fa-robot"></i> Memindai foto untuk mencari Nomor...</div>
+                        
+                        <input type="text" id="input-nomor-1" class="nomor-member" placeholder="Nomor otomatis / ketik manual..." style="margin-top: 8px;">
+                    </div>
+                </div>
 
-                <label>2. Nomor Member</label>
-                <input type="text" id="input-nomor-member" placeholder="Terisi otomatis / ketik manual...">
-
-                <label>Jumlah Aktivasi</label>
-                <input type="number" id="input-qty" value="1" min="1">
+                <button class="btn btn-add-form" onclick="tambahFormMember()">
+                    <i class="fa-solid fa-plus-circle"></i> Tambah Member Lainnya
+                </button>
 
                 <button class="btn btn-wa" id="btn-submit" onclick="prosesLaporanMember()">
                     <i class="fa-brands fa-whatsapp fa-lg"></i> Proses Grid & Lapor WA
@@ -228,6 +238,7 @@
         let userAktif = null;
         let setupToko = { target: "", shift: 3, personil: "" }; 
         let historiGlobalSemuaBulan = []; 
+        let jumlahFormCounter = 1; // Penghitung jumlah form dinamis
         
         const hariIni = new Date();
         const tglSekarang = String(hariIni.getDate()).padStart(2, '0');
@@ -236,12 +247,43 @@
         
         document.getElementById('input-filter-bulan').value = `${thnSekarang}-${blnSekarang}`;
 
-        async function autoScanNomorMember(event) {
+        // -------------------------------------------------------------
+        // FITUR TAMBAH FORM MEMBER DINAMIS
+        // -------------------------------------------------------------
+        function tambahFormMember() {
+            jumlahFormCounter++;
+            const wadah = document.getElementById('wadah-form-member');
+            
+            const divForm = document.createElement('div');
+            divForm.className = 'member-item-box';
+            divForm.id = `member-box-${jumlahFormCounter}`;
+            
+            divForm.innerHTML = `
+                <div class="hapus-form-btn" onclick="hapusFormMember(${jumlahFormCounter})" title="Hapus Form Ini"><i class="fa-solid fa-times"></i></div>
+                <label style="color: #0ea5e9;">💎 Data Member ${jumlahFormCounter}</label>
+                <input type="file" id="input-foto-${jumlahFormCounter}" class="foto-member" accept="image/*" onchange="autoScanNomorMember(event, ${jumlahFormCounter})">
+                <div id="scan-status-${jumlahFormCounter}" class="scan-indicator"><i class="fa-solid fa-robot"></i> Memindai foto untuk mencari Nomor...</div>
+                
+                <input type="text" id="input-nomor-${jumlahFormCounter}" class="nomor-member" placeholder="Nomor otomatis / ketik manual..." style="margin-top: 8px;">
+            `;
+            
+            wadah.appendChild(divForm);
+        }
+
+        function hapusFormMember(id) {
+            const elm = document.getElementById(`member-box-${id}`);
+            if (elm) elm.remove();
+        }
+
+        // -------------------------------------------------------------
+        // OCR TESSERACT (UPDATE: MENGABAIKAN ANGKA PENDEK SEPERTI PLU/HARGA)
+        // -------------------------------------------------------------
+        async function autoScanNomorMember(event, id) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const inputNomor = document.getElementById('input-nomor-member');
-            const scanStatus = document.getElementById('scan-status');
+            const inputNomor = document.getElementById(`input-nomor-${id}`);
+            const scanStatus = document.getElementById(`scan-status-${id}`);
 
             inputNomor.value = "";
             inputNomor.placeholder = "Memindai foto... mohon tunggu ⏳";
@@ -251,14 +293,15 @@
             try {
                 const result = await Tesseract.recognize(file, 'eng');
                 const teksTerbaca = result.data.text;
-                // Memfilter HANYA deretan angka panjang (Minimal 12 sampai 20 digit) 
-                // Ini akan otomatis mengabaikan PLU, Harga, atau QTY di layar komputer!
+                
+                // KUNCI UTAMA: Hanya cari deretan angka antara 12 hingga 20 digit.
+                // Mengabaikan angka Qty, Harga, atau PLU yang pendek-pendek di layar monitor.
                 const cocokAngka = teksTerbaca.match(/\d{12,20}/g); 
 
                 if (cocokAngka && cocokAngka.length > 0) {
                     const nomorTerpanjang = cocokAngka.reduce((a, b) => a.length > b.length ? a : b);
                     inputNomor.value = nomorTerpanjang;
-                    scanStatus.innerHTML = `<i class="fa-solid fa-check-circle"></i> Nomor otomatis terdeteksi! (Cek kembali)`;
+                    scanStatus.innerHTML = `<i class="fa-solid fa-check-circle"></i> Nomor otomatis terdeteksi!`;
                     scanStatus.style.color = "#0ea5e9";
                 } else {
                     scanStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Nomor kurang jelas, ketik manual.`;
@@ -266,7 +309,7 @@
                     inputNomor.placeholder = "Ketik nomor member di sini...";
                 }
             } catch (err) {
-                scanStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Gagal memindai. Ketik manual saja.`;
+                scanStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Gagal memindai. Ketik manual.`;
                 scanStatus.style.color = "#ef4444";
                 inputNomor.placeholder = "Ketik nomor member di sini...";
             }
@@ -375,7 +418,6 @@
 
             historiGlobalSemuaBulan.forEach(item => {
                 let itemBulan, itemTahun;
-                
                 if (item.waktu.includes('/')) {
                     const parts = item.waktu.split(' ')[0].split('/'); 
                     if(parts.length >= 3) { itemBulan = parts[1]; itemTahun = parts[2]; }
@@ -412,10 +454,10 @@
                 divTrend.innerHTML = `<span class="trend-flat"><i class="fa-solid fa-minus"></i> Data bulan lalu kosong</span>`;
             } else if (totalBulanIni > totalBulanLalu) {
                 let naik = totalBulanIni - totalBulanLalu;
-                divTrend.innerHTML = `<span class="trend-up"><i class="fa-solid fa-arrow-trend-up"></i> Naik ${naik} dari bulan lalu (${totalBulanLalu})</span>`;
+                divTrend.innerHTML = `<span class="trend-up"><i class="fa-solid fa-arrow-trend-up"></i> Naik ${naik} dari bln lalu (${totalBulanLalu})</span>`;
             } else if (totalBulanIni < totalBulanLalu) {
                 let turun = totalBulanLalu - totalBulanIni;
-                divTrend.innerHTML = `<span class="trend-down"><i class="fa-solid fa-arrow-trend-down"></i> Turun ${turun} dari bulan lalu (${totalBulanLalu})</span>`;
+                divTrend.innerHTML = `<span class="trend-down"><i class="fa-solid fa-arrow-trend-down"></i> Turun ${turun} dari bln lalu (${totalBulanLalu})</span>`;
             } else {
                 divTrend.innerHTML = `<span class="trend-flat"><i class="fa-solid fa-equals"></i> Sama dengan bulan lalu (${totalBulanLalu})</span>`;
             }
@@ -428,7 +470,6 @@
         function renderTabelHistori(historiBulanIni) {
             const tbody = document.getElementById('tabel-histori');
             tbody.innerHTML = '';
-
             if(historiBulanIni.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px; color:#94a3b8; font-style:italic;"><i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>Belum ada pencapaian di bulan ini.</td></tr>`;
             } else {
@@ -438,7 +479,7 @@
                             <td style="color:#64748b; font-size:12px;">${item.waktu}</td>
                             <td>Shift ${item.shift}</td>
                             <td style="color:#0ea5e9; font-weight:800;">${item.crew}</td>
-                            <td style="font-weight:600; color:#334155;">${item.member}</td>
+                            <td style="font-weight:600; color:#334155; word-break: break-all;">${item.member}</td>
                             <td style="text-align:center;"><span class="badge badge-qty">+${item.qty}</span></td>
                         </tr>
                     `;
@@ -446,23 +487,18 @@
             }
         }
 
-        // ====================================================================
-        // LOGIKA KLASEMEN BARU (KUSUT HANYA MUNCUL JIKA ADA YANG LAPOR)
-        // ====================================================================
         function renderKlasemenPersonil(historiBulanIni) {
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
 
             const arrCrewSetup = setupToko.personil ? setupToko.personil.split(',').map(x => x.trim()).filter(Boolean) : [];
-            
             if (arrCrewSetup.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding:15px; color:#ef4444; font-size:12px; background:#fee2e2; border-radius:10px;"><i class="fa-solid fa-triangle-exclamation"></i> Kepala Toko belum mendaftarkan nama crew di menu setup!</div>`;
                 return;
             }
 
             let skorCrew = {};
-            let totalSemua = 0; // PENANDA APAKAH SUDAH ADA YANG LAPOR
-            
+            let totalSemua = 0; 
             arrCrewSetup.forEach(nama => skorCrew[nama.toUpperCase()] = 0);
 
             historiBulanIni.forEach(item => {
@@ -471,10 +507,7 @@
                 else skorCrew[namaHistori] = parseInt(item.qty);
             });
 
-            // Urutkan Array dari Skor Terbesar
             let klasemenTersusun = Object.keys(skorCrew).sort((a, b) => skorCrew[b] - skorCrew[a]);
-            
-            // Cari Skor Tertinggi & Terendah, dan hitung Total
             let skorTertinggi = skorCrew[klasemenTersusun[0]] || 0;
             let skorTerendah = skorCrew[klasemenTersusun[klasemenTersusun.length - 1]] || 0;
             
@@ -483,26 +516,18 @@
             klasemenTersusun.forEach((nama, index) => {
                 let qty = skorCrew[nama];
                 let lebarBar = skorTertinggi > 0 ? (qty / skorTertinggi) * 100 : 0; 
-
-                // MEDALI DEFAULT
                 let ikonMedali = '🎖️';
                 let labelTambahan = "";
                 
-                // JIKA BELUM ADA YANG INPUT (AWAL BULAN), SEMUA AMAN (STRIP)
                 if (totalSemua === 0) {
                     ikonMedali = '➖';
                 } else {
-                    // JIKA SUDAH ADA YANG INPUT, RULES BERLAKU
                     if (qty === skorTertinggi) {
-                        ikonMedali = '👑'; 
-                        labelTambahan = `<span class="label-status gacor">🔥 GACOR</span>`;
+                        ikonMedali = '👑'; labelTambahan = `<span class="label-status gacor">🔥 GACOR</span>`;
                     } else if (qty === skorTerendah) {
-                        ikonMedali = '🐌'; 
-                        labelTambahan = `<span class="label-status kusut">💤 KUSUT BINGIT</span>`;
+                        ikonMedali = '🐌'; labelTambahan = `<span class="label-status kusut">💤 KUSUT BINGIT</span>`;
                     } else {
-                        // Posisi tengah (bukan tertinggi dan bukan terendah)
-                        if(index === 1) ikonMedali = '🥈';
-                        else if(index === 2) ikonMedali = '🥉';
+                        if(index === 1) ikonMedali = '🥈'; else if(index === 2) ikonMedali = '🥉';
                     }
                 }
 
@@ -533,88 +558,156 @@
             
             await fetchAPI("saveSetup", { target: target, shift: shift, personil: personil });
             alert("✅ Pengaturan Toko Berhasil Disimpan ke Spreadsheet!");
-            
             muatDataCloud();
         }
 
+        // -------------------------------------------------------------
+        // LOGIKA PROSES & PENGGABUNGAN FOTO (STRUK PANJANG)
+        // -------------------------------------------------------------
         async function prosesLaporanMember() {
             const btn = document.getElementById('btn-submit');
             const shift = document.getElementById('input-shift').value;
-            const nomorMember = document.getElementById('input-nomor-member').value.trim();
-            const qty = document.getElementById('input-qty').value;
-            const fileInput = document.getElementById('input-foto');
             
-            if(fileInput.files.length === 0) return alert("WAJIB melampirkan foto bukti pendaftaran/struk!");
-            if(!nomorMember) return alert("Nomor Member kosong! Tunggu proses scan selesai atau ketik manual.");
+            // Mengumpulkan data dari semua form member yang ada
+            let listNomor = [];
+            let listFile = [];
+            let adaError = false;
+
+            document.querySelectorAll('.member-item-box').forEach(box => {
+                let inputNomor = box.querySelector('.nomor-member').value.trim();
+                let inputFile = box.querySelector('.foto-member').files[0];
+                
+                if(!inputFile) {
+                    alert("⚠️ Ada form yang belum diisi Foto Struk/Kartunya!");
+                    adaError = true; return;
+                }
+                if(!inputNomor) {
+                    alert("⚠️ Ada form yang Nomor Membernya masih kosong!");
+                    adaError = true; return;
+                }
+
+                listNomor.push(inputNomor);
+                listFile.push(inputFile);
+            });
+
+            if(adaError) return;
+            if(listFile.length === 0) return alert("Tambahkan minimal 1 data member!");
 
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan ke Cloud...`;
 
             const waktuKirim = `${tglSekarang}/${blnSekarang}/${thnSekarang} ` + new Date().toLocaleTimeString('id-ID', { hour12: false });
+            
+            // Gabungkan nomor jadi 1 string pakai koma (Contoh: "99901..., 99902...")
+            const nomorGabungan = listNomor.join(', ');
+            const qtyTotal = listNomor.length;
 
+            // 1. Simpan ke Cloud (TIDAK PERLU RUBAH SPREADSHEET SAMA SEKALI!)
             await fetchAPI("saveHistori", {
-                waktu: waktuKirim, shift: shift, crew: userAktif.nama, member: nomorMember, qty: qty
+                waktu: waktuKirim, shift: shift, crew: userAktif.nama, member: nomorGabungan, qty: qtyTotal
             });
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+            // 2. PROSES BIKIN STRUK PANJANG (Vertikal Canvas)
+            const canvas = document.getElementById('canvas-grid');
+            const ctx = canvas.getContext('2d');
+            const cWidth = 800;
+            const footerH = 150;
             
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.getElementById('canvas-grid');
-                    const ctx = canvas.getContext('2d');
-                    
-                    const cWidth = 800;
-                    const cHeight = Math.round((img.height * cWidth) / img.width) + 120; 
-                    canvas.width = cWidth;
-                    canvas.height = cHeight;
+            // Fungsi helper untuk load image
+            const loadImg = (file) => {
+                return new Promise((res) => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = new Image();
+                        img.onload = () => res(img);
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
 
-                    ctx.drawImage(img, 0, 0, cWidth, cHeight - 120);
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(0, cHeight - 120, cWidth, 120);
-                    ctx.fillStyle = "#0ea5e9";
-                    ctx.fillRect(0, cHeight - 120, cWidth, 5);
+            // Hitung total tinggi yang dibutuhkan
+            let loadedImgs = [];
+            let totalTinggiFoto = 0;
 
-                    ctx.fillStyle = "#334155";
-                    ctx.font = "bold 32px Poppins, Arial";
-                    ctx.fillText(`NO. MEMBER: ${nomorMember.toUpperCase()} (Qty: ${qty})`, 25, cHeight - 65);
-                    
-                    ctx.fillStyle = "#64748b";
-                    ctx.font = "20px Poppins, Arial";
-                    ctx.fillText(`${userAktif.toko} | Crew: ${userAktif.nama} | ${waktuKirim}`, 25, cHeight - 25);
-
-                    const linkDL = document.createElement('a');
-                    linkDL.download = `Member_${nomorMember}_S${shift}.jpg`;
-                    linkDL.href = canvas.toDataURL("image/jpeg", 0.85);
-                    linkDL.click();
-
-                    const teksWA = `💎 *LAPORAN NEW MEMBER* 💎\n\n` +
-                                   `🏪 *Toko:* ${userAktif.toko}\n` +
-                                   `⏰ *Waktu:* ${waktuKirim}\n` +
-                                   `🦸‍♂️ *Kasir/Crew:* ${userAktif.nama} (Shift ${shift})\n` +
-                                   `━━━━━━━━━━━━━━━━━━━━\n` +
-                                   `🆔 *Nomor Member:* ${nomorMember}\n` +
-                                   `💳 *Total Aktivasi:* ${qty}\n\n` +
-                                   `_Catatan: Foto bukti sudah terunduh di HP Anda, silakan lampirkan (paste)._`;
-
-                    setTimeout(() => {
-                        window.open(`https://wa.me/?text=${encodeURIComponent(teksWA)}`, '_blank');
-                        
-                        document.getElementById('input-nomor-member').value = "";
-                        document.getElementById('input-qty').value = "1";
-                        document.getElementById('input-foto').value = "";
-                        document.getElementById('scan-status').style.display = 'none';
-                        
-                        btn.disabled = false;
-                        btn.innerHTML = `<i class="fa-brands fa-whatsapp fa-lg"></i> Proses Grid & Lapor WA`;
-                        
-                        muatDataCloud(); 
-                    }, 1000);
-                }
-                img.src = e.target.result;
+            for(let i=0; i<listFile.length; i++) {
+                let img = await loadImg(listFile[i]);
+                // Sesuaikan tinggi secara proporsional dengan lebar 800px
+                let h = Math.round((img.height * cWidth) / img.width);
+                loadedImgs.push({img: img, h: h, nomor: listNomor[i]});
+                totalTinggiFoto += h;
             }
-            reader.readAsDataURL(file);
+
+            // Set ukuran canvas
+            canvas.width = cWidth;
+            canvas.height = totalTinggiFoto + footerH;
+
+            // Gambar foto bertumpuk ke bawah
+            let currentY = 0;
+            for(let i=0; i<loadedImgs.length; i++) {
+                let item = loadedImgs[i];
+                ctx.drawImage(item.img, 0, currentY, cWidth, item.h);
+                
+                // Beri garis pembatas antar foto (jika lebih dari 1)
+                if(i > 0) {
+                    ctx.fillStyle = "#0ea5e9";
+                    ctx.fillRect(0, currentY, cWidth, 5);
+                }
+                currentY += item.h;
+            }
+
+            // Gambar Footer di paling bawah
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, currentY, cWidth, footerH);
+            ctx.fillStyle = "#0ea5e9";
+            ctx.fillRect(0, currentY, cWidth, 5);
+
+            ctx.fillStyle = "#334155";
+            ctx.font = "bold 32px Poppins, Arial";
+            ctx.fillText(`MEMBER MASUK: ${qtyTotal} AKTIVASI`, 25, currentY + 55);
+            
+            ctx.fillStyle = "#64748b";
+            ctx.font = "20px Poppins, Arial";
+            ctx.fillText(`${userAktif.toko} | Crew: ${userAktif.nama} | ${waktuKirim}`, 25, currentY + 95);
+
+            // 3. Download Otomatis Gambar Panjang Tersebut
+            const linkDL = document.createElement('a');
+            linkDL.download = `Member_${qtyTotal}Aktivasi_S${shift}.jpg`;
+            linkDL.href = canvas.toDataURL("image/jpeg", 0.85);
+            linkDL.click();
+
+            // 4. Siapkan format teks WA
+            let detailNomorText = "";
+            listNomor.forEach((no, idx) => { detailNomorText += `  ${idx+1}. ${no}\n`; });
+
+            const teksWA = `💎 *LAPORAN NEW MEMBER* 💎\n\n` +
+                           `🏪 *Toko:* ${userAktif.toko}\n` +
+                           `⏰ *Waktu:* ${waktuKirim}\n` +
+                           `🦸‍♂️ *Kasir/Crew:* ${userAktif.nama} (Shift ${shift})\n` +
+                           `━━━━━━━━━━━━━━━━━━━━\n` +
+                           `💳 *Total Aktivasi:* ${qtyTotal}\n` +
+                           `🆔 *Rincian Nomor:*\n${detailNomorText}\n` +
+                           `_Catatan: Bukti foto struk gabungan sudah terunduh di HP Anda, silakan lampirkan._`;
+
+            setTimeout(() => {
+                window.open(`https://wa.me/?text=${encodeURIComponent(teksWA)}`, '_blank');
+                
+                // Reset form kembali ke 1 kotak saja
+                document.getElementById('wadah-form-member').innerHTML = `
+                    <div class="member-item-box" id="member-box-1">
+                        <label style="color: #0ea5e9;">💎 Data Member 1</label>
+                        <input type="file" id="input-foto-1" class="foto-member" accept="image/*" onchange="autoScanNomorMember(event, 1)">
+                        <div id="scan-status-1" class="scan-indicator"><i class="fa-solid fa-robot"></i> Memindai foto untuk mencari Nomor...</div>
+                        <input type="text" id="input-nomor-1" class="nomor-member" placeholder="Nomor otomatis / ketik manual..." style="margin-top: 8px;">
+                    </div>
+                `;
+                jumlahFormCounter = 1;
+                
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-brands fa-whatsapp fa-lg"></i> Proses Grid & Lapor WA`;
+                
+                muatDataCloud(); 
+            }, 1000);
         }
 
         window.onload = init;
