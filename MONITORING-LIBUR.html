@@ -216,7 +216,7 @@
 
 <script>
     // =========================================================================
-    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzgKmQKYDTQ-rb-7jE3sQQO4uE32jSiIh0eUim3E7YhLfTdHw9DEquCyXFntWPrJKi-/exec"; 
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbw0JG6sVSzCkdYu_9sHw75UzzragDXUXsLCdw5kAjDCu4ZDCnO0zsUYCR9A1Tr0DBY/exec"; 
     // =========================================================================
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -236,7 +236,7 @@
     }
     setInterval(updateClock, 1000); updateClock();
 
-    let databaseLibur = JSON.parse(localStorage.getItem(`dbLiburV12_${toko}`)) || {};
+    let databaseLibur = JSON.parse(localStorage.getItem(`dbLiburV13_${toko}`)) || {};
     let photosData = {}; 
 
     function showLoad() { document.getElementById('loader').style.display = 'flex'; }
@@ -275,7 +275,7 @@
             
             if(result.status === "success") {
                 databaseLibur = result.data; 
-                localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+                localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
             }
         } catch(e) {
             console.log("Koneksi gagal, memakai memori lokal.");
@@ -304,7 +304,7 @@
         
         if(!databaseLibur[nama]) {
             databaseLibur[nama] = { tasks: [], history: {} };
-            localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+            localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
             document.getElementById('inputNamaKru').value = '';
             refreshAdminView();
             renderDropdown();
@@ -321,7 +321,7 @@
         if(!taskText) return alert("Isi tugas terlebih dahulu!");
 
         databaseLibur[nama].tasks.push({ deskripsi: taskText, status: false });
-        localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+        localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
         taskInput.value = '';
         refreshAdminView();
         if(document.getElementById('selectPersonil').value === nama) loadJobdesKru();
@@ -330,7 +330,7 @@
 
     async function hapusJobdeskSpesifik(nama, idx) {
         databaseLibur[nama].tasks.splice(idx, 1);
-        localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+        localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
         refreshAdminView();
         if(document.getElementById('selectPersonil').value === nama) loadJobdesKru();
         await sinkronKeCloud(); 
@@ -339,7 +339,7 @@
     async function hapusPersonil(nama) {
         if(confirm(`Hapus data ${nama}?`)) {
             delete databaseLibur[nama];
-            localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+            localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
             refreshAdminView();
             renderDropdown();
             resetUI();
@@ -473,7 +473,7 @@
 
     function toggleTask(nama, index) {
         databaseLibur[nama].tasks[index].status = !databaseLibur[nama].tasks[index].status;
-        localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+        localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
         loadJobdesKru();
         sinkronKeCloud(false, "", 0, [], true); 
     }
@@ -508,10 +508,16 @@
 
         const data = databaseLibur[nama];
         const totalUploaded = Object.keys(photosData).length;
+        const totalTugas = data.tasks.length;
+        let selesai = data.tasks.filter(t => t.status).length;
         
-        if (data.tasks.length === 0) return alert("Tidak ada jobdesk untuk dilaporkan.");
-        if (totalUploaded < data.tasks.length) {
-            return alert(`Laporan Ditolak!\nBaru ${totalUploaded} foto diupload dari total ${data.tasks.length} Jobdesk.\nWajib isi semua foto.`);
+        if (totalTugas === 0) return alert("Tidak ada jobdesk untuk dilaporkan.");
+        
+        // ====================================================================
+        // PERINGATAN "NERAKA" (Validasi Super Ketat)
+        // ====================================================================
+        if (selesai < totalTugas || totalUploaded < totalTugas) {
+            return alert("🚨 LAPORAN DITOLAK MENTAH-MENTAH! 🚨\n\nWahai manusia, kerjaan belum beres kok mau kabur libur?! 😡\n\n1. Pastikan SEMUA kotak jobdesk sudah DICEKLIS.\n2. Pastikan SEMUA FOTO bukti sudah DI-UPLOAD.\n\nSelesaikan dulu tanggung jawabnya, jangan ninggalin beban buat kawan yang jaga! 🔥");
         }
 
         showLoad();
@@ -560,30 +566,24 @@
         link.href = canvas.toDataURL("image/jpeg", 0.85);
         link.click();
         
-        const tglHariIni = new Date().getDate();
-        let selesai = data.tasks.filter(t => t.status).length;
-        let persen = Math.round((selesai / data.tasks.length) * 100);
+        // Karena harus lewat validasi ketat, persentasenya pasti murni 100%
+        let persen = 100; 
         
-        // --- REVISI RESET UI SETELAH KLIK SIMPAN ---
         databaseLibur[nama].tasks.forEach(t => t.status = false);
-        localStorage.setItem(`dbLiburV12_${toko}`, JSON.stringify(databaseLibur));
+        localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
         
         let arrRincianTugas = data.tasks.map((t, i) => ({
             namaJob: `Job ${i+1}: ${t.deskripsi}`,
             status: 'Selesai' 
         }));
         
-        // Proses Upload & Tunggu
         await sinkronKeCloud(true, nama, persen, arrRincianTugas);
-
-        // Setelah sukses cloud, Panggil ulang data dari cloud agar UI terupdate
         await tarikDataAwal(); 
 
         hideLoad();
         
-        alert("✅ Laporan Berhasil! Grid foto telah diunduh.\nSistem membuka format laporan ke WhatsApp.");
+        alert("✅ Laporan Berhasil! Grid foto telah diunduh.\nSelamat berlibur, kawan! 🏖️");
 
-        // --- REVISI WHATSAPP FORMAT (ENCODING KHUSUS WA) ---
         let textWA = `✨ *LAPORAN CEKLIS LIBUR* ✨\n`;
         textWA += `━━━━━━━━━━━━━━━━━━━━━\n`;
         textWA += `🏪 *Toko:* ${toko.toUpperCase()}\n`;
@@ -600,7 +600,6 @@
         textWA += `━━━━━━━━━━━━━━━━━━━━━\n`;
         textWA += `💡 _(Laporan sah dilampirkan dengan foto grid otomatis)_ 📸`;
 
-        // Gunakan encodeURIComponent agar Line Break (\n) berubah otomatis menjadi Format URL WA yang valid
         window.open(`https://wa.me/?text=${encodeURIComponent(textWA)}`, '_blank');
     }
 
