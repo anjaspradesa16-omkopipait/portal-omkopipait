@@ -502,7 +502,7 @@
         if (event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
     }
 
-    async function prosesSimpanDanKirimWA() {
+async function prosesSimpanDanKirimWA() {
         const nama = document.getElementById('selectPersonil').value;
         if (!nama) return alert("Personil belum terdaftar atau tidak valid!");
 
@@ -513,9 +513,7 @@
         
         if (totalTugas === 0) return alert("Tidak ada jobdesk untuk dilaporkan.");
         
-        // ====================================================================
-        // PERINGATAN "NERAKA" (Validasi Super Ketat)
-        // ====================================================================
+        // PERINGATAN "NERAKA"
         if (selesai < totalTugas || totalUploaded < totalTugas) {
             return alert("🚨 LAPORAN DITOLAK MENTAH-MENTAH! 🚨\n\nWahai manusia, kerjaan belum beres kok mau kabur libur?! 😡\n\n1. Pastikan SEMUA kotak jobdesk sudah DICEKLIS.\n2. Pastikan SEMUA FOTO bukti sudah DI-UPLOAD.\n\nSelesaikan dulu tanggung jawabnya, jangan ninggalin beban buat kawan yang jaga! 🔥");
         }
@@ -524,9 +522,9 @@
         
         await new Promise(r => setTimeout(r, 300)); 
 
+        // ... (Canvas Grid Generator Bapak tetap sama) ...
         const canvas = document.getElementById('photoGridCanvas');
         const ctx = canvas.getContext('2d');
-        
         const cols = 2;
         const rows = Math.ceil(totalUploaded / cols);
         const imgSize = 400; 
@@ -536,7 +534,6 @@
         canvas.height = 100 + (rows * imgSize) + (pad * (rows + 1));
         
         ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
         ctx.fillStyle = "#2c3e50"; ctx.font = "bold 28px Arial";
         ctx.fillText(`Bukti Ceklis Libur - ${nama} (${toko})`, pad, 50);
         ctx.fillStyle = "#7f8c8d"; ctx.font = "bold 16px Arial";
@@ -549,12 +546,9 @@
             const img = await loadImg(photosData[idx]);
             const col = counter % cols;
             const row = Math.floor(counter / cols);
-            
             const x = pad + col * (imgSize + pad);
             const y = 100 + pad + row * (imgSize + pad);
-            
             ctx.drawImage(img, x, y, imgSize, imgSize);
-            
             ctx.fillStyle = '#f39c12'; ctx.fillRect(x, y, 110, 35);
             ctx.fillStyle = 'black'; ctx.font = 'bold 18px Arial';
             ctx.fillText(`Tugas ${parseInt(idx) + 1}`, x + 10, y + 24);
@@ -566,39 +560,31 @@
         link.href = canvas.toDataURL("image/jpeg", 0.85);
         link.click();
         
-        // Karena harus lewat validasi ketat, persentasenya pasti murni 100%
         let persen = 100; 
-        
         databaseLibur[nama].tasks.forEach(t => t.status = false);
         localStorage.setItem(`dbLiburV13_${toko}`, JSON.stringify(databaseLibur));
         
-        let arrRincianTugas = data.tasks.map((t, i) => ({
-            namaJob: `Job ${i+1}: ${t.deskripsi}`,
-            status: 'Selesai' 
-        }));
+        let arrRincianTugas = data.tasks.map((t, i) => ({ namaJob: `Job ${i+1}: ${t.deskripsi}`, status: 'Selesai' }));
         
         await sinkronKeCloud(true, nama, persen, arrRincianTugas);
         await tarikDataAwal(); 
 
         hideLoad();
         
-        alert("✅ Laporan Berhasil! Grid foto telah diunduh.\nSelamat berlibur, kawan! 🏖️");
+        alert("✅ Laporan Berhasil! Grid foto telah diunduh.\nSistem membuka WhatsApp...");
 
-        let textWA = `✨ *LAPORAN CEKLIS LIBUR* ✨\n`;
-        textWA += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        textWA += `🏪 *Toko:* ${toko.toUpperCase()}\n`;
-        textWA += `🦸‍♂️ *Personil:* ${nama}\n`;
-        textWA += `📆 *Tanggal:* ${document.getElementById('tanggal').innerText}\n`;
-        textWA += `📈 *Total Target:* ${persen}% Selesai\n`;
-        textWA += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        textWA += `*📋 STATUS TUGAS:*\n`;
-
-        data.tasks.forEach((t) => {
-             textWA += ` 🟢 ✅ _${t.deskripsi}_\n`;
-        });
-
-        textWA += `━━━━━━━━━━━━━━━━━━━━━\n`;
-        textWA += `💡 _(Laporan sah dilampirkan dengan foto grid otomatis)_ 📸`;
+        // --- REVISI: MENGGUNAKAN JALUR NATIVE DEEP LINK WHATSAPP ---
+        let waText = `✨ *LAPORAN CEKLIS LIBUR* ✨\n`;
+        waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        waText += `🏪 *Toko:* ${toko.toUpperCase()}\n`;
+        waText += `🦸‍♂️ *Personil:* ${nama}\n`;
+        waText += `📆 *Tanggal:* ${document.getElementById('tanggal').innerText}\n`;
+        waText += `📈 *Total Target:* ${persen}% Selesai\n`;
+        waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        waText += `*📋 STATUS TUGAS:*\n`;
+        data.tasks.forEach((t) => { waText += ` 🟢 ✅ _${t.deskripsi}_\n`; });
+        waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        waText += `💡 _(Laporan sah dilampirkan dengan foto grid otomatis)_ 📸`;
 
         // Jalur Native Deep Link (Anti-stuck)
         setTimeout(() => { 
