@@ -621,7 +621,7 @@ async function tarikSetupCloud() {
                 waText += `💡 _(Laporan ini sah dan disertai dengan lampiran foto grid)_ 📸`;
 
                 setTimeout(() => { 
-                    window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank'); 
+                    window.location.href = `whatsapp://send?text=${encodeURIComponent(waText)}`; 
                 }, 1000);
                 
                 document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
