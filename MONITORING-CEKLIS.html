@@ -18,20 +18,67 @@
         button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; margin-top:10px; }
         .btn-wa { background: #25d366; color: white; border: 2px solid #128c7e; }
         .btn-save { background: #27ae60; color: white; }
-        .btn-danger { background: #e74c3c; color: white; }
+        .btn-add { background: #3498db; color: white; padding: 8px; margin-top: 5px; font-size: 11px; width: auto; display: inline-block;}
+        .btn-remove { background: #e74c3c; color: white; padding: 8px; border-radius: 5px; margin-left: 5px; cursor: pointer;}
         
-        /* Tabel Rekap 31 Hari Ala PPS */
+/* ================= INPUT DINAMIS ADMIN ================= */
+        #wadahPersonil {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .personil-item {
+            display: flex;
+            align-items: center;
+            background: #ecf0f1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 2px solid #bdc3c7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .personil-item input {
+            border: none;
+            background: transparent;
+            width: 90px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            outline: none;
+            text-transform: uppercase;
+        }
+        .personil-item .btn-remove {
+            background: transparent;
+            color: #e74c3c;
+            padding: 0 0 0 8px;
+            margin: 0;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #wadahJobdesk {
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .input-group { display: flex; align-items: center; margin-top: 8px; }
+        .input-group input { margin-top: 0; flex: 1; }
+
+        /* Tabel Rekap 31 Hari */
         #wrapperHarian { margin-top: 20px; overflow-x: auto; background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 700px; }
         th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
         th { background: #34495e; color: white; }
-        .status-ok { color: #27ae60; font-weight: bold; }
-        .status-bad { color: #e74c3c; font-weight: bold; }
 
-        /* Rapor Personil Ala PPS */
+        /* Rapor Personil */
         .rapor-card { margin-top: 10px; border: 2px solid #ddd; padding: 10px; border-radius: 10px; background: #fff; }
-        .progress-container { background: #eee; border-radius: 10px; height: 14px; width: 100%; margin-top: 3px; border: 1px solid #ddd; overflow: hidden; }
-        .progress-bar { height: 100%; background: #3498db; transition: width 0.5s ease; }
         
         /* Jobdesk Crew */
         .jobdesk-item { background: #f8f9fa; border: 1px solid #eee; padding: 10px; margin-top: 8px; border-radius: 8px; }
@@ -49,18 +96,17 @@
             .grid { display: flex !important; flex-direction: column !important; }
         }
 
-        /* --- EFEK WARNA WARNI & KELAP KELIP --- */
+        /* --- EFEK WARNA WARNI --- */
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 5px #f39c12; border-color: #f39c12; }
             50% { box-shadow: 0 0 20px #e74c3c, 0 0 10px #9b59b6; border-color: #e74c3c; }
             100% { box-shadow: 0 0 5px #f39c12; border-color: #f39c12; }
         }
         .kelap-kelip { animation: pulseGlow 1.5s infinite; border: 2px solid; }
-        .badge-ok { background: linear-gradient(45deg, #27ae60, #2ecc71); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
-        .badge-bad { background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
-        .progress-container { background: #dcdde1; border-radius: 20px; height: 22px; width: 100%; margin-top: 5px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        .progress-bar { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: width 1s ease-in-out; }
-
+        .badge-ok { background: linear-gradient(45deg, #27ae60, #2ecc71); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; }
+        .badge-bad { background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; }
+        .progress-container { background: #dcdde1; border-radius: 20px; height: 22px; width: 100%; margin-top: 5px; overflow: hidden; position: relative; }
+        .progress-bar { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; font-size: 11px; transition: width 1s ease-in-out; }
     </style>
 </head>
 <body>
@@ -73,10 +119,9 @@
     <div class="container" id="mainUI" style="display:none;">
         <h2 style="text-align:center; color:#2c3e50; margin-bottom:10px;">📋 DASHBOARD CEKLIS SHIFT</h2>
 
-    <!-- BARIS INFO REAL-TIME TANGGAL & WAKTU -->
-    <div style="text-align:center; background: #2c3e50; color: #f39c12; padding: 10px 15px; border-radius: 50px; font-weight: bold; font-size: 13px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid #f39c12; letter-spacing: 1px;" id="liveClock">
-        ⏳ Sinkronisasi Data Waktu...
-    </div>>
+        <div style="text-align:center; background: #2c3e50; color: #f39c12; padding: 10px 15px; border-radius: 50px; font-weight: bold; font-size: 13px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid #f39c12; letter-spacing: 1px;" id="liveClock">
+            ⏳ Sinkronisasi Data Waktu...
+        </div>
 
         <div class="grid">
             
@@ -90,16 +135,18 @@
                     <option value="Toko Non-24 Jam">Toko Non-24 Jam</option>
                 </select>
 
-                <label>Daftar Personil (Pisahkan dengan koma)</label>
-                <textarea id="setupPersonil" rows="2" placeholder="Contoh: Budi, Andi, Siska"></textarea>
+                <label>Daftar Personil</label>
+                <div id="wadahPersonil"></div>
+                <button class="btn-add" onclick="tambahInputan('personil')">➕ Tambah Personil</button>
 
-                <label>Daftar Jobdesk Wajib (Pisahkan dengan koma)</label>
-                <textarea id="setupJobdesk" rows="3" placeholder="Contoh: Sapu Area Dalam, Pel Area Sales, Kuras Chiller"></textarea>
+                <label style="margin-top: 15px;">Daftar Jobdesk Wajib</label>
+                <div id="wadahJobdesk"></div>
+                <button class="btn-add" onclick="tambahInputan('jobdesk')">➕ Tambah Jobdesk</button>
 
-                <button class="btn-save" onclick="simpanSetup()">💾 SIMPAN SETUP CLOUD</button>
+                <button class="btn-save" style="margin-top: 20px;" onclick="simpanSetup()">💾 SIMPAN SETUP CLOUD</button>
             </div>
 
-            <!-- ================= CREW: INPUT LAPORAN ================= -->
+            <!-- ================= CREW & ADMIN: INPUT LAPORAN ================= -->
             <div class="card" id="cardCrewInput" style="display: none;">
                 <h3 style="color:#e67e22;">📝 FORM CEKLIS SHIFT</h3>
                 
@@ -118,16 +165,14 @@
                     </div>
                 </div>
 
-                <label>Nama Kasir Bertugas</label>
-                <select id="kasirAktif">
-                    <!-- Dirender dari list admin -->
-                </select>
+                <label>Nama Kasir Bertugas (Dari Portal Login)</label>
+                <input type="text" id="kasirAktif" readonly style="background:#e9ecef; font-weight:bold; color:#2c3e50; text-align:center;">
 
                 <div style="margin-top:10px; padding:8px; background:#fff3cd; border:1px solid #ffe69c; color:#856404; font-size:11px; font-weight:bold;">
                     ⚠️ WAJIB CEKLIS & UPLOAD FOTO TIAP TUGAS!
                 </div>
 
-                <div id="areaCeklisCrew" style="margin-top:10px; max-height: 300px; overflow-y: auto;">
+                <div id="areaCeklisCrew" style="margin-top:10px; max-height: 350px; overflow-y: auto;">
                     <!-- Dirender via JS -->
                 </div>
 
@@ -138,9 +183,7 @@
             <div class="card" id="cardAdminRapor" style="display: none;">
                 <h3 style="color:#27ae60;">📊 ANALISA KONTRIBUSI PERSONIL</h3>
                 <div style="font-size:11px; color:#666; margin-bottom:10px;">Total laporan ceklis yang dikerjakan bulan ini per orang:</div>
-                <div id="raporPersonilArea" style="max-height: 250px; overflow-y: auto;">
-                    <!-- Dirender via JS -->
-                </div>
+                <div id="raporPersonilArea" style="max-height: 250px; overflow-y: auto;"></div>
             </div>
 
         </div>
@@ -157,13 +200,10 @@
                         <th id="thShift3">Shift 3</th>
                     </tr>
                 </thead>
-                <tbody id="bodyRekap31">
-                    <!-- Data 1-31 Hari -->
-                </tbody>
+                <tbody id="bodyRekap31"></tbody>
             </table>
         </div>
 
-        <!-- TOMBOL KEMBALI KESISTEM UTAMA OMKOPIPAIT -->
         <div style="text-align: center; margin: 30px 0 10px 0;">
             <a href="index.html" style="background: #f39c12; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; border: 2px solid #fff;">⬅ KEMBALI KE MENU UTAMA</a>
         </div>
@@ -172,16 +212,16 @@
     <!-- LOGIC JAVASCRIPT -->
     <script>
         // 🔴🔴🔴 PASTE LINK URL GOOGLE APPS SCRIPT ANDA DI SINI 🔴🔴🔴
-        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTjQYNu02LwnUkrYck_ldSfT4tV2p2_iQPgEahqVxML8kMqnQcmPe0LewR2WR2wrZ9/exec";
+        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFxkj-UHGqshGxwqiI7S0qeaw489GaMljixDDeTOEtsJGooEjlf5OTWsTQABIlVPFG/exec";
         
         let globalUser = null;
-        let setupMaster = { tipe: "Toko 24 Jam", personil: "", jobdesk: "" };
+        let setupMaster = { tipe: "Toko 24 Jam", personil: [], jobdesk: [] };
         let laporanBulanIni = [];
+        let isSubmitting = false;
 
-        // Deteksi Bulan & Tanggal Hari Ini
         const today = new Date();
-        const blnSekarang = today.getMonth() + 1; // 1-12
-        const tglSekarang = today.getDate(); // 1-31
+        const blnSekarang = today.getMonth() + 1;
+        const tglSekarang = today.getDate();
 
         function showLoad() { document.getElementById('loader').style.display = 'flex'; }
         function hideLoad() { document.getElementById('loader').style.display = 'none'; }
@@ -197,19 +237,16 @@
             }
         }
 
-        // ================= FITUR JAM REAL-TIME =================
+        // ================= JAM REAL-TIME =================
         function jalankanJam() {
             setInterval(() => {
                 const now = new Date();
                 const hari = String(now.getDate()).padStart(2, '0');
                 const bulan = String(now.getMonth() + 1).padStart(2, '0');
                 const tahun = now.getFullYear();
-                
                 const jam = String(now.getHours()).padStart(2, '0');
                 const menit = String(now.getMinutes()).padStart(2, '0');
                 const detik = String(now.getSeconds()).padStart(2, '0');
-
-                // Ambil nama toko jika sudah login
                 const tokoAktif = globalUser ? globalUser.toko : "MEMUAT...";
 
                 document.getElementById('liveClock').innerHTML = 
@@ -217,9 +254,8 @@
             }, 1000);
         }
 
-        // ================= 1. INIT DARI PORTAL OMKOPIPAIT =================
+        // ================= INIT =================
         async function init() {
-            // Ambil dari sesi login halaman index.html
             const user = JSON.parse(sessionStorage.getItem("userArea"));
             const hariLogin = localStorage.getItem("lastLoginDate");
 
@@ -238,47 +274,110 @@
             };
 
             document.getElementById('mainUI').style.display = "block";
-            
             jalankanJam();
             showLoad();
             await tarikSetupCloud();
             
-            // Tampilkan untuk Semua Role (Admin & Crew)
             document.getElementById('cardAdminRapor').style.display = 'flex';
             document.getElementById('wrapperHarian').style.display = 'block';
 
+            document.getElementById('cardCrewInput').style.display = 'flex';
+            document.getElementById('tglLapor').value = tglSekarang;
+            renderFormCrew();
+
             if (globalUser.role === 'admin') {
                 document.getElementById('cardAdminTarget').style.display = 'flex';
-            } else {
-                document.getElementById('cardCrewInput').style.display = 'flex';
-                document.getElementById('tglLapor').value = tglSekarang;
-                renderFormCrew();
+                renderAdminSetup();
             }
 
-            // Panggil laporan cloud untuk kedua role agar bisa dimonitor bersama
             await tarikLaporanCloud();
-
             hideLoad();
         }
 
-        // ================= 2. LOGIC TARIK DATA =================
-        async function tarikSetupCloud() {
-            const res = await fetchToCloud({ action: "getSetup", kodeToko: globalUser.toko });
-            if (res.data) setupMaster = res.data;
+        // ================= INPUT DINAMIS ADMIN =================
+        function renderAdminSetup() {
+            document.getElementById('setupTipeToko').value = setupMaster.tipe;
+            const wPersonil = document.getElementById('wadahPersonil');
+            const wJobdesk = document.getElementById('wadahJobdesk');
+            wPersonil.innerHTML = ""; wJobdesk.innerHTML = "";
 
-            // Jika Admin, isi ke form setup
-            if(globalUser.role === 'admin') {
-                document.getElementById('setupTipeToko').value = setupMaster.tipe;
-                document.getElementById('setupPersonil').value = setupMaster.personil;
-                document.getElementById('setupJobdesk').value = setupMaster.jobdesk;
+            if (setupMaster.personil.length === 0) tambahInputan('personil');
+            else setupMaster.personil.forEach(val => tambahInputan('personil', val));
+
+            if (setupMaster.jobdesk.length === 0) tambahInputan('jobdesk');
+            else setupMaster.jobdesk.forEach(val => tambahInputan('jobdesk', val));
+        }
+
+        function tambahInputan(tipe, isi = "") {
+            const wadah = document.getElementById(tipe === 'personil' ? 'wadahPersonil' : 'wadahJobdesk');
+            const div = document.createElement('div');
+            
+            if (tipe === 'personil') {
+                div.className = "personil-item";
+                
+                const inp = document.createElement('input');
+                inp.type = "text";
+                inp.className = "input-personil";
+                inp.placeholder = "NAMA";
+                inp.value = isi;
+
+                const btnHapus = document.createElement('div');
+                btnHapus.className = "btn-remove";
+                btnHapus.innerHTML = "✖";
+                btnHapus.title = "Hapus Personil";
+                btnHapus.onclick = function() { wadah.removeChild(div); };
+
+                div.appendChild(inp);
+                div.appendChild(btnHapus);
+            } else {
+                div.className = "input-group";
+                
+                const inp = document.createElement('input');
+                inp.type = "text";
+                inp.className = "input-jobdesk";
+                inp.placeholder = "Ketik tugas jobdesk di sini...";
+                inp.value = isi;
+
+                const btnHapus = document.createElement('div');
+                btnHapus.className = "btn-remove";
+                btnHapus.innerHTML = "❌";
+                btnHapus.title = "Hapus Jobdesk";
+                btnHapus.style.marginLeft = "10px";
+                btnHapus.onclick = function() { wadah.removeChild(div); };
+
+                div.appendChild(inp);
+                div.appendChild(btnHapus);
+            }
+            
+            wadah.appendChild(div);
+
+            if (tipe === 'jobdesk') {
+                wadah.scrollTop = wadah.scrollHeight;
             }
         }
+
+async function tarikSetupCloud() {
+    // Memaksa browser mengambil data fresh dari Cloud menggunakan URL Apps Script
+    // Menambahkan timestamp (?t=...) agar browser tidak menggunakan data lama
+    const url = APP_SCRIPT_URL + "?kodeToko=" + encodeURIComponent(globalUser.toko) + "&t=" + new Date().getTime();
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data) {
+            setupMaster.tipe = data.tipe;
+            setupMaster.personil = data.personil;
+            setupMaster.jobdesk = data.jobdesk;
+        }
+    } catch (error) {
+        console.error("Gagal menarik data terbaru:", error);
+    }
+}
 
         async function tarikLaporanCloud() {
             const res = await fetchToCloud({ action: "getLaporan", kodeToko: globalUser.toko, bulan: blnSekarang });
             laporanBulanIni = res.data || [];
             
-            // Atur Tampilan Kolom Shift 3 (Tutup jika toko non-24 jam)
             if (setupMaster.tipe === "Toko Non-24 Jam") document.getElementById('thShift3').style.display = 'none';
             else document.getElementById('thShift3').style.display = 'table-cell';
 
@@ -286,21 +385,34 @@
             renderRaporPersonil();
         }
 
-        // ================= 3. LOGIC ADMIN (SIMPAN SETUP) =================
+        // ================= SIMPAN SETUP =================
         async function simpanSetup() {
             const tipe = document.getElementById('setupTipeToko').value;
-            const personil = document.getElementById('setupPersonil').value;
-            const jobdesk = document.getElementById('setupJobdesk').value;
+            
+            const pInputs = document.querySelectorAll('.input-personil');
+            const jInputs = document.querySelectorAll('.input-jobdesk');
+            
+            let arrPersonil = [];
+            pInputs.forEach(el => { if(el.value.trim() !== "") arrPersonil.push(el.value.trim()); });
+            
+            let arrJobdesk = [];
+            jInputs.forEach(el => { if(el.value.trim() !== "") arrJobdesk.push(el.value.trim()); });
 
-            if(!personil || !jobdesk) return alert("Personil dan Jobdesk tidak boleh kosong!");
+            // REVISI: Jobdesk boleh kosong untuk nyicil save data. Hanya pastikan personil terisi.
+            if(arrPersonil.length === 0) return alert("Minimal harus ada 1 nama personil!");
             
             showLoad();
-            await fetchToCloud({ action: "saveSetup", kodeToko: globalUser.toko, tipe, personil, jobdesk });
+            await fetchToCloud({ action: "saveSetup", kodeToko: globalUser.toko, tipe: tipe, personil: arrPersonil, jobdesk: arrJobdesk });
             alert("Setup Toko Berhasil Disimpan di Cloud!");
+            
+            setupMaster.personil = arrPersonil;
+            setupMaster.jobdesk = arrJobdesk;
+            
+            renderFormCrew();
             hideLoad();
         }
 
-        // ================= 4. DASHBOARD BULANAN =================
+        // ================= DASHBOARD & RAPOR =================
         function renderTabelBulanan() {
             const tbody = document.getElementById('bodyRekap31');
             tbody.innerHTML = "";
@@ -312,7 +424,6 @@
                 const s2 = lapHariIni.find(l => l.shift == 2);
                 const s3 = lapHariIni.find(l => l.shift == 3);
 
-                // Perbaikan: Pakai lencana warna-warni & buang tulisan lihat bukti
                 const st1 = s1 ? `<div class="badge-ok">🌟 ${s1.nama}</div>` : `<div class="badge-bad">❌ Kosong</div>`;
                 const st2 = s2 ? `<div class="badge-ok">🌟 ${s2.nama}</div>` : `<div class="badge-bad">❌ Kosong</div>`;
                 const st3 = s3 ? `<div class="badge-ok">🌟 ${s3.nama}</div>` : `<div class="badge-bad">❌ Kosong</div>`;
@@ -327,7 +438,7 @@
         function renderRaporPersonil() {
             const area = document.getElementById('raporPersonilArea');
             area.innerHTML = "";
-            const arrKru = setupMaster.personil.split(',').map(x => x.trim()).filter(Boolean);
+            const arrKru = setupMaster.personil;
 
             if(arrKru.length === 0) {
                 area.innerHTML = "<p style='color:red; font-size:11px;'>Belum ada personil di-setup.</p>"; return;
@@ -341,9 +452,8 @@
                 const totalLapor = laporanBulanIni.filter(l => l.nama.toUpperCase() === nama.toUpperCase()).length;
                 const pct = Math.min(100, Math.round((totalLapor / targetPerAnak) * 100));
 
-                // Perbaikan: Progress Bar warna warni & ada teks persentasenya!
                 let grad = pct >= 75 ? 'linear-gradient(90deg, #00b09b, #96c93d)' : (pct >= 50 ? 'linear-gradient(90deg, #f12711, #f5af19)' : 'linear-gradient(90deg, #cb2d3e, #ef473a)');
-                let xtraClass = pct >= 80 ? 'kelap-kelip' : ''; // Kalau rajin banget, dia kelap-kelip
+                let xtraClass = pct >= 80 ? 'kelap-kelip' : '';
 
                 area.innerHTML += `
                     <div class="rapor-card" style="margin-bottom:10px;">
@@ -359,30 +469,20 @@
             });
         }
 
-        // ================= 5. LOGIC CREW (FORM) =================
+        // ================= FORM CREW =================
         function renderFormCrew() {
-            // Atur Dropdown Shift
             if(setupMaster.tipe === "Toko Non-24 Jam") document.getElementById('optShift3').style.display = "none";
             
-            // Atur Dropdown Nama (Dari Setup Admin)
-            const ddnNama = document.getElementById('kasirAktif');
-            ddnNama.innerHTML = `<option value="">-- Pilih Nama --</option>`;
-            const arrKru = setupMaster.personil.split(',').map(x => x.trim()).filter(Boolean);
-            arrKru.forEach(n => {
-                const sel = (n.toUpperCase() === globalUser.nama) ? "selected" : "";
-                ddnNama.innerHTML += `<option value="${n}" ${sel}>${n}</option>`;
-            });
+            document.getElementById('kasirAktif').value = globalUser.nama;
 
-            // Atur Jobdesk
             const areaJob = document.getElementById('areaCeklisCrew');
             areaJob.innerHTML = "";
-            const arrJob = setupMaster.jobdesk.split(',').map(x => x.trim()).filter(Boolean);
 
-            if(arrJob.length === 0) {
+            if(setupMaster.jobdesk.length === 0) {
                 areaJob.innerHTML = `<div style="color:red; font-weight:bold; padding:10px;">Admin belum membuat daftar jobdesk.</div>`; return;
             }
 
-            arrJob.forEach((job, idx) => {
+            setupMaster.jobdesk.forEach((job, idx) => {
                 areaJob.innerHTML += `
                     <div class="jobdesk-item">
                         <label><input type="checkbox" id="chk_${idx}" class="chk-wajib"> ${job}</label>
@@ -392,25 +492,23 @@
             });
         }
 
-// ================= FITUR BARU: GENERATE GRID & DOWNLOAD =================
+        // ================= GENERATE GRID 3x3 =================
         function buatGridDanDownload(files, nama, shift) {
             return new Promise(async (resolve) => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
 
-                const cols = 2; // Buat jadi 2 kolom menyamping
+                const cols = 3; 
                 const rows = Math.ceil(files.length / cols);
-                const imgSize = 400; // Ukuran kotak foto
-                const pad = 15; // Jarak antar foto
+                const imgSize = 350; 
+                const pad = 15; 
 
                 canvas.width = (cols * imgSize) + (pad * (cols + 1));
                 canvas.height = 70 + (rows * imgSize) + (pad * (rows + 1));
 
-                // Bikin Background Putih
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Tambahkan Teks Judul Laporan di atas Grid
                 ctx.fillStyle = '#2c3e50';
                 ctx.font = 'bold 28px Arial';
                 ctx.fillText(`Bukti Ceklis Shift ${shift} - ${nama}`, pad, 45);
@@ -427,7 +525,6 @@
                     });
                 };
 
-                // Gambar foto-foto ke dalam canvas
                 for (let i = 0; i < files.length; i++) {
                     const img = await loadImg(files[i]);
                     const col = i % cols;
@@ -436,10 +533,8 @@
                     const x = pad + col * (imgSize + pad);
                     const y = 70 + pad + row * (imgSize + pad);
 
-                    // Tarik dan paskan foto ke kotak
                     ctx.drawImage(img, x, y, imgSize, imgSize);
 
-                    // Tambahkan tulisan penanda tugas di pojok foto
                     ctx.fillStyle = '#f39c12';
                     ctx.fillRect(x, y, 120, 35);
                     ctx.fillStyle = 'black';
@@ -447,26 +542,24 @@
                     ctx.fillText(`Tugas ${i+1}`, x + 10, y + 24);
                 }
 
-                // Proses Download Otomatis
                 const link = document.createElement('a');
                 link.download = `Laporan_Ceklis_${globalUser.toko}_Shift${shift}_${nama}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.85); // Compress sedikit biar ringan
+                link.href = canvas.toDataURL('image/jpeg', 0.85); 
                 link.click(); 
 
                 resolve();
             });
         }
 
-        // ================= 6. KIRIM LAPORAN (VERSI SUPER CEPAT & ANTI-SPAM) =================
+        // ================= KIRIM LAPORAN =================
         async function kirimLaporan() {
-            // ---> TANGKAP TOMBOLNYA
+            if(isSubmitting) return;
+
             const btnKirim = document.querySelector('.btn-wa');
-
-            const nama = document.getElementById('kasirAktif').value;
+            const nama = globalUser.nama; 
             const shift = document.getElementById('shfInput').value;
-            const arrJob = setupMaster.jobdesk.split(',').map(x => x.trim()).filter(Boolean);
+            const arrJob = setupMaster.jobdesk;
 
-            if(!nama) return alert("Pilih Nama Kasir Bertugas!");
             if(arrJob.length === 0) return alert("Belum ada tugas disetup.");
 
             let semuaCek = true, semuaFoto = true;
@@ -481,20 +574,18 @@
                 else fileFotos.push(fileInput.files[0]);
             }
 
-            if(!semuaCek) return alert("GAGAL: Masih ada tugas yang BELUM DICEKLIS!");
-            if(!semuaFoto) return alert("GAGAL: Bukti Foto wajib diupload semuanya!");
+            if(!semuaCek) return alert("PERINGATAN: Masih ada tugas yang BELUM DICEKLIS! Pastikan semua perintah kepala toko dijalankan tanpa terkecuali.");
+            if(!semuaFoto) return alert("PERINGATAN: Bukti Foto wajib diupload sepenuhnya! Tidak boleh ada foto yang kosong.");
 
-            // ---> BEKUKAN TOMBOL AGAR TIDAK BISA DI-SPAM KLIK
+            isSubmitting = true;
             btnKirim.disabled = true;
             btnKirim.style.opacity = "0.5";
-            btnKirim.innerText = "⏳ MENGIRIM...";
+            btnKirim.innerText = "⏳ MENGIRIM... (MOHON TUNGGU)";
 
             showLoad();
             try {
-                // 1. Eksekusi generate Grid (PicMix) dan langsung download
                 await buatGridDanDownload(fileFotos, nama, shift);
 
-                // 2. Kirim hanya TEKS laporan ke Cloud (Tanpa foto, jadi kilat!)
                 for (let i = 0; i < arrJob.length; i++) {
                     arrayKirim.push({ namaJobdesk: arrJob[i], status: "Selesai" });
                 }
@@ -510,22 +601,22 @@
                 });
 
                 hideLoad();
-
-                // ---> NYALAKAN KEMBALI TOMBOL JIKA SUDAH SELESAI
+                isSubmitting = false;
                 btnKirim.disabled = false;
                 btnKirim.style.opacity = "1";
                 btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
 
-                // 3. Buat teks WhatsApp lalu buka aplikasinya (FULL SYMBOL)
                 let waText = `✨ *LAPORAN CEKLIS AWAL SHIFT* ✨\n`;
                 waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
                 waText += `🏪 *Toko:* ${globalUser.toko}\n`;
-                waText += `📆 *Tanggal:* ${tglSekarang}/${blnSekarang}/${today.getFullYear()}\n`;
+                waText += `📅 *Tanggal:* ${tglSekarang}/${blnSekarang}/${today.getFullYear()}\n`;
                 waText += `⏰ *Shift:* ${shift}\n`;
-                waText += `🦸‍♂️ *Personil:* ${nama}\n`;
+                waText += `🧑‍🚀 *Personil:* ${nama}\n`;
                 waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
                 waText += `*📋 STATUS TUGAS:* \n`;
-                arrJob.forEach(job => { waText += ` 🟢 ✅ _${job}_\n`; });
+                
+                arrJob.forEach(job => { waText += ` ✅ _${job}_\n`; });
+                
                 waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
                 waText += `💡 _(Laporan ini sah dan disertai dengan lampiran foto grid)_ 📸`;
 
@@ -533,14 +624,13 @@
                     window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank'); 
                 }, 1000);
                 
-                // Bersihkan formulir
                 document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
                 document.querySelectorAll('.foto-wajib').forEach(fl => fl.value = "");
             } catch (e) {
                 alert("Gagal koneksi, coba lagi!");
                 hideLoad();
                 
-                // ---> NYALAKAN KEMBALI TOMBOL JIKA ERROR
+                isSubmitting = false;
                 btnKirim.disabled = false;
                 btnKirim.style.opacity = "1";
                 btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
