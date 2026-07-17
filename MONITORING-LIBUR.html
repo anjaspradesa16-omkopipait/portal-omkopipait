@@ -600,7 +600,10 @@
         textWA += `━━━━━━━━━━━━━━━━━━━━━\n`;
         textWA += `💡 _(Laporan sah dilampirkan dengan foto grid otomatis)_ 📸`;
 
-        window.open(`https://wa.me/?text=${encodeURIComponent(textWA)}`, '_blank');
+        // Jalur Native Deep Link (Anti-stuck)
+        setTimeout(() => { 
+            window.location.href = `whatsapp://send?text=${encodeURIComponent(waText)}`; 
+        }, 1000);
     }
 
     function renderRaporPersonil() {
