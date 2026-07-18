@@ -253,7 +253,7 @@
 
     <script>
         // MASUKKAN URL APP SCRIPT BARU ANDA DI SINI!
-        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbzWcF4VDRo4kJ8z_lVaWWs_yXvOxozEmbnt0dzZU2Xeg9eWwHDFwu0NdcINLaQXwWZnIg/exec"; 
+        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbzadxs9I22GoieYQMe4odGRP2ZsxhWlJRmqFPlpRHLp7SVjaPkVaLGSYuyYBiK1TAt7-Q/exec"; 
 
         const urlParams = new URLSearchParams(window.location.search);
         const loginData = JSON.parse(sessionStorage.getItem("userArea")) || {};
@@ -437,7 +437,7 @@
             fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteRak", storeCode: userToko, crewName: crewName, rak: rakNum }) }).then(res => res.json()).then(res => { alert(res.message); syncWithCloud(); });
         }
 
-        function renderCrewFormLayout() {
+function renderCrewFormLayout() {
             const grid = document.getElementById('checklistGridContainer');
             grid.innerHTML = "";
             let expBox = document.getElementById('expContainer');
@@ -456,52 +456,47 @@
             document.getElementById('activeCrewName').innerText = activeCrew.name;
             document.getElementById('activeCrewTarget').innerText = (activeCrew.raks ? activeCrew.raks.length : 0) + " Rak";
             
-            // PERBAIKAN: Mengunci UI jika hanya CREW yang sedang aktif ini yang isDone = true
-            const crewLocked = activeCrew.isDone;
-
+            // HAPUS KUNCI TOTAL: Personil sekarang bebas lapor berkali-kali!
             if(activeCrew.raks && activeCrew.raks.length > 0) {
                 activeCrew.raks.forEach(rak => {
                     const sudahDiceklis = activeCrew.savedRaks && activeCrew.savedRaks.includes(rak);
                     let div = document.createElement('div'); div.className = "checklist-item";
-                    div.innerHTML = `<input type="checkbox" id="chk_${rak}" ${sudahDiceklis ? 'checked' : ''} ${(sudahDiceklis || crewLocked) ? 'disabled' : ''}><label for="chk_${rak}">${rak}</label>`;
+                    
+                    // Rak yang sudah disave akan terkunci tercentang, tidak bisa dicabut. Tinggal klik rak yang baru.
+                    div.innerHTML = `<input type="checkbox" id="chk_${rak}" ${sudahDiceklis ? 'checked disabled' : ''}><label for="chk_${rak}">${rak}</label>`;
                     grid.appendChild(div);
                 });
             } else {
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#aaa; font-style:italic;">Belum ada jatah rak.</div>`;
             }
 
+            // Sembunyikan Banner "Sistem Terkunci" selamanya
             const lockBanner = document.getElementById('lockNotification');
-            const simpanBtn = document.getElementById('btnSimpanChecklist');
-            const waBtn = document.getElementById('btnKirimWA');
-            const tambahBtn = document.getElementById('btnTambahItem');
+            if(lockBanner) lockBanner.style.display = "none";
             
-            if (crewLocked) {
-                lockBanner.style.display = "flex";
-                simpanBtn.innerText = "LAPORAN SUDAH TERKUNCI ONLINE";
-                simpanBtn.className = "btn btn-disabled"; simpanBtn.disabled = true;
-                if(tambahBtn) tambahBtn.style.display = "none";
+            // Jaga tombol simpan agar selalu hidup
+            const simpanBtn = document.getElementById('btnSimpanChecklist');
+            simpanBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN DATA KE CLOUD';
+            simpanBtn.className = "btn btn-primary"; 
+            simpanBtn.disabled = false;
+            
+            const tambahBtn = document.getElementById('btnTambahItem');
+            if(tambahBtn) tambahBtn.style.display = "inline-flex";
+            
+            const waBtn = document.getElementById('btnKirimWA');
+            // Aktifkan tombol Kirim WA kapan pun personil sudah punya laporan masuk
+            if (activeCrew.isDone) {
                 waBtn.className = "btn btn-success"; waBtn.disabled = false;
-                document.getElementById('uploadRak').disabled = true;
-                document.getElementById('uploadDisplay').disabled = true;
-                document.getElementById('uploadBuku').disabled = true;
-                const btnResetRak = document.querySelector('button[onclick="resetFotoRak()"]');
-                if(btnResetRak) btnResetRak.style.display = "none";
-                document.querySelectorAll('#expContainer input, #expContainer select, #expContainer button').forEach(el => {
-                    el.disabled = true;
-                    if(el.tagName === 'BUTTON') el.style.display = 'none';
-                });
             } else {
-                lockBanner.style.display = "none";
-                simpanBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN & KUNCI DATA KE CLOUD';
-                simpanBtn.className = "btn btn-primary"; simpanBtn.disabled = false;
-                if(tambahBtn) tambahBtn.style.display = "inline-flex";
                 waBtn.className = "btn btn-disabled"; waBtn.disabled = true;
-                document.getElementById('uploadRak').disabled = false;
-                document.getElementById('uploadDisplay').disabled = false;
-                document.getElementById('uploadBuku').disabled = false;
-                const btnResetRak = document.querySelector('button[onclick="resetFotoRak()"]');
-                if(btnResetRak) btnResetRak.style.display = "inline-block";
             }
+
+            document.getElementById('uploadRak').disabled = false;
+            document.getElementById('uploadDisplay').disabled = false;
+            document.getElementById('uploadBuku').disabled = false;
+            
+            const btnResetRak = document.querySelector('button[onclick="resetFotoRak()"]');
+            if(btnResetRak) btnResetRak.style.display = "inline-block";
         }
 
         function hitungOtomatisNotifRH(inputDateElem, selectOptionElem, alertContainerId) {
@@ -619,8 +614,7 @@
         }
         function closeProgressPopup() { document.getElementById('progressModal').style.display = "none"; }
 
-        // PERBAIKAN BUG DOBEL SUBMIT
-        function saveChecklistToCloud() {
+function saveChecklistToCloud() {
             const btnSimpan = document.getElementById('btnSimpanChecklist');
             const totalFotoRak = listFotoRakDicicil.length;
             const totalFotoDisplay = document.getElementById('uploadDisplay').files.length;
@@ -633,7 +627,6 @@
             if (totalFotoDisplay !== 1) return alert("⚠️ GAGAL SIMPAN:\nFoto Full Display Toko belum di-upload!");
             if (totalFotoBuku !== 1) return alert("⚠️ GAGAL SIMPAN:\nFoto Buku Checklist Fisik belum di-upload!");
 
-            // DISABLE TOMBOL LANGSUNG AGAR TIDAK DIKLIK BERKALI-KALI
             btnSimpan.disabled = true;
             btnSimpan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN KE CLOUD...';
             showLoading(true);
@@ -645,12 +638,21 @@
             const target = document.getElementById('activeCrewTarget').innerText;
 
             let checkedRaks = [];
+            // Ambil SEMUA rak yang tercentang (baik yang lama maupun yang baru dicentang)
             document.querySelectorAll('#checklistGridContainer input[type="checkbox"]:checked').forEach(chk => { checkedRaks.push(chk.id.replace('chk_', '')); });
 
             let items = [];
+            let rowsToMark = [];
+            
+            // ANTI-DOBEL: Hanya memproses barang EXP yang belum pernah disave
             document.querySelectorAll('#expContainer .item-row').forEach(row => {
-                let fields = row.querySelectorAll('input, select');
-                if(fields[0] && fields[0].value) items.push({ namaBarang: fields[0].value, noRak: fields[1].value, tglExp: fields[2].value, kategori: "RH " + fields[3].value + " Hari" });
+                if (row.getAttribute('data-saved') !== 'true') {
+                    let fields = row.querySelectorAll('input, select');
+                    if(fields[0] && fields[0].value) {
+                        items.push({ namaBarang: fields[0].value, noRak: fields[1].value, tglExp: fields[2].value, kategori: "RH " + fields[3].value + " Hari" });
+                        rowsToMark.push({ row: row, fields: fields });
+                    }
+                }
             });
 
             const payload = { action: "saveChecklist", tanggal: tgl, bulan: bln, tahun: thn, storeCode: userToko, crewName: crew, targetRak: target, checkedRaks: checkedRaks, itemsEXP: items };
@@ -666,14 +668,30 @@
                         cloudPlottingData[indexCrew].savedRaks = checkedRaks;
                     }
                 }
-                renderCrewFormLayout(); renderMatriksBulananLayout(); renderHorrorLeaderboard(); renderAdminManagementTable();
+                
+                // Bekukan kotak EXP yang baru disave agar tidak terkirim 2x saat klik simpan lagi
+                rowsToMark.forEach(obj => {
+                    obj.row.setAttribute('data-saved', 'true');
+                    obj.fields.forEach(f => f.disabled = true);
+                    let btnHapus = obj.row.querySelector('button');
+                    if (btnHapus) btnHapus.style.display = 'none'; 
+                });
+
+                renderCrewFormLayout(); 
+                renderMatriksBulananLayout(); 
+                renderHorrorLeaderboard(); 
+                renderAdminManagementTable();
+                
+                // Hidupkan kembali tombolnya!
+                btnSimpan.disabled = false;
+                btnSimpan.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN DATA KE CLOUD';
                 showLoading(false);
             })
             .catch(err => { 
                 alert("Laporan masuk ke Drive, gagal sinkronisasi tampilan lokal."); 
                 showLoading(false);
                 btnSimpan.disabled = false;
-                btnSimpan.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN & KUNCI DATA KE CLOUD';
+                btnSimpan.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN DATA KE CLOUD';
             });
         }
 
