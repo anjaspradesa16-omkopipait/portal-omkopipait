@@ -17,110 +17,35 @@
         .locked-mode .readonly-date { pointer-events: none !important; background-color: #dddddd !important; color: #888888 !important; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #2c3e50; color: #333; padding: 15px; }
         .container { max-width: 1400px; margin: auto; background: #f4f7f6; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:15px;
-}
-/* =========================
-   FIX HP FINAL v2
-=========================*/
+        .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
+        
+        /* =========================
+           FIX HP FINAL v2
+        =========================*/
+        @media only screen and (max-width:768px){
+            *{box-sizing:border-box;}
+            html, body{ width:100%; margin:0; padding:0; overflow-x:hidden !important; }
+            body{padding:6px !important;}
+            .container{ width:100% !important; max-width:100% !important; margin:0 !important; padding:12px !important; overflow:hidden; }
+            .grid{ display:flex !important; flex-direction:column !important; width:100%; }
+            .card{ width:100% !important; min-width:0 !important; }
+            .card div[style*="display:flex"]{ flex-wrap:wrap !important; }
+            input, select, textarea, button, input[type=file]{ width:100% !important; max-width:100% !important; }
+            #wrapperHarian{overflow-x:auto;}
+            #tabelPPS{min-width:700px;}
+            #akumulasiArea{overflow-x:auto;}
+            #akumulasiArea table{min-width:500px;}
+            #raporArea{ overflow-x:hidden !important; padding:5px !important; }
+            .rapor-card{ width:100% !important; overflow:hidden !important; }
+            .rapor-table{ width:100% !important; table-layout:fixed; font-size:10px; }
+            .rapor-table td, .rapor-table th{ padding:4px; word-break:break-word; }
+        }
 
-@media only screen and (max-width:768px){
-
-*{box-sizing:border-box;}
-
-html, body{
-    width:100%;
-    margin:0;
-    padding:0;
-    overflow-x:hidden !important;
-}
-
-body{padding:6px !important;}
-
-.container{
-    width:100% !important;
-    max-width:100% !important;
-    margin:0 !important;
-    padding:12px !important;
-    overflow:hidden;
-}
-
-/* layout vertikal */
-.grid{
-    display:flex !important;
-    flex-direction:column !important;
-    width:100%;
-}
-
-.card{
-    width:100% !important;
-    min-width:0 !important;
-}
-
-/* cegah flex melebar */
-.card div[style*="display:flex"]{
-    flex-wrap:wrap !important;
-}
-
-/* form */
-input, select, textarea, button, input[type=file]{
-    width:100% !important;
-    max-width:100% !important;
-}
-
-/* monitoring harian boleh geser */
-#wrapperHarian{overflow-x:auto;}
-#tabelPPS{min-width:700px;}
-
-/* akumulasi toko boleh geser */
-#akumulasiArea{overflow-x:auto;}
-#akumulasiArea table{min-width:500px;}
-
-/* analisa personil jangan geser */
-#raporArea{
-    overflow-x:hidden !important;
-    padding:5px !important;
-}
-
-.rapor-card{
-    width:100% !important;
-    overflow:hidden !important;
-}
-
-.rapor-table{
-    width:100% !important;
-    table-layout:fixed;
-    font-size:10px;
-}
-
-.rapor-table td,
-.rapor-table th{
-    padding:4px;
-    word-break:break-word;
-}
-
-}
-
-@keyframes pulseDanger{
-
-0%{
-transform:scale(1);
-box-shadow:0 0 5px red;
-}
-
-50%{
-transform:scale(1.02);
-box-shadow:0 0 25px red;
-}
-
-100%{
-transform:scale(1);
-box-shadow:0 0 5px red;
-}
-
-}
+        @keyframes pulseDanger{
+            0%{ transform:scale(1); box-shadow:0 0 5px red; }
+            50%{ transform:scale(1.02); box-shadow:0 0 25px red; }
+            100%{ transform:scale(1); box-shadow:0 0 5px red; }
+        }
 
         .card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; display: flex; flex-direction: column; }
         h3 { margin-top: 0; color: #8e44ad; font-size: 13px; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; }
@@ -147,75 +72,56 @@ box-shadow:0 0 5px red;
         canvas { display: none; }
     </style>
     <style>
-.rapor-card{
-margin-top:10px;
-border:none;
-padding:12px;
-border-radius:16px;
-background:linear-gradient(135deg,#ffffff,#f8f9ff);
-box-shadow:0 5px 15px rgba(0,0,0,.08);
-transition:.3s;
-}
+        .rapor-card{ margin-top:10px; border:none; padding:12px; border-radius:16px; background:linear-gradient(135deg,#ffffff,#f8f9ff); box-shadow:0 5px 15px rgba(0,0,0,.08); transition:.3s; }
+        .rapor-card:hover{ transform:translateY(-3px); box-shadow:0 8px 25px rgba(0,0,0,.15); }
+        .modal-rapor{ display:none; position:fixed; z-index:9999; inset:0; background:rgba(0,0,0,.75); overflow-y:auto; padding:15px; backdrop-filter:blur(4px); }
+        .modal-content{ position:relative; background:linear-gradient(135deg,#ffffff,#f4f8ff,#fff5ec); margin:30px auto; padding:20px; border-radius:20px; width:90%; max-width:850px; color:#333; border:3px solid #fff; box-shadow:0 15px 40px rgba(0,0,0,.35); animation:zoomIn .4s; }
+        .modal-content::before{ content:"🏆 PPS MONITORING"; display:block; text-align:center; font-size:18px; font-weight:bold; margin-bottom:10px; padding:10px; border-radius:12px; background:linear-gradient(90deg,#8e44ad,#3498db,#2ecc71); color:#fff; }
+        .btn-tutup{ float:right; font-size:30px; font-weight:bold; cursor:pointer; color:#e74c3c; transition:.3s; }
+        .btn-tutup:hover{ transform:scale(1.2) rotate(90deg); }
 
-.rapor-card:hover{
-transform:translateY(-3px);
-box-shadow:0 8px 25px rgba(0,0,0,.15);
-}
-
-.modal-rapor{
-    display:none;
-    position:fixed;
-    z-index:9999;
-    inset:0;
-    background:rgba(0,0,0,.75);
-    overflow-y:auto;
-    padding:15px;
-    backdrop-filter:blur(4px);
-}
-
-.modal-content{
-    position:relative;
-    background:linear-gradient(135deg,#ffffff,#f4f8ff,#fff5ec);
-    margin:30px auto;
-    padding:20px;
-    border-radius:20px;
-    width:90%;
-    max-width:850px;
-    color:#333;
-    border:3px solid #fff;
-    box-shadow:0 15px 40px rgba(0,0,0,.35);
-    animation:zoomIn .4s;
-}
-
-.modal-content::before{
-    content:"🏆 PPS MONITORING";
-    display:block;
-    text-align:center;
-    font-size:18px;
-    font-weight:bold;
-    margin-bottom:10px;
-    padding:10px;
-    border-radius:12px;
-    background:linear-gradient(90deg,#8e44ad,#3498db,#2ecc71);
-    color:#fff;
-}
-
-.btn-tutup{
-    float:right;
-    font-size:30px;
-    font-weight:bold;
-    cursor:pointer;
-    color:#e74c3c;
-    transition:.3s;
-}
-
-.btn-tutup:hover{
-    transform:scale(1.2) rotate(90deg);
-}
-
-</style>
+        /* =========================
+           TAMBAHAN TAMPILAN LOADING CLOUD 
+        ========================= */
+        #cloudLoadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 999999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+        }
+        .cloud-spinner {
+            width: 60px;
+            height: 60px;
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            animation: spinCloud 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+        }
+        @keyframes spinCloud {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-teks { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+        .loading-subteks { font-size: 12px; color: #f1c40f; margin-top: 10px; font-weight: normal; }
+    </style>
 </head>
 <body>
+
+<!-- OVERLAY LOADING CLOUD -->
+<div id="cloudLoadingOverlay">
+    <div class="cloud-spinner"></div>
+    <div class="loading-teks" id="loadingPesan">Sedang Sync Data Cloud...</div>
+    <div class="loading-subteks">Mohon bersabar bosku, jangan diklik-klik terus ya ☕</div>
+</div>
 
 <div class="container">
     <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">DASHBOARD MONITORING PPS v34.0</h2>
@@ -257,8 +163,11 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
             <h3 style="color:#e67e22;">2. INPUT HASIL SHIFT</h3>
             <label id="labelTglInput">Tanggal Input (BEBAS)</label>
             <input type="number" id="tglInput" placeholder="1-31" min="1" max="31" oninput="loadReal();">
+            
+            <!-- UBAHAN KUNCI KASIR: Diubah jadi teks mati dari data login -->
             <label>Kasir Bertugas</label>
-            <select id="kasirAktif" onchange="resetBukti()"></select>
+            <input type="text" id="kasirAktif" readonly style="background-color:#e0e0e0; font-weight:bold; cursor:not-allowed; border:1px solid #ccc; text-transform:uppercase;">
+            
             <label>Shift Lapor</label>
             <select id="shfInput" onchange="loadReal();">
                 <option value="s3">Shift 3</option>
@@ -281,35 +190,13 @@ box-shadow:0 8px 25px rgba(0,0,0,.15);
             </div>
             <button id="btnSimpanShift" class="btn-save" onclick="simpanReal()">✅ SIMPAN DATA SHIFT</button>
             <button onclick="bukaRapor()" style="width:100%; background:#8e44ad; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-            🔍 PERBESAR ANALISA KASIR
-            <button onclick="bukaAkumulasi()"
-style="width:100%;
-background:#16a085;
-color:white;
-padding:12px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-margin-top:10px;
-font-weight:bold;">
-📊 LIHAT AKUMULASI TOKO
-</button>
-<button onclick="bukaVSBulan()"
-style="width:100%;
-background:#2980b9;
-color:white;
-padding:12px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-margin-top:10px;
-font-weight:bold;">
-📈 VS BULAN LALU
-</button>
-            <button onclick="bukaRanking()"
-            style="width:100%;background:#f39c12;color:white;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;font-weight:bold;">
-            🏆 RANKING PENJUALAN
-            </button>
+            🔍 PERBESAR ANALISA KASIR</button>
+            <button onclick="bukaAkumulasi()" style="width:100%; background:#16a085; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold;">
+            📊 LIHAT AKUMULASI TOKO</button>
+            <button onclick="bukaVSBulan()" style="width:100%; background:#2980b9; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold;">
+            📈 VS BULAN LALU</button>
+            <button onclick="bukaRanking()" style="width:100%;background:#f39c12;color:white;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;font-weight:bold;">
+            🏆 RANKING PENJUALAN</button>
         </div>
 
         <div class="card">
@@ -349,6 +236,19 @@ font-weight:bold;">
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
+    // --- FUNGSI MUNCULIN & NGILANGIN LOADING ---
+    function showLoading(pesan = "Sedang Sync Data Cloud...") {
+        const p = document.getElementById('loadingPesan');
+        if(p) p.innerText = pesan;
+        const l = document.getElementById('cloudLoadingOverlay');
+        if(l) l.style.display = 'flex';
+    }
+
+    function hideLoading() {
+        const l = document.getElementById('cloudLoadingOverlay');
+        if(l) l.style.display = 'none';
+    }
+
     // --- 2. FUNGSI SISTEM (TETAP ASLI) ---
     function getK() { 
         const thn = document.getElementById('thnArsip')?.value || "2026";
@@ -377,13 +277,9 @@ function bukaRanking(){
 const k=getK();
 
 const html=`
-<div class="modal-rapor" id="rankingModal"
-style="display:block;">
-
+<div class="modal-rapor" id="rankingModal" style="display:block;">
 <div class="modal-content">
-
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-
 <select id="rankItem">
 <option value="PWP">PWP</option>
 <option value="PSM">PSM</option>
@@ -393,83 +289,31 @@ style="display:block;">
 </select>
 
 <select id="rankPeriode">
-
-<option value="1">
-PERIODE 1 (1-15)
-</option>
-
-<option value="2">
-PERIODE 2 (16-AKHIR)
-</option>
-
-<option value="3">
-PSM WEEK 1
-</option>
-
-<option value="4">
-PSM WEEK 2
-</option>
-
-<option value="5">
-PSM WEEK 3
-</option>
-
-<option value="6">
-PSM WEEK 4
-</option>
-
-</select>
-
-<button onclick="generateRanking()">
-TAMPILKAN
-</button>
-
-</div>
-
-<hr>
-
-<div id="rankingArea">
-Pilih Item & Periode
-</div>
-
-<button
-onclick="tutupRanking()"
-style="margin-top:10px;background:#e74c3c;color:white;">
-TUTUP
-</button>
-
-</div>
-</div>`;
-
-document.body.insertAdjacentHTML(
-'beforeend',
-html
-);
-
-document.getElementById('rankItem').onchange=function(){
-
-const p=document.getElementById('rankPeriode');
-
-if(this.value==='PSM'){
-
-p.innerHTML=`
+<option value="1">PERIODE 1 (1-15)</option>
+<option value="2">PERIODE 2 (16-AKHIR)</option>
 <option value="3">PSM WEEK 1</option>
 <option value="4">PSM WEEK 2</option>
 <option value="5">PSM WEEK 3</option>
 <option value="6">PSM WEEK 4</option>
-`;
+</select>
 
+<button onclick="generateRanking()">TAMPILKAN</button>
+</div>
+<hr>
+<div id="rankingArea">Pilih Item & Periode</div>
+<button onclick="tutupRanking()" style="margin-top:10px;background:#e74c3c;color:white;">TUTUP</button>
+</div></div>`;
+
+document.body.insertAdjacentHTML('beforeend',html);
+
+document.getElementById('rankItem').onchange=function(){
+const p=document.getElementById('rankPeriode');
+if(this.value==='PSM'){
+p.innerHTML=`<option value="3">PSM WEEK 1</option><option value="4">PSM WEEK 2</option><option value="5">PSM WEEK 3</option><option value="6">PSM WEEK 4</option>`;
 }else{
-
-p.innerHTML=`
-<option value="1">PERIODE 1 (1-15)</option>
-<option value="2">PERIODE 2 (16-AKHIR)</option>
-`;
-
+p.innerHTML=`<option value="1">PERIODE 1 (1-15)</option><option value="2">PERIODE 2 (16-AKHIR)</option>`;
 }
-
 };
-
 }
 
 function tutupAkumulasi() {
@@ -483,19 +327,16 @@ function tutupAkumulasi() {
 function bukaAkumulasi() {
     const areaAsli = document.getElementById('akumulasiArea');
     if(!areaAsli) return;
-
     let modal = document.getElementById('modalAkumulasi');
     if(!modal){
         modal = document.createElement('div');
         modal.id = 'modalAkumulasi';
         document.body.appendChild(modal);
     }
-
     modal.className = 'modal-rapor';
     modal.style.display = 'block';
     modal.style.pointerEvents = 'auto';
     document.body.style.overflow = 'hidden';
-
     modal.innerHTML = `
         <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
@@ -519,33 +360,21 @@ function tutupVSBulan(){
 }
 
 function bukaVSBulan(){
-
     const area=document.getElementById('vsBulanArea');
     if(!area) return;
-
     let modal=document.getElementById('modalVSBulan');
-
     if(!modal){
         modal=document.createElement('div');
         modal.id='modalVSBulan';
         document.body.appendChild(modal);
     }
-
     modal.className='modal-rapor';
     modal.style.display='block';
-
     modal.innerHTML=`
     <div class="modal-content">
-
-        <span class="btn-tutup"
-        onclick="tutupVSBulan()">
-        ×
-        </span>
-
+        <span class="btn-tutup" onclick="tutupVSBulan()">×</span>
         ${area.innerHTML}
-
-    </div>
-    `;
+    </div>`;
 }
 
 function generateRanking(){
@@ -579,7 +408,7 @@ function generateRanking(){
             if(masuk) hasil[nama]=(hasil[nama]||0)+(parseFloat(data[item])||0);
         });
     }
-    // hitung target personil
+    
     let targetPersonil=0;
     if(item!=="PSM"){
         const p=(periode=="1")?1:2;
@@ -590,7 +419,7 @@ function generateRanking(){
         const targetToko=parseFloat(db[k.yr][k.mn][k.tk].target[wk]?.PSM)||0;
         targetPersonil=kru.length>0?Math.ceil(targetToko/kru.length):0;
     }
-    // buat array ranking
+    
     let arr=Object.entries(hasil).map(x=>{
         const real=x[1];
         const gap=Math.max(0,targetPersonil-real);
@@ -601,197 +430,75 @@ function generateRanking(){
     if(sortBy==="real") arr.sort((a,b)=>b.real-a.real);
     if(sortBy==="gap") arr.sort((a,b)=>a.gap-b.gap);
     if(sortBy==="pct") arr.sort((a,b)=>b.pct-a.pct);
-    // hitung top/bottom/avg
+    
     const topNama=arr.length?arr[0].nama:"-";
     const topReal=arr.length?arr[0].real:0;
     const bawahNama=arr.length?arr[arr.length-1].nama:"-";
     const bawahReal=arr.length?arr[arr.length-1].real:0;
     const avg=arr.length?Math.round(arr.reduce((a,b)=>a+b.real,0)/arr.length):0;
-    // bikin html popup
-    let targetToko=0;
-let realToko=0;
-
-arr.forEach(x=>realToko+=x.real);
-
-if(item!=="PSM"){
-
-    const p=(periode=="1")?1:2;
-
-    targetToko=
-    (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[item])||0)+
-    (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[item])||0);
-
-}else{
-
-    const wk=parseInt(periode)-2;
-
-    targetToko=
-    parseFloat(
-    db[k.yr][k.mn][k.tk].target[wk]?.PSM
-    )||0;
-
-}
-
-const sisaToko=
-Math.max(
-0,
-targetToko-realToko
-);
-
-const pctToko=
-targetToko>0
-?Math.round((realToko/targetToko)*100)
-:0;
-
-let html=`
-
-<h3>🏆 RANKING ${item}</h3>
-
-<div style="
-background:#f8f9fa;
-padding:12px;
-border-radius:12px;
-margin-bottom:10px;
-line-height:1.8;
-">
-
-🏆 TOP SELLER :
-<b>${topNama}</b>
-(${topReal})
-
-<br>
-
-🚨 ZONA BAHAYA :
-<b>${bawahNama}</b>
-(${bawahReal})
-
-<br>
-
-🔥 SELISIH PEMIMPIN :
-<b>${topReal-bawahReal} PCS</b>
-
-<br>
-
-🏪 TARGET TOKO :
-<b>${targetToko}</b>
-
-<br>
-
-📦 REAL TOKO :
-<b>${realToko}</b>
-
-<br>
-
-📈 PROGRESS TOKO :
-<b>${pctToko}%</b>
-
-<br>
-
-🔥 SISA TARGET TOKO :
-<b>${sisaToko} PCS</b>
-
-<br>
-
-👥 TARGET PERSONIL :
-<b>${targetPersonil}</b>
-
-</div>
-
-`;
-
-arr.forEach((x,i)=>{
-
-const real = x.real;
-
-const pct =
-targetToko>0
-? (real/targetToko)*100
-: 0;
-
-const gap =
-Math.max(
-0,
-targetToko-real
-);
-
-    // Medal/Ranking
-    const medal = i==0?"🥇":i==1?"🥈":i==2?"🥉":(i+1)+".";
     
+    let targetToko=0;
+    let realToko=0;
+    arr.forEach(x=>realToko+=x.real);
 
-    // STATUS kejam
-if(pct>=100){
+    if(item!=="PSM"){
+        const p=(periode=="1")?1:2;
+        targetToko=(parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[item])||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[item])||0);
+    }else{
+        const wk=parseInt(periode)-2;
+        targetToko=parseFloat(db[k.yr][k.mn][k.tk].target[wk]?.PSM)||0;
+    }
 
-    status="🏆 TARGET TOKO DILIBAS";
+    const sisaToko=Math.max(0,targetToko-realToko);
+    const pctToko=targetToko>0?Math.round((realToko/targetToko)*100):0;
 
-}
-else if(pct>=75){
+    let html=`
+    <h3>🏆 RANKING ${item}</h3>
+    <div style="background:#f8f9fa;padding:12px;border-radius:12px;margin-bottom:10px;line-height:1.8;">
+    🏆 TOP SELLER : <b>${topNama}</b> (${topReal})<br>
+    🚨 ZONA BAHAYA : <b>${bawahNama}</b> (${bawahReal})<br>
+    🔥 SELISIH PEMIMPIN : <b>${topReal-bawahReal} PCS</b><br>
+    🏪 TARGET TOKO : <b>${targetToko}</b><br>
+    📦 REAL TOKO : <b>${realToko}</b><br>
+    📈 PROGRESS TOKO : <b>${pctToko}%</b><br>
+    🔥 SISA TARGET TOKO : <b>${sisaToko} PCS</b><br>
+    👥 TARGET PERSONIL : <b>${targetPersonil}</b>
+    </div>`;
 
-    status="🔥 SIAP NAIK PODIUM";
+    arr.forEach((x,i)=>{
+        const real = x.real;
+        const pct = targetToko>0 ? (real/targetToko)*100 : 0;
+        const gap = Math.max(0,targetToko-real);
+        const medal = i==0?"🥇":i==1?"🥈":i==2?"🥉":(i+1)+".";
+        
+        let status="";
+        if(pct>=100) status="🏆 TARGET TOKO DILIBAS";
+        else if(pct>=75) status="🔥 SIAP NAIK PODIUM";
+        else if(pct>=50) status="⚡ MASIH ADA HARAPAN";
+        else if(pct>=25) status="🚨 TERTINGGAL JAUH";
+        else status="💀 KONTRIBUSI MINIM";
 
-}
-else if(pct>=50){
+        let gapColor="#c0392b";
+        if(pct>=100) gapColor="#27ae60";
+        else if(pct>=75) gapColor="#3498db";
+        else if(pct>=50) gapColor="#f39c12";
+        else if(pct>=25) gapColor="#e67e22";
+        else gapColor="#c0392b";
 
-    status="⚡ MASIH ADA HARAPAN";
-
-}
-else if(pct>=25){
-
-    status="🚨 TERTINGGAL JAUH";
-
-}
-else{
-
-    status="💀 KONTRIBUSI MINIM";
-
-}
-
-    // Warna GAP
-let gapColor="#c0392b";
-
-if(pct>=100)
-gapColor="#27ae60";
-
-else if(pct>=75)
-gapColor="#3498db";
-
-else if(pct>=50)
-gapColor="#f39c12";
-
-else if(pct>=25)
-gapColor="#e67e22";
-
-else
-gapColor="#c0392b";
-
-    html+=`
-    <div style="margin:10px 0;padding:10px;background:#fff;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,.1);">
-        <div>${medal} <b>${x.nama}</b></div>
-        <div style="margin-top:5px;font-size:13px;">
-${real} / ${targetToko}
-(${Math.round((real/targetToko)*100)}%)
-</div>
-        <div style="
-color:${gapColor};
-font-weight:bold;
-">
-
-🎯 GAP : ${gap}
-
-<br>
-
-🏁 TERTINGGAL DARI PEMIMPIN :
-${topReal-real} PCS
-
-<br>
-
-${status}
-
-</div>
-        <div style="height:20px;background:#eee;border-radius:10px;overflow:hidden;margin-top:5px;">
-            <div style="height:100%;width:${Math.min(100,pct)}%;background:#3498db;"></div>
-        </div>
-    `;
-});
+        html+=`
+        <div style="margin:10px 0;padding:10px;background:#fff;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,.1);">
+            <div>${medal} <b>${x.nama}</b></div>
+            <div style="margin-top:5px;font-size:13px;">${real} / ${targetToko} (${Math.round((real/targetToko)*100)}%)</div>
+            <div style="color:${gapColor};font-weight:bold;">
+            🎯 GAP : ${gap}<br>
+            🏁 TERTINGGAL DARI PEMIMPIN : ${topReal-real} PCS<br>
+            ${status}
+            </div>
+            <div style="height:20px;background:#eee;border-radius:10px;overflow:hidden;margin-top:5px;">
+                <div style="height:100%;width:${Math.min(100,pct)}%;background:#3498db;"></div>
+            </div></div>
+        `;
+    });
     document.getElementById('rankingArea').innerHTML=html;
 }
     
@@ -807,7 +514,7 @@ ${status}
         } 
     }
 
-    // --- 3. WINDOW ONLOAD (TETAP ASLI) ---
+    // --- 3. WINDOW ONLOAD (TETAP ASLI + UBAHAN NAMA KASIR) ---
     window.onload = function() {
         const b = document.getElementById('blnArsip');
         if (b) {
@@ -841,6 +548,17 @@ ${status}
             }
         }
 
+        // ==========================================
+        // KUNCI KASIR OTOMATIS DARI DATA LOGIN
+        // ==========================================
+        const inKasir = document.getElementById("kasirAktif");
+        if (inKasir && userSesi) {
+            // Mengambil nama dari session (nama / username / user). Jika kosong akan tertulis TIDAK_DIKETAHUI
+            let namaKasir = userSesi.nama || userSesi.username || userSesi.user || "TIDAK_DIKETAHUI";
+            inKasir.value = namaKasir.toUpperCase();
+        }
+        // ==========================================
+
         initPPS();
         
         const urlParams = new URLSearchParams(window.location.search);
@@ -873,7 +591,7 @@ ${status}
         pullDataFromCloud();
     };
 
-    // --- 4. FUNGSI KERJA (TETAP ASLI BAPAK) ---
+    // --- 4. FUNGSI KERJA ---
     function initPPS() {
         const k = getK(); if(!k.tk) return;
         if(!db[k.yr]) db[k.yr] = {}; if(!db[k.yr][k.mn]) db[k.yr][k.mn] = {};
@@ -887,30 +605,20 @@ ${status}
     }
 
     function updateKruList() {
-        const s = document.getElementById('kasirAktif'); const valLama = s.value;
-        s.innerHTML = "<option value=''>-- Pilih Kasir --</option>";
-        document.getElementById('listKru').value.split(',').forEach(n => { if(n.trim()) s.innerHTML += `<option value="${n.trim()}">${n.trim()}</option>`; });
-        s.value = valLama;
+        // Fungsi update list ke dropdown dimatikan, karena kotak nama kasir sekarang ditarik otomatis dari session login & dikunci mati.
     }
 
-   function saveKru() {
-    const k = getK();
-    if(!k.tk) return;
-
-    db[k.yr][k.mn][k.tk].kru =
-    document.getElementById('listKru').value;
-    saveDisk();
-    updateKruList();
-    updateShiftOption();
-}
+    function saveKru() {
+        const k = getK(); if(!k.tk) return;
+        db[k.yr][k.mn][k.tk].kru = document.getElementById('listKru').value;
+        saveDisk(); updateKruList(); updateShiftOption();
+    }
+    
     function saveTipe() { 
-    const k = getK();
-    if(!k.tk) return;
-
-    db[k.yr][k.mn][k.tk].tipe = document.getElementById('tipeToko').value;
-    saveDisk();
-    updateShiftOption();
-}
+        const k = getK(); if(!k.tk) return;
+        db[k.yr][k.mn][k.tk].tipe = document.getElementById('tipeToko').value;
+        saveDisk(); updateShiftOption();
+    }
 
     function getLogic(tgl, it, yr, mn) {
         const dM = new Date(yr, mn, 0).getDate();
@@ -934,11 +642,22 @@ ${status}
     function simpanTarget() {
         const k = getK(); const wk = document.getElementById('wkTarget').value;
         if(!k.tk) return alert("Kode Toko Kosong!");
+        
         items.forEach(it => { const el = document.getElementById(`t_${it}`); if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; });
         saveDisk(); 
+        
+        showLoading("Menyimpan Target ke Cloud..."); // MUNCULKAN LOADING
+        
         const payload = { toko: k.tk, yr: k.yr, mn: k.mn, wk: wk, targets: db[k.yr][k.mn][k.tk].target[wk], kru: db[k.yr][k.mn][k.tk].kru, tipe: db[k.yr][k.mn][k.tk].tipe, tipeData: "PPS_TARGET" };
-        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-        alert("Target Disimpan & Sinkron Cloud! 📊");
+        
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+        .then(() => {
+            hideLoading();
+            alert("Target Disimpan & Sinkron Cloud! 📊");
+        }).catch(() => {
+            hideLoading();
+            alert("Gagal koneksi ke cloud!");
+        });
     }
 
     function loadReal() {
@@ -962,33 +681,14 @@ ${status}
     }
 
   function updateShiftOption() {
-
-    const tipe=
-    document.getElementById('tipeToko').value;
-
-    const shf=
-    document.getElementById('shfInput');
-
-    const old=
-    shf.value;
-
-    shf.innerHTML=
-    tipe=="3"
-    ? `<option value="s3">Shift 3</option>
-       <option value="s1">Shift 1</option>
-       <option value="s2">Shift 2</option>`
-    :
-      `<option value="s1">Shift 1</option>
-       <option value="s2">Shift 2</option>`;
-
-    if(
-       [...shf.options]
-       .some(o=>o.value===old)
-    ){
-       shf.value=old;
-    }
-
-}
+    const tipe=document.getElementById('tipeToko').value;
+    const shf=document.getElementById('shfInput');
+    const old=shf.value;
+    shf.innerHTML= tipe=="3"
+    ? `<option value="s3">Shift 3</option><option value="s1">Shift 1</option><option value="s2">Shift 2</option>`
+    : `<option value="s1">Shift 1</option><option value="s2">Shift 2</option>`;
+    if([...shf.options].some(o=>o.value===old)){ shf.value=old; }
+  }
 
    function checkTargetStatus() {
     const k = getK(); const tgl = parseInt(document.getElementById('tglInput').value); if(!tgl) return false;
@@ -998,17 +698,14 @@ ${status}
     items.forEach(it => {
         const log = getLogic(tgl, it, k.yr, k.mn);
         const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
-
         if(tTotal > 0) {
             const tS = Math.ceil(tTotal / (log.dWk * tipe));
-
             if((parseFloat(document.getElementById(`r_${it}`).value) || 0) < tS)
                 failItems.push(it.replace('_',' '));
         }
     });
 
     const lbl = document.getElementById('labelWarning');
-
     if(failItems.length > 0) {
         lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`;
         lbl.style.display = 'block';
@@ -1048,15 +745,14 @@ ${status}
         
         if(!hS[shfKey]) hS[shfKey] = {};
         
-        items.forEach(it => { 
-            hS[shfKey][it] = parseFloat(document.getElementById(`r_${it}`).value) || 0; 
-        });
-        
+        items.forEach(it => { hS[shfKey][it] = parseFloat(document.getElementById(`r_${it}`).value) || 0; });
         hS[shfKey+'_nama'] = ksr; 
         hS[shfKey+'_note'] = note;
         hS[shfKey+'_jam'] = waktuSekarang; 
         
         saveDisk();
+
+        showLoading("Menyimpan Data Harian ke Cloud..."); // MUNCULKAN LOADING
 
         const payload = { 
             toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
@@ -1070,63 +766,54 @@ ${status}
             tipeData: "PPS_HARIAN_SAVE_V2" 
         };
 
-        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-        alert("BERHASIL! Data Tersimpan & Sinkron Cloud ✅");
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+        .then(() => {
+            hideLoading();
+            alert("BERHASIL! Data Tersimpan & Sinkron Cloud ✅");
+        }).catch(() => {
+            hideLoading();
+            alert("Gagal koneksi ke cloud!");
+        });
     }
 
     function pullDataFromCloud() {
         const k = getK(); if(!k.tk) return;
+        
+        showLoading("Mengambil Data Terbaru dari Cloud..."); // MUNCULKAN LOADING SAAT BUKA
+
         fetch(`${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}`)
         .then(res => res.json())
         .then(data => {
-console.log("DATA CLOUD", data);
-console.log("BULAN LALU DARI CLOUD", data.bulanLalu);
+            console.log("DATA CLOUD", data);
+            console.log("BULAN LALU DARI CLOUD", data.bulanLalu);
             if(data && data.target) {
-db[k.yr][k.mn][k.tk].target = data.target;
-db[k.yr][k.mn][k.tk].harian = data.harian || {};
-db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
-db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+                db[k.yr][k.mn][k.tk].target = data.target;
+                db[k.yr][k.mn][k.tk].harian = data.harian || {};
+                db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
+                db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+                db[k.yr][k.mn][k.tk].bulanLalu = data.bulanLalu || {};
+                db[k.yr][k.mn][k.tk].bulanLaluDetail = data.bulanLaluDetail || {};
+                db[k.yr][k.mn][k.tk].bulanLaluKasir = data.bulanLaluKasir || {};
+                db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni = data.bulanLaluSampaiHariIni || {};
 
-db[k.yr][k.mn][k.tk].bulanLalu =
-data.bulanLalu || {};
-
-db[k.yr][k.mn][k.tk].bulanLaluDetail =
-data.bulanLaluDetail || {};
-
-db[k.yr][k.mn][k.tk].bulanLaluKasir =
-data.bulanLaluKasir || {};
-
-db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni =
-data.bulanLaluSampaiHariIni || {};
-
-console.log(
-"BULAN LALU KASIR",
-data.bulanLaluKasir
-);
-
-console.log(
-"BULAN LALU MTD",
-data.bulanLaluSampaiHariIni
-);
-
-console.log(
-"DETAIL BULAN LALU",
-data.bulanLaluDetail
-);
                 localStorage.setItem('dbPPS_v30', JSON.stringify(db));
+                
+                // HANYA LIST KRU DAN TIPE TOKO YANG DITIMPA
                 document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
                 document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
+                
                 updateKruList();
                 updateShiftOption();
                 switchWeek();
                 updateUI();
             }
-        }).catch(e => console.log("Cloud Pull Error"));
+            hideLoading(); // Hilangkan loading kalau sukses
+        }).catch(e => {
+            console.log("Cloud Pull Error");
+            hideLoading(); // Hilangkan loading walau error
+        });
 
-        console.log(
-"DATA BULAN LALU",
-db[k.yr][k.mn][k.tk].bulanLalu
-);
+        console.log("DATA BULAN LALU", db[k.yr]?.[k.mn]?.[k.tk]?.bulanLalu);
     }
 
     function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
@@ -1171,9 +858,7 @@ db[k.yr][k.mn][k.tk].bulanLalu
             // 2. HITUNG KONTRIBUSI PERSONIL (TARGET BULAT TOKO)
             for (let personil in kStats) {
                 ['s1', 's2', 's3'].forEach(sh => {
-                    // Cari data kasir berdasarkan nama di tiap shift
                     const listKeysKru = Object.keys(h).filter(key => key.startsWith(sh + '_') && key.endsWith('_nama'));
-                    
                     listKeysKru.forEach(keyNama => {
                         if (h[keyNama] === personil) {
                             const actualKey = keyNama.replace('_nama', '');
@@ -1181,28 +866,19 @@ db[k.yr][k.mn][k.tk].bulanLalu
                                 const val = parseFloat(h[actualKey]?.[it]) || 0;
                                 const log = getLogic(i, it, k.yr, k.mn);
                                 
-                                // HASIL REAL: Tetap dijumlahkan apa adanya
                                 kStats[personil].total += val;
                                 kStats[personil].w[log.wk].R += val;
                                 kStats[personil].p[i <= 15 ? 1 : 2].R += val;
-                                // --- TAMBAHKAN DI SINI (BARIS 449) ---
                                 if(!kStats[personil].p[i<=15?1:2].items) kStats[personil].p[i<=15?1:2].items = {};
                                 if(!kStats[personil].w[log.wk].items) kStats[personil].w[log.wk].items = {};
                                 kStats[personil].p[i<=15?1:2].items[it] = (kStats[personil].p[i<=15?1:2].items[it] || 0) + val;
                                 kStats[personil].w[log.wk].items[it] = (kStats[personil].w[log.wk].items[it] || 0) + val;
 
-                               // --- TARGET BULAT KHUSUS (PSM MINGGUAN, LAINNYA PERIODE) ---
-                                
-                                // 1. Target Mingguan (W1-W4) -> Selalu Bulat Mingguan buat semua item
                                 kStats[personil].w[log.wk].T = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
                                 
-                                // 2. Target Periode (P1/P2)
                                 if (it === 'PSM') {
-                                    // KHUSUS PSM: Target Periode adalah target mingguan murni (W1/W2/W3/W4)
-                                    // Supaya kasir nggak shock lihat target PSM sebulan numpuk jadi satu
                                     kStats[personil].p[i <= 15 ? 1 : 2].T = kStats[personil].w[log.wk].T;
                                 } else {
-                                    // ITEM LAIN (PWP, SERBA, dll): Tetap Gabungan Mingguan dalam satu Periode
                                     if (i <= 15) {
                                         let tW1 = parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it]) || 0;
                                         let tW2 = parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it]) || 0;
@@ -1223,44 +899,16 @@ db[k.yr][k.mn][k.tk].bulanLalu
             body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
         }
 
-let bulanLaluDetail =
-db[k.yr]?.[k.mn]?.[k.tk]?.bulanLaluDetail || {};
-
+let bulanLaluDetail = db[k.yr]?.[k.mn]?.[k.tk]?.bulanLaluDetail || {};
 let bulanIniDetail = {
-
-PWP_P1:0,
-PWP_P2:0,
-
-SERBA_P1:0,
-SERBA_P2:0,
-
-SUGER_P1:0,
-SUGER_P2:0,
-
-CEBAN_P1:0,
-CEBAN_P2:0,
-
-PSM_W1:0,
-PSM_W2:0,
-PSM_W3:0,
-PSM_W4:0
-
+PWP_P1:0, PWP_P2:0, SERBA_P1:0, SERBA_P2:0, SUGER_P1:0, SUGER_P2:0, CEBAN_P1:0, CEBAN_P2:0, PSM_W1:0, PSM_W2:0, PSM_W3:0, PSM_W4:0
 };
 
 for(let tgl=1; tgl<=dM; tgl++){
-
   const h = harianData[tgl] || {};
-
   Object.keys(h).forEach(key=>{
-
-    if(
-      key.endsWith('_nama') ||
-      key.endsWith('_note') ||
-      key.endsWith('_jam')
-    ) return;
-
+    if(key.endsWith('_nama') || key.endsWith('_note') || key.endsWith('_jam')) return;
     const row = h[key];
-
     const pwp   = parseFloat(row.PWP)||0;
     const psm   = parseFloat(row.PSM)||0;
     const serba = parseFloat(row.SERBA_GRATIS)||0;
@@ -1268,429 +916,124 @@ for(let tgl=1; tgl<=dM; tgl++){
     const ceban = parseFloat(row.CEBAN)||0;
 
     if(tgl<=15){
-
-      bulanIniDetail.PWP_P1 += pwp;
-      bulanIniDetail.SERBA_P1 += serba;
-      bulanIniDetail.SUGER_P1 += suger;
-      bulanIniDetail.CEBAN_P1 += ceban;
-
+      bulanIniDetail.PWP_P1 += pwp; bulanIniDetail.SERBA_P1 += serba; bulanIniDetail.SUGER_P1 += suger; bulanIniDetail.CEBAN_P1 += ceban;
     }else{
-
-      bulanIniDetail.PWP_P2 += pwp;
-      bulanIniDetail.SERBA_P2 += serba;
-      bulanIniDetail.SUGER_P2 += suger;
-      bulanIniDetail.CEBAN_P2 += ceban;
-
+      bulanIniDetail.PWP_P2 += pwp; bulanIniDetail.SERBA_P2 += serba; bulanIniDetail.SUGER_P2 += suger; bulanIniDetail.CEBAN_P2 += ceban;
     }
 
-    if(tgl<=7){
-
-      bulanIniDetail.PSM_W1 += psm;
-
-    }else if(tgl<=15){
-
-      bulanIniDetail.PSM_W2 += psm;
-
-    }else if(tgl<=23){
-
-      bulanIniDetail.PSM_W3 += psm;
-
-    }else{
-
-      bulanIniDetail.PSM_W4 += psm;
-
-    }
-
+    if(tgl<=7) bulanIniDetail.PSM_W1 += psm;
+    else if(tgl<=15) bulanIniDetail.PSM_W2 += psm;
+    else if(tgl<=23) bulanIniDetail.PSM_W3 += psm;
+    else bulanIniDetail.PSM_W4 += psm;
   });
-
 }
+
 let targetVS = {
-
-PWP_P1:
-(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PWP)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PWP)||0),
-
-PWP_P2:
-(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PWP)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PWP)||0),
-
-SERBA_P1:
-(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SERBA_GRATIS)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SERBA_GRATIS)||0),
-
-SERBA_P2:
-(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SERBA_GRATIS)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SERBA_GRATIS)||0),
-
-SUGER_P1:
-(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SUGER)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SUGER)||0),
-
-SUGER_P2:
-(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SUGER)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SUGER)||0),
-
-CEBAN_P1:
-(parseFloat(db[k.yr][k.mn][k.tk].target[1]?.CEBAN)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.CEBAN)||0),
-
-CEBAN_P2:
-(parseFloat(db[k.yr][k.mn][k.tk].target[3]?.CEBAN)||0)+
-(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.CEBAN)||0),
-
-PSM_W1:
-parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PSM)||0,
-
-PSM_W2:
-parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PSM)||0,
-
-PSM_W3:
-parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PSM)||0,
-
-PSM_W4:
-parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PSM)||0
-
+PWP_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PWP)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PWP)||0),
+PWP_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PWP)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PWP)||0),
+SERBA_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SERBA_GRATIS)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SERBA_GRATIS)||0),
+SERBA_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SERBA_GRATIS)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SERBA_GRATIS)||0),
+SUGER_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SUGER)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SUGER)||0),
+SUGER_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SUGER)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SUGER)||0),
+CEBAN_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.CEBAN)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.CEBAN)||0),
+CEBAN_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.CEBAN)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.CEBAN)||0),
+PSM_W1: parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PSM)||0,
+PSM_W2: parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PSM)||0,
+PSM_W3: parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PSM)||0,
+PSM_W4: parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PSM)||0
 };
 
 let rankingVS = [
-
-{
-nama:"PWP P1",
-trend: pctGrowth(
-bulanIniDetail.PWP_P1,
-bulanLaluDetail.PWP_P1
-)
-},
-
-{
-nama:"PWP P2",
-trend: pctGrowth(
-bulanIniDetail.PWP_P2,
-bulanLaluDetail.PWP_P2
-)
-},
-
-{
-nama:"PSM W1",
-trend: pctGrowth(
-bulanIniDetail.PSM_W1,
-bulanLaluDetail.PSM_W1
-)
-},
-
-{
-nama:"PSM W2",
-trend: pctGrowth(
-bulanIniDetail.PSM_W2,
-bulanLaluDetail.PSM_W2
-)
-},
-
-{
-nama:"PSM W3",
-trend: pctGrowth(
-bulanIniDetail.PSM_W3,
-bulanLaluDetail.PSM_W3
-)
-},
-
-{
-nama:"PSM W4",
-trend: pctGrowth(
-bulanIniDetail.PSM_W4,
-bulanLaluDetail.PSM_W4
-)
-},
-
-{
-nama:"SERBA P1",
-trend: pctGrowth(
-bulanIniDetail.SERBA_P1,
-bulanLaluDetail.SERBA_P1
-)
-},
-
-{
-nama:"SERBA P2",
-trend: pctGrowth(
-bulanIniDetail.SERBA_P2,
-bulanLaluDetail.SERBA_P2
-)
-},
-
-{
-nama:"SUGER P1",
-trend: pctGrowth(
-bulanIniDetail.SUGER_P1,
-bulanLaluDetail.SUGER_P1
-)
-},
-
-{
-nama:"SUGER P2",
-trend: pctGrowth(
-bulanIniDetail.SUGER_P2,
-bulanLaluDetail.SUGER_P2
-)
-},
-
-{
-nama:"CEBAN P1",
-trend: pctGrowth(
-bulanIniDetail.CEBAN_P1,
-bulanLaluDetail.CEBAN_P1
-)
-},
-
-{
-nama:"CEBAN P2",
-trend: pctGrowth(
-bulanIniDetail.CEBAN_P2,
-bulanLaluDetail.CEBAN_P2
-)
-}
-
+{nama:"PWP P1", trend: pctGrowth(bulanIniDetail.PWP_P1, bulanLaluDetail.PWP_P1)},
+{nama:"PWP P2", trend: pctGrowth(bulanIniDetail.PWP_P2, bulanLaluDetail.PWP_P2)},
+{nama:"PSM W1", trend: pctGrowth(bulanIniDetail.PSM_W1, bulanLaluDetail.PSM_W1)},
+{nama:"PSM W2", trend: pctGrowth(bulanIniDetail.PSM_W2, bulanLaluDetail.PSM_W2)},
+{nama:"PSM W3", trend: pctGrowth(bulanIniDetail.PSM_W3, bulanLaluDetail.PSM_W3)},
+{nama:"PSM W4", trend: pctGrowth(bulanIniDetail.PSM_W4, bulanLaluDetail.PSM_W4)},
+{nama:"SERBA P1", trend: pctGrowth(bulanIniDetail.SERBA_P1, bulanLaluDetail.SERBA_P1)},
+{nama:"SERBA P2", trend: pctGrowth(bulanIniDetail.SERBA_P2, bulanLaluDetail.SERBA_P2)},
+{nama:"SUGER P1", trend: pctGrowth(bulanIniDetail.SUGER_P1, bulanLaluDetail.SUGER_P1)},
+{nama:"SUGER P2", trend: pctGrowth(bulanIniDetail.SUGER_P2, bulanLaluDetail.SUGER_P2)},
+{nama:"CEBAN P1", trend: pctGrowth(bulanIniDetail.CEBAN_P1, bulanLaluDetail.CEBAN_P1)},
+{nama:"CEBAN P2", trend: pctGrowth(bulanIniDetail.CEBAN_P2, bulanLaluDetail.CEBAN_P2)}
 ];
 
-const terbaik =
-[...rankingVS]
-.sort((a,b)=>b.trend-a.trend)
-.slice(0,2);
-
-const terburuk =
-[...rankingVS]
-.sort((a,b)=>a.trend-b.trend)
-.slice(0,2);
-
+const terbaik = [...rankingVS].sort((a,b)=>b.trend-a.trend).slice(0,2);
+const terburuk = [...rankingVS].sort((a,b)=>a.trend-b.trend).slice(0,2);
 
 let summaryVS = `
 <div class="rapor-card">
-
-<div style="
-font-size:18px;
-font-weight:bold;
-margin-bottom:10px;">
-📊 RINGKASAN BULAN INI
-</div>
-
+<div style="font-size:18px;font-weight:bold;margin-bottom:10px;">📊 RINGKASAN BULAN INI</div>
 <div style="margin-bottom:10px;">
 🏆 TERBAIK<br>
-1. ${terbaik[0].nama} (${terbaik[0].trend >= 999 ? 'NEW' : terbaik[0].trend + '%' })
-<br>
+1. ${terbaik[0].nama} (${terbaik[0].trend >= 999 ? 'NEW' : terbaik[0].trend + '%' })<br>
 2. ${terbaik[1].nama} (${terbaik[1].trend >= 999 ? 'NEW' : terbaik[1].trend + '%' })
 </div>
-
 <div>
 ⚠️ PERLU PERHATIAN<br>
-1. ${terburuk[0].nama} (${terburuk[0].trend >= 999 ? 'NEW' : terburuk[0].trend + '%' })
-<br>
+1. ${terburuk[0].nama} (${terburuk[0].trend >= 999 ? 'NEW' : terburuk[0].trend + '%' })<br>
 2. ${terburuk[1].nama} (${terburuk[1].trend >= 999 ? 'NEW' : terburuk[1].trend + '%' })
-</div>
-
-</div>
-`;
+</div></div>`;
 
 let vsHtml = summaryVS + `
 <div class="rapor-card">
-
-<div style="
-font-size:16px;
-font-weight:bold;
-margin-bottom:10px;">
-ACTUAL 📈 VS ACTUAL BULAN LALU
-</div>
-
+<div style="font-size:16px;font-weight:bold;margin-bottom:10px;">ACTUAL 📈 VS ACTUAL BULAN LALU</div>
 <table class="rapor-table">
-<tr>
-<th>ITEM</th>
-<th>BULAN LALU</th>
-<th>BULAN INI</th>
-<th>TARGET</th>
-<th>%</th>
-<th>SELISIH</th>
-<th>TREND</th>
-</tr>
+<tr><th>ITEM</th><th>BULAN LALU</th><th>BULAN INI</th><th>TARGET</th><th>%</th><th>SELISIH</th><th>TREND</th></tr>
 `;
 
-vsHtml += `
+const barisVS = (label, bLalu, bIni, tgt) => `<tr>
+<td>${label}</td><td>${bLalu||0}</td><td>${bIni||0}</td><td>${tgt}</td>
+<td>${renderPctVS(bIni,tgt)}</td><td>${bIni-bLalu}</td><td>${trendVS(bIni,bLalu)}</td></tr>`;
 
-<tr>
-<td>PWP (01-15)</td>
-<td>${bulanLaluDetail.PWP_P1||0}</td>
-<td>${bulanIniDetail.PWP_P1||0}</td>
-<td>${targetVS.PWP_P1}</td>
-<td>${renderPctVS(bulanIniDetail.PWP_P1,targetVS.PWP_P1)}</td>
-<td>${bulanIniDetail.PWP_P1-bulanLaluDetail.PWP_P1}</td>
-<td>${trendVS(bulanIniDetail.PWP_P1,bulanLaluDetail.PWP_P1)}</td>
-</tr>
+vsHtml += barisVS("PWP (01-15)", bulanLaluDetail.PWP_P1, bulanIniDetail.PWP_P1, targetVS.PWP_P1);
+vsHtml += barisVS("PWP (16-AKHIR)", bulanLaluDetail.PWP_P2, bulanIniDetail.PWP_P2, targetVS.PWP_P2);
+vsHtml += barisVS("PSM WEEK 1", bulanLaluDetail.PSM_W1, bulanIniDetail.PSM_W1, targetVS.PSM_W1);
+vsHtml += barisVS("PSM WEEK 2", bulanLaluDetail.PSM_W2, bulanIniDetail.PSM_W2, targetVS.PSM_W2);
+vsHtml += barisVS("PSM WEEK 3", bulanLaluDetail.PSM_W3, bulanIniDetail.PSM_W3, targetVS.PSM_W3);
+vsHtml += barisVS("PSM WEEK 4", bulanLaluDetail.PSM_W4, bulanIniDetail.PSM_W4, targetVS.PSM_W4);
+vsHtml += barisVS("SERBA (01-15)", bulanLaluDetail.SERBA_P1, bulanIniDetail.SERBA_P1, targetVS.SERBA_P1);
+vsHtml += barisVS("SERBA (16-AKHIR)", bulanLaluDetail.SERBA_P2, bulanIniDetail.SERBA_P2, targetVS.SERBA_P2);
+vsHtml += barisVS("SUGER (01-15)", bulanLaluDetail.SUGER_P1, bulanIniDetail.SUGER_P1, targetVS.SUGER_P1);
+vsHtml += barisVS("SUGER (16-AKHIR)", bulanLaluDetail.SUGER_P2, bulanIniDetail.SUGER_P2, targetVS.SUGER_P2);
+vsHtml += barisVS("CEBAN (01-15)", bulanLaluDetail.CEBAN_P1, bulanIniDetail.CEBAN_P1, targetVS.CEBAN_P1);
+vsHtml += barisVS("CEBAN (16-AKHIR)", bulanLaluDetail.CEBAN_P2, bulanIniDetail.CEBAN_P2, targetVS.CEBAN_P2);
+vsHtml += `</table></div>`;
 
-<tr>
-<td>PWP (16-AKHIR)</td>
-<td>${bulanLaluDetail.PWP_P2||0}</td>
-<td>${bulanIniDetail.PWP_P2||0}</td>
-<td>${targetVS.PWP_P2}</td>
-<td>${renderPctVS(bulanIniDetail.PWP_P2,targetVS.PWP_P2)}</td>
-<td>${bulanIniDetail.PWP_P2-bulanLaluDetail.PWP_P2}</td>
-<td>${trendVS(bulanIniDetail.PWP_P2,bulanLaluDetail.PWP_P2)}</td>
-</tr>
+let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
 
-<tr>
-<td>PSM WEEK 1</td>
-<td>${bulanLaluDetail.PSM_W1||0}</td>
-<td>${bulanIniDetail.PSM_W1||0}</td>
-<td>${targetVS.PSM_W1}</td>
-<td>${renderPctVS(bulanIniDetail.PSM_W1,targetVS.PSM_W1)}</td>
-<td>${bulanIniDetail.PSM_W1-bulanLaluDetail.PSM_W1}</td>
-<td>${trendVS(bulanIniDetail.PSM_W1,bulanLaluDetail.PSM_W1)}</td>
-</tr>
-
-<tr>
-<td>PSM WEEK 2</td>
-<td>${bulanLaluDetail.PSM_W2||0}</td>
-<td>${bulanIniDetail.PSM_W2||0}</td>
-<td>${targetVS.PSM_W2}</td>
-<td>${renderPctVS(bulanIniDetail.PSM_W2,targetVS.PSM_W2)}</td>
-<td>${bulanIniDetail.PSM_W2-bulanLaluDetail.PSM_W2}</td>
-<td>${trendVS(bulanIniDetail.PSM_W2,bulanLaluDetail.PSM_W2)}</td>
-</tr>
-
-<tr>
-<td>PSM WEEK 3</td>
-<td>${bulanLaluDetail.PSM_W3||0}</td>
-<td>${bulanIniDetail.PSM_W3||0}</td>
-<td>${targetVS.PSM_W3}</td>
-<td>${renderPctVS(bulanIniDetail.PSM_W3,targetVS.PSM_W3)}</td>
-<td>${bulanIniDetail.PSM_W3-bulanLaluDetail.PSM_W3}</td>
-<td>${trendVS(bulanIniDetail.PSM_W3,bulanLaluDetail.PSM_W3)}</td>
-</tr>
-
-<tr>
-<td>PSM WEEK 4</td>
-<td>${bulanLaluDetail.PSM_W4||0}</td>
-<td>${bulanIniDetail.PSM_W4||0}</td>
-<td>${targetVS.PSM_W4}</td>
-<td>${renderPctVS(bulanIniDetail.PSM_W4,targetVS.PSM_W4)}</td>
-<td>${bulanIniDetail.PSM_W4-bulanLaluDetail.PSM_W4}</td>
-<td>${trendVS(bulanIniDetail.PSM_W4,bulanLaluDetail.PSM_W4)}</td>
-</tr>
-
-<tr>
-<td>SERBA (01-15)</td>
-<td>${bulanLaluDetail.SERBA_P1||0}</td>
-<td>${bulanIniDetail.SERBA_P1||0}</td>
-<td>${targetVS.SERBA_P1}</td>
-<td>${renderPctVS(bulanIniDetail.SERBA_P1,targetVS.SERBA_P1)}</td>
-<td>${bulanIniDetail.SERBA_P1-bulanLaluDetail.SERBA_P1}</td>
-<td>${trendVS(bulanIniDetail.SERBA_P1,bulanLaluDetail.SERBA_P1)}</td>
-</tr>
-
-<tr>
-<td>SERBA (16-AKHIR)</td>
-<td>${bulanLaluDetail.SERBA_P2||0}</td>
-<td>${bulanIniDetail.SERBA_P2||0}</td>
-<td>${targetVS.SERBA_P2}</td>
-<td>${renderPctVS(bulanIniDetail.SERBA_P2,targetVS.SERBA_P2)}</td>
-<td>${bulanIniDetail.SERBA_P2-bulanLaluDetail.SERBA_P2}</td>
-<td>${trendVS(bulanIniDetail.SERBA_P2,bulanLaluDetail.SERBA_P2)}</td>
-</tr>
-
-<tr>
-<td>SUGER (01-15)</td>
-<td>${bulanLaluDetail.SUGER_P1||0}</td>
-<td>${bulanIniDetail.SUGER_P1||0}</td>
-<td>${targetVS.SUGER_P1}</td>
-<td>${renderPctVS(bulanIniDetail.SUGER_P1,targetVS.SUGER_P1)}</td>
-<td>${bulanIniDetail.SUGER_P1-bulanLaluDetail.SUGER_P1}</td>
-<td>${trendVS(bulanIniDetail.SUGER_P1,bulanLaluDetail.SUGER_P1)}</td>
-</tr>
-
-<tr>
-<td>SUGER (16-AKHIR)</td>
-<td>${bulanLaluDetail.SUGER_P2||0}</td>
-<td>${bulanIniDetail.SUGER_P2||0}</td>
-<td>${targetVS.SUGER_P2}</td>
-<td>${renderPctVS(bulanIniDetail.SUGER_P2,targetVS.SUGER_P2)}</td>
-<td>${bulanIniDetail.SUGER_P2-bulanLaluDetail.SUGER_P2}</td>
-<td>${trendVS(bulanIniDetail.SUGER_P2,bulanLaluDetail.SUGER_P2)}</td>
-</tr>
-
-<tr>
-<td>CEBAN (01-15)</td>
-<td>${bulanLaluDetail.CEBAN_P1||0}</td>
-<td>${bulanIniDetail.CEBAN_P1||0}</td>
-<td>${targetVS.CEBAN_P1}</td>
-<td>${renderPctVS(bulanIniDetail.CEBAN_P1,targetVS.CEBAN_P1)}</td>
-<td>${bulanIniDetail.CEBAN_P1-bulanLaluDetail.CEBAN_P1}</td>
-<td>${trendVS(bulanIniDetail.CEBAN_P1,bulanLaluDetail.CEBAN_P1)}</td>
-</tr>
-
-<tr>
-<td>CEBAN (16-AKHIR)</td>
-<td>${bulanLaluDetail.CEBAN_P2||0}</td>
-<td>${bulanIniDetail.CEBAN_P2||0}</td>
-<td>${targetVS.CEBAN_P2}</td>
-<td>${renderPctVS(bulanIniDetail.CEBAN_P2,targetVS.CEBAN_P2)}</td>
-<td>${bulanIniDetail.CEBAN_P2-bulanLaluDetail.CEBAN_P2}</td>
-<td>${trendVS(bulanIniDetail.CEBAN_P2,bulanLaluDetail.CEBAN_P2)}</td>
-</tr>
-
-`;
-
-vsHtml += `
-</table>
-</div>
-`;
-
-     let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
-
-/* ITEM PERIODE */
 [['PWP','PWP'], ['SERBA_GRATIS','SERBA'], ['SUGER','SUGER'], ['CEBAN','CEBAN']].forEach(([key,label]) => {
-
     for(let p=1; p<=2; p++) {
         let real=0, target=0;
-
         for(let tgl=1; tgl<=dM; tgl++) {
             const periode = (tgl<=15)?1:2;
             if(periode!==p) continue;
-
             const h = harianData[tgl] || {};
-
             Object.keys(h).forEach(k => {
                 if(!k.endsWith('_nama') && !k.endsWith('_note') && !k.endsWith('_jam') && h[k])
                     real += parseFloat(h[k][key]) || 0;
             });
         }
-
         if(p===1) target = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[key])||0);
         else target = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[key])||0);
-
         const pct = target>0 ? (real/target)*100 : 0;
-
         akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
     }
-
 });
 
-
-/* PSM WEEK */
 for(let w=1; w<=4; w++) {
     let real = 0;
-
     for(let tgl=1; tgl<=dM; tgl++) {
         const log = getLogic(tgl,'PSM',k.yr,k.mn);
         if(log.wk !== w) continue;
-
         const h = harianData[tgl] || {};
-
         Object.keys(h).forEach(key => {
             if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key])
                 real += parseFloat(h[key].PSM) || 0;
         });
     }
-
     const target = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.PSM) || 0;
     const pct = target > 0 ? (real/target)*100 : 0;
-
     akHtml += `<tr><td>PSM WEEK ${w}</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
 }
 
@@ -1698,197 +1041,117 @@ akHtml += "</table>";
 document.getElementById('akumulasiArea').innerHTML = akHtml;
 document.getElementById('vsBulanArea').innerHTML = vsHtml;
 
-        // --- AWAL BAGIAN COPY-PASTE ---
-        let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
+let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
 
-        for(let n in kStats) {
-            rHtml += `
-                <div class="rapor-card">
-                <div style="font-size:18px; border-bottom:2px solid #eee; padding-bottom:5px; margin-bottom:10px;">👤 <b>${n}</b></div>
-                <table class="rapor-table" style="width:100%; border-collapse:collapse;">
-                    <tr style="background:#f8f9fa;">
-                        <th style="text-align:left; padding:8px; border:1px solid #ddd;">ITEM & PERIODE</th>
-                        <th style="text-align:center; padding:8px; border:1px solid #ddd;">REAL/TGT</th>
-                        <th style="text-align:center; padding:8px; border:1px solid #ddd;">PROGRESS</th>
-                    </tr>`;
+for(let n in kStats) {
+    rHtml += `
+        <div class="rapor-card">
+        <div style="font-size:18px; border-bottom:2px solid #eee; padding-bottom:5px; margin-bottom:10px;">👤 <b>${n}</b></div>
+        <table class="rapor-table" style="width:100%; border-collapse:collapse;">
+            <tr style="background:#f8f9fa;">
+                <th style="text-align:left; padding:8px; border:1px solid #ddd;">ITEM & PERIODE</th>
+                <th style="text-align:center; padding:8px; border:1px solid #ddd;">REAL/TGT</th>
+                <th style="text-align:center; padding:8px; border:1px solid #ddd;">PROGRESS</th>
+            </tr>`;
 
-            // FUNGSI HELPER UNTUK BAR DIAGRAM
-            const buatBar = (label, real, target, colorClass) => {
-                let pct = target > 0 ? Math.min(100, Math.round((real / target) * 100)) : 0;
-                return `
-                <tr>
-                    <td style="text-align:left; padding:8px; border:1px solid #ddd;"><b>${label}</b></td>
-                    <td style="text-align:center; padding:8px; border:1px solid #ddd;"><b>${real}/${target}</b></td>
-                    <td style="padding:8px; border:1px solid #ddd;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <div class="progress-container" style="flex:1; height:14px; background:#eee; border-radius:10px; overflow:hidden; border:1px solid #ccc;">
-                                <div class="progress-bar ${colorClass}" style="width:${pct}%; height:100%;"></div>
-                            </div>
-                            <span style="font-weight:bold; min-width:35px;">${pct}%</span>
-                        </div>
-                    </td>
-                </tr>`;
-            };
+    const buatBar = (label, real, target, colorClass) => {
+        let pct = target > 0 ? Math.min(100, Math.round((real / target) * 100)) : 0;
+        return `<tr>
+            <td style="text-align:left; padding:8px; border:1px solid #ddd;"><b>${label}</b></td>
+            <td style="text-align:center; padding:8px; border:1px solid #ddd;"><b>${real}/${target}</b></td>
+            <td style="padding:8px; border:1px solid #ddd;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="progress-container" style="flex:1; height:14px; background:#eee; border-radius:10px; overflow:hidden; border:1px solid #ccc;">
+                        <div class="progress-bar ${colorClass}" style="width:${pct}%; height:100%;"></div>
+                    </div>
+                    <span style="font-weight:bold; min-width:35px;">${pct}%</span>
+                </div>
+            </td>
+        </tr>`;
+    };
 
-            // 1. TAMPILKAN PWP, SERBA, SUGER, CEBAN (P1 & P2)
-            const listUtama = [
-                {k: 'PWP', l: 'PWP', c: 'bg-pwp'},
-                {k: 'SERBA_GRATIS', l: 'SERBA', c: 'bg-serba'},
-                {k: 'SUGER', l: 'SUGER', c: 'bg-suger'},
-                {k: 'CEBAN', l: 'CEBAN', c: 'bg-ceban'}
-            ];
+    const listUtama = [
+        {k: 'PWP', l: 'PWP', c: 'bg-pwp'},
+        {k: 'SERBA_GRATIS', l: 'SERBA', c: 'bg-serba'},
+        {k: 'SUGER', l: 'SUGER', c: 'bg-suger'},
+        {k: 'CEBAN', l: 'CEBAN', c: 'bg-ceban'}
+    ];
 
-            // 1. TAMPILKAN PWP, SERBA, SUGER, CEBAN (P1 & P2) - TARGET PER ITEM
-            listUtama.forEach(it => {
-                // Ambil target spesifik item ini dari database toko
-                let t1 = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it.k])||0);
-                let t2 = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it.k])||0);
-                
-                // Ambil hasil jualan real khusus item ini
-                let r1 = kStats[n].p[1].items?.[it.k] || 0;
-                let r2 = kStats[n].p[2].items?.[it.k] || 0;
+    listUtama.forEach(it => {
+        let t1 = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it.k])||0);
+        let t2 = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it.k])||0);
+        let r1 = kStats[n].p[1].items?.[it.k] || 0;
+        let r2 = kStats[n].p[2].items?.[it.k] || 0;
 
-                rHtml += buatBar(`${it.l} (01-15)`, r1, t1, it.c);
-                rHtml += buatBar(`${it.l} (16-AKHIR)`, r2, t2, it.c);
-            });
+        rHtml += buatBar(`${it.l} (01-15)`, r1, t1, it.c);
+        rHtml += buatBar(`${it.l} (16-AKHIR)`, r2, t2, it.c);
+    });
 
-          // 2. TAMPILKAN PSM (WEEKLY - TARGET MINGGUAN)
-for(let w=1; w<=4; w++) {
-    let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
-    let rW = kStats[n].w[w].items?.['PSM'] || 0;
-
-    if(tW > 0 || rW > 0)
-        rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
-}
-
-rHtml += `</table></div>`; 
+    for(let w=1; w<=4; w++) {
+        let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
+        let rW = kStats[n].w[w].items?.['PSM'] || 0;
+        if(tW > 0 || rW > 0) rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
+    }
+    rHtml += `</table></div>`; 
 } 
 
-// =====================================
-// KARTU MEMATIKAN + JURU KUNCI
-// =====================================
-
 let kasirNol = [], semuaKasir = [];
-
 for(let nama in kStats){
     let total = 0;
     Object.values(kStats[nama].p).forEach(p=>{
         if(!p.items) return;
-        Object.values(p.items).forEach(v=>{
-            total += parseFloat(v)||0;
-        });
+        Object.values(p.items).forEach(v=>{ total += parseFloat(v)||0; });
     });
     semuaKasir.push({nama,total});
     if(total===0) kasirNol.push(nama);
 }
 
-// --- Kartu merah untuk yang belum kontribusi ---
 let kartuMematikan = "";
 if(kasirNol.length){
     kartuMematikan += `
-    <div class="rapor-card"
-    style="
-    background:linear-gradient(135deg,#ff0000,#8b0000);
-    color:white;
-    border:4px solid #ffcccc;
-    animation:pulseDanger 1.2s infinite;">
-    <div style="font-size:24px;font-weight:bold;text-align:center;margin-bottom:10px;">
-    🚨 ALERT PPS 🚨
-    </div>
+    <div class="rapor-card" style="background:linear-gradient(135deg,#ff0000,#8b0000); color:white; border:4px solid #ffcccc; animation:pulseDanger 1.2s infinite;">
+    <div style="font-size:24px;font-weight:bold;text-align:center;margin-bottom:10px;">🚨 ALERT PPS 🚨</div>
     <div style="font-size:18px;text-align:center;line-height:1.8;">
-    💀 KASIR TANPA PENJUALAN BULAN INI 💀
-    <br><br>
-    ${kasirNol.map(x=>`🔥 ${x}`).join("<br>")}
-    <br><br>
-    ⚠️ BELUM ADA KONTRIBUSI PPS SAMA SEKALI
-    </div>
-    </div>
-    `;
+    💀 KASIR TANPA PENJUALAN BULAN INI 💀<br><br>${kasirNol.map(x=>`🔥 ${x}`).join("<br>")}<br><br>⚠️ BELUM ADA KONTRIBUSI PPS SAMA SEKALI
+    </div></div>`;
 }
 
-// --- Kartu juru kunci untuk yang paling bawah (total kontribusi terkecil) ---
 const kasirSorted = semuaKasir.sort((a,b)=>a.total-b.total);
 const juruKunci = kasirSorted[0];
 
 if(juruKunci && juruKunci.total > 0){
-
     kartuMematikan += `
-    <div class="rapor-card"
-    style="background:linear-gradient(135deg,#ff9800,#e74c3c); color:white;">
-    <div style="font-size:20px; font-weight:bold; text-align:center;">
-    ⚠️ JURU KUNCI BULAN INI
-    </div>
-    <div style="text-align:center; font-size:16px; margin-top:10px;">
-    👤 ${juruKunci.nama}<br>
-    Total PPS: ${juruKunci.total}
-    </div>
-    </div>
-    `;
+    <div class="rapor-card" style="background:linear-gradient(135deg,#ff9800,#e74c3c); color:white;">
+    <div style="font-size:20px; font-weight:bold; text-align:center;">⚠️ JURU KUNCI BULAN INI</div>
+    <div style="text-align:center; font-size:16px; margin-top:10px;">👤 ${juruKunci.nama}<br>Total PPS: ${juruKunci.total}</div>
+    </div>`;
 }
 
 const alertArea = document.getElementById('alertKasirArea');
-if(alertArea){
-    alertArea.innerHTML = kartuMematikan;
-}
-
-// =====================================
-// TREND BULAN LALU VS BULAN INI
-// VERSI TANGGAL 1-SKRG VS 1-SKRG
-// =====================================
+if(alertArea) alertArea.innerHTML = kartuMematikan;
 
 let trendHtml = `
 <div class="rapor-card">
-
-<div style="
-font-size:18px;
-font-weight:bold;
-margin-bottom:10px;
-color:#2980b9;
-">
-
-📈 TREND KASIR BULAN LALU VS BULAN INI
-<br>
-<small style="color:#666;">
-(Tanggal 1-${new Date().getDate()} dibanding periode yang sama bulan lalu)
-</small>
-
-</div>
-`;
+<div style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#2980b9;">
+📈 TREND KASIR BULAN LALU VS BULAN INI<br><small style="color:#666;">(Tanggal 1-${new Date().getDate()} dibanding periode yang sama bulan lalu)</small>
+</div>`;
 
 let trendNow = {};
-// AMBIL DATA BULAN LALU DARI CLOUD (yang memang sudah tersimpan)
-const dataLalu = db[k.yr][k.mn][k.tk].bulanLaluKasir || {};  // ini tetap dari cloud, sudah bulan Mei
+const dataLalu = db[k.yr][k.mn][k.tk].bulanLaluKasir || {}; 
 const dataNow = trendNow;
-
 const today = new Date().getDate();
 
 for(let tgl=1; tgl<=today; tgl++){
-
   const h = harianData[tgl] || {};
-
   Object.keys(h).forEach(key=>{
-
     if(!key.endsWith('_nama')) return;
-
     const nama = h[key];
-
     const dataKey = key.replace('_nama','');
-
     const row = h[dataKey];
-
     if(!row) return;
 
     if(!trendNow[nama]){
-
-      trendNow[nama]={
-        PWP_P1:0,PWP_P2:0,
-        SERBA_P1:0,SERBA_P2:0,
-        SUGER_P1:0,SUGER_P2:0,
-        CEBAN_P1:0,CEBAN_P2:0,
-        PSM_W1:0,PSM_W2:0,
-        PSM_W3:0,PSM_W4:0
-      };
-
+      trendNow[nama]={ PWP_P1:0,PWP_P2:0, SERBA_P1:0,SERBA_P2:0, SUGER_P1:0,SUGER_P2:0, CEBAN_P1:0,CEBAN_P2:0, PSM_W1:0,PSM_W2:0, PSM_W3:0,PSM_W4:0 };
     }
 
     const pwp   = parseFloat(row.PWP)||0;
@@ -1898,237 +1161,69 @@ for(let tgl=1; tgl<=today; tgl++){
     const ceban = parseFloat(row.CEBAN)||0;
 
     if(tgl<=15){
-
-      trendNow[nama].PWP_P1 += pwp;
-      trendNow[nama].SERBA_P1 += serba;
-      trendNow[nama].SUGER_P1 += suger;
-      trendNow[nama].CEBAN_P1 += ceban;
-
+      trendNow[nama].PWP_P1 += pwp; trendNow[nama].SERBA_P1 += serba; trendNow[nama].SUGER_P1 += suger; trendNow[nama].CEBAN_P1 += ceban;
     }else{
-
-      trendNow[nama].PWP_P2 += pwp;
-      trendNow[nama].SERBA_P2 += serba;
-      trendNow[nama].SUGER_P2 += suger;
-      trendNow[nama].CEBAN_P2 += ceban;
-
+      trendNow[nama].PWP_P2 += pwp; trendNow[nama].SERBA_P2 += serba; trendNow[nama].SUGER_P2 += suger; trendNow[nama].CEBAN_P2 += ceban;
     }
 
-    if(tgl<=7)
-      trendNow[nama].PSM_W1 += psm;
-
-    else if(tgl<=15)
-      trendNow[nama].PSM_W2 += psm;
-
-    else if(tgl<=23)
-      trendNow[nama].PSM_W3 += psm;
-
-    else
-      trendNow[nama].PSM_W4 += psm;
-
+    if(tgl<=7) trendNow[nama].PSM_W1 += psm;
+    else if(tgl<=15) trendNow[nama].PSM_W2 += psm;
+    else if(tgl<=23) trendNow[nama].PSM_W3 += psm;
+    else trendNow[nama].PSM_W4 += psm;
   });
-
 }
-
-console.log("TREND DATA LALU", dataLalu);
-console.log("TREND DATA NOW", dataNow);
 
 for(let nama in dataLalu){
+    let bl = dataLalu[nama] || {};
+    let nw = dataNow[nama] || {};
 
-let bl = dataLalu[nama] || {};
-let nw = dataNow[nama] || {};
+    let bulanLaluTotal = (bl.PWP_P1||0)+(bl.PWP_P2||0)+(bl.PSM_W1||0)+(bl.PSM_W2||0)+(bl.PSM_W3||0)+(bl.PSM_W4||0)+(bl.SERBA_P1||0)+(bl.SERBA_P2||0)+(bl.SUGER_P1||0)+(bl.SUGER_P2||0)+(bl.CEBAN_P1||0)+(bl.CEBAN_P2||0);
+    let bulanIniTotal = (nw.PWP_P1||0)+(nw.PWP_P2||0)+(nw.PSM_W1||0)+(nw.PSM_W2||0)+(nw.PSM_W3||0)+(nw.PSM_W4||0)+(nw.SERBA_P1||0)+(nw.SERBA_P2||0)+(nw.SUGER_P1||0)+(nw.SUGER_P2||0)+(nw.CEBAN_P1||0)+(nw.CEBAN_P2||0);
+    
+    let selisih = bulanIniTotal-bulanLaluTotal;
+    let pct = 0;
+    let status = "🟡 STABIL";
 
-let bulanLaluTotal =
+    if(bulanLaluTotal === 0){ status = "⚠️ DATA PEMBANDING BELUM TERSEDIA"; }
+    else{
+        pct = Math.round((selisih/bulanLaluTotal)*100);
+        if(pct>=20) status="🔥 MELEJIT";
+        else if(pct>=5) status="🟢 MENINGKAT";
+        else if(pct<=-20) status="🔴 TURUN TAJAM";
+        else if(pct<0) status="🟠 MENURUN";
+    }
 
-(bl.PWP_P1||0)+
-(bl.PWP_P2||0)+
-(bl.PSM_W1||0)+
-(bl.PSM_W2||0)+
-(bl.PSM_W3||0)+
-(bl.PSM_W4||0)+
-(bl.SERBA_P1||0)+
-(bl.SERBA_P2||0)+
-(bl.SUGER_P1||0)+
-(bl.SUGER_P2||0)+
-(bl.CEBAN_P1||0)+
-(bl.CEBAN_P2||0);
-
-let bulanIniTotal =
-
-(nw.PWP_P1||0)+
-(nw.PWP_P2||0)+
-(nw.PSM_W1||0)+
-(nw.PSM_W2||0)+
-(nw.PSM_W3||0)+
-(nw.PSM_W4||0)+
-(nw.SERBA_P1||0)+
-(nw.SERBA_P2||0)+
-(nw.SUGER_P1||0)+
-(nw.SUGER_P2||0)+
-(nw.CEBAN_P1||0)+
-(nw.CEBAN_P2||0);
-
-let selisih =
-bulanIniTotal-bulanLaluTotal;
-
-let pct = 0;
-
-let status = "🟡 STABIL";
-
-if(bulanLaluTotal === 0){
-
-  status = "⚠️ DATA PEMBANDING BELUM TERSEDIA";
-
-}else{
-
-  pct =
-  Math.round(
-  (selisih/bulanLaluTotal)*100
-  );
-
-  if(pct>=20)
-  status="🔥 MELEJIT";
-
-  else if(pct>=5)
-  status="🟢 MENINGKAT";
-
-  else if(pct<=-20)
-  status="🔴 TURUN TAJAM";
-
-  else if(pct<0)
-  status="🟠 MENURUN";
-
+    trendHtml += `
+    <div style="background:#fff; padding:10px; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.1);">
+    <b>${nama}</b><br><br>
+    Bulan Lalu : <b>${bulanLaluTotal}</b><br>
+    Bulan Ini : <b>${bulanIniTotal}</b><br>
+    Selisih : <b style="color:${selisih>=0?'green':'red'};">${selisih>=0?'+':''}${selisih}</b><br>
+    ${status} ${bulanLaluTotal===0 ? '' : `(${pct}%)`}
+    </div>`;
 }
-
-trendHtml += `
-
-<div style="
-background:#fff;
-padding:10px;
-margin-bottom:10px;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,.1);
-">
-
-<b>${nama}</b>
-
-<br><br>
-
-Bulan Lalu :
-<b>${bulanLaluTotal}</b>
-
-<br>
-
-Bulan Ini :
-<b>${bulanIniTotal}</b>
-
-<br>
-
-Selisih :
-<b style="
-color:${selisih>=0?'green':'red'};
-">
-${selisih>=0?'+':''}${selisih}
-</b>
-
-<br>
-
-${status}
-
-${bulanLaluTotal===0 ? '' : `(${pct}%)`}
-
-</div>
-`;
-
-}
-
 trendHtml += "</div>";
-
 rHtml += trendHtml;
 
-// tampilkan hasil
-const rArea =
-document.getElementById('raporArea');
-
-if(rArea)
-rArea.innerHTML = rHtml;
+const rArea = document.getElementById('raporArea');
+if(rArea) rArea.innerHTML = rHtml;
 }
 
-function pctVS(real,target){
-return target>0
-? Math.round((real/target)*100)
-: 0;
-}
-
-function warnaPctVS(pct){
-
-if(pct>=100){
-return "#27ae60";
-}
-
-if(pct>=50){
-return "#f1c40f";
-}
-
-return "#e74c3c";
-
-}
-
-function renderPctVS(real,target){
-
-const pct = pctVS(real,target);
-
-return `
-<span style="
-font-weight:bold;
-color:${warnaPctVS(pct)};
-">
-${pct}%
-</span>
-`;
-
-}
+function pctVS(real,target){ return target>0 ? Math.round((real/target)*100) : 0; }
+function warnaPctVS(pct){ if(pct>=100) return "#27ae60"; if(pct>=50) return "#f1c40f"; return "#e74c3c"; }
+function renderPctVS(real,target){ const pct = pctVS(real,target); return `<span style="font-weight:bold; color:${warnaPctVS(pct)};">${pct}%</span>`; }
 
 function trendVS(sekarang,lalu){
-
-if(lalu<=0){
-
-if(sekarang>0) return "🟢 NEW";
-
-return "⚪ 0%";
-
-}
-
-const pct =
-Math.round(
-((sekarang-lalu)/lalu)*100
-);
-
-if(pct>0)
-return `🟢 +${pct}%`;
-
-if(pct<0)
-return `🔴 ${pct}%`;
-
-return "⚪ 0%";
-
+    if(lalu<=0){ if(sekarang>0) return "🟢 NEW"; return "⚪ 0%"; }
+    const pct = Math.round(((sekarang-lalu)/lalu)*100);
+    if(pct>0) return `🟢 +${pct}%`;
+    if(pct<0) return `🔴 ${pct}%`;
+    return "⚪ 0%";
 }
 
 function pctGrowth(sekarang,lalu){
-
-if(lalu<=0){
-
-if(sekarang>0){
-return 999;
-}
-
-return 0;
-
-}
-
-return Math.round(
-((sekarang-lalu)/lalu)*100
-);
-
+    if(lalu<=0){ if(sekarang>0) return 999; return 0; }
+    return Math.round(((sekarang-lalu)/lalu)*100);
 }
 
     function setInputState(bolehEdit, pesan = "") {
@@ -2166,50 +1261,38 @@ return Math.round(
         const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
         if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
 
-        // --- 1. RUMUS TARGET ---
-const p = tgl <= 15 ? 1 : 2;
-const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
-let tTokoBulat = {};
-const itm = ['PWP','PSM','SERBA_GRATIS','SUGER','CEBAN'];
-const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+        const p = tgl <= 15 ? 1 : 2;
+        const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+        let tTokoBulat = {};
+        const itm = ['PWP','PSM','SERBA_GRATIS','SUGER','CEBAN'];
+        const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
 
-let pDetail = "📊 *HASIL SHIFT INI:*\n";
-let adaBebanShift = false;
+        let pDetail = "📊 *HASIL SHIFT INI:*\n";
+        let adaBebanShift = false;
 
-itm.forEach(it => {
+        itm.forEach(it => {
+            tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
+            if(it === 'PSM') {
+                const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
+                tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.PSM) || 0;
+            }
 
-    tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
+            let tS = 0;
+            if(it === 'PSM') {
+                const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
+                tS = Math.ceil(tTokoBulat[it] / (logPSM.dWk * tipe));
+            } else {
+                tS = Math.ceil(tTokoBulat[it] / (tipe * (tgl<=15 ? 15 : (new Date(k.yr,k.mn,0).getDate()-15))));
+            }
 
-    if(it === 'PSM') {
-        const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
-        tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.PSM) || 0;
-    }
+            const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
+            const pct = tS > 0 ? (rS/tS)*100 : 0;
 
-    let tS = 0;
+            if(rS < tS) adaBebanShift = true;
 
-    if(it === 'PSM') {
-        const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
-        tS = Math.ceil(tTokoBulat[it] / (logPSM.dWk * tipe));
-    } else {
-        tS = Math.ceil(tTokoBulat[it] / (tipe * (tgl<=15 ? 15 : (new Date(k.yr,k.mn,0).getDate()-15))));
-    }
+            pDetail += `🔹 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt Shift: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n\n${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}\n\n`;
+        });
 
-    const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
-    const pct = tS > 0 ? (rS/tS)*100 : 0;
-
-    if(rS < tS) adaBebanShift = true;
-
-    pDetail += `🔹 *${it.replace('_',' ')}*
-Real: ${rS} / Tgt Shift: ${tS}
-${getTextBar(pct)} (${Math.round(pct)}%)
-
-${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
-
-`;
-
-});
-
-        // --- 2. KUNCI ALASAN BERULANG ---
         if(adaBebanShift) {
             if(!note) return alert("🚨 TARGET SHIFT TIDAK CAPAI!\nWajib isi kendala/alasan.");
             if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
@@ -2222,7 +1305,6 @@ ${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
 
         saveDisk();
 
-        // --- 3. HITUNG REKAP ---
         let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0}; 
         const dM = new Date(k.yr, k.mn, 0).getDate();
         for(let i=1; i<=dM; i++){
@@ -2241,7 +1323,6 @@ ${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
             });
         }
 
-        // --- 4. DASHBOARD TOKO (WARNA) ---
         let dashToko = "🏪 *DASHBOARD TOKO (AKUMULASI):*\n";
         ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
             let kR = it === 'SERBA' ? 'SERBA' : it;
@@ -2251,7 +1332,6 @@ ${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
             dashToko += `${emo} ${it}: ${getTextBar(pctT)} ${akumulasiToko[kR]}/${tTokoBulat[kT]} (${Math.round(pctT)}%)\n`;
         });
 
-        // --- 5. KONTRIBUSI PERSONIL (WARNA) ---
         let personilWA = "🏆 *KONTRIBUSI PERSONIL (PERIODE):*\n";
         for (let n in rekapIndiv) {
             personilWA += `👤 *${n}*\n`;
@@ -2267,7 +1347,6 @@ ${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
 
         const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA/ALASAN:* ${note || '-'}\n\n${dashToko}\n${personilWA}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
 
-        // --- 6. GAMBAR ---
         const cnv = document.getElementById('canvasJoin');
         if (cnv) {
             const ctx = cnv.getContext('2d');
@@ -2283,7 +1362,6 @@ ${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}
     } catch (err) { alert("🚨 ERROR: " + err.message); }
 }
 
-// --- FUNGSI MODAL (BIAR BISA DIKLIK LAGI) ---
 function tutupRapor() {
     const modal = document.getElementById('modalRapor');
     if (modal) { modal.style.display = "none"; document.body.style.overflow = "auto"; }
