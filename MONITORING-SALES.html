@@ -2,8 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-    content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Sales Pro v10 - ULTIMATE JOSS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -43,249 +42,67 @@
         .quote-box { background: #fdf9e7; border-left: 5px solid #f1c40f; padding: 10px; margin-top: 15px; font-style: italic; font-size: 11px; color: #7f8c8d; }
     
         /* Styling Pop-up Modal AI */
-.modal-ai {
-    display: none; 
-    position: fixed; 
-    z-index: 9999; /* Pastikan angka ini paling tinggi */
-    left: 0; 
-    top: 0; 
-    width: 100%; 
-    height: 100%;
-    background-color: rgba(0,0,0,0.7); /* Gelapkan sedikit biar fokus */
-    backdrop-filter: blur(5px);
-}
+        .modal-ai { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .modal-content { background-color: #fff; margin: 3vh auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 50px rgba(0,0,0,0.5); gap:0 !important; }
+        #aiQuestionBox{ margin-top:0 !important; padding-top:10px !important; }
+        #aiAnalysisContent{ margin-bottom:0 !important; padding-bottom:0 !important; }
+        #aiDecision{ margin-top:6px !important; margin-bottom:2px !important; padding:12px !important; border-radius:15px; text-align:center; min-height:auto; }
 
-.modal-content {
-    background-color: #fff; 
-    margin: 5% auto; 
-    padding: 30px; 
-    border-radius: 20px;
-    width: 90%; 
-    max-width: 800px; 
-    position: relative; /* Wajib ada ini */
-    box-shadow: 0 10px 50px rgba(0,0,0,0.5);
-}
+        @keyframes popupMasuk{ from{ opacity:0; transform:translateY(30px) scale(.9); } to{ opacity:1; transform:translateY(0) scale(1); } }
 
-#aiQuestionBox{
-margin-top:0 !important;
-padding-top:10px !important;
-}
+        /* HEADER AI BERGERAK */
+        .ai-header{ background: linear-gradient(270deg, #3498db, #9b59b6, #f1c40f, #3498db); background-size:600% 600%; animation:gradientMove 8s ease infinite; padding:15px; color:white; border-radius:15px; text-align:center; margin-bottom:20px; }
+        @keyframes gradientMove{ 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
 
-/* ANIMASI POPUP */
-.modal-content{
-    background-color: #fff;
-    margin: 3vh auto;
-    padding: 25px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 900px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.5);
-}
+        /* KOTAK STATUS */
+        .status-badge{ padding:8px 15px; border-radius:50px; display:inline-block; font-size:12px; font-weight:bold; animation:pulseBadge 1.5s infinite; }
+        @keyframes pulseBadge{ 0%{transform:scale(1);} 50%{transform:scale(1.05);} 100%{transform:scale(1);} }
 
-#aiAnalysisContent{
-margin-bottom:0 !important;
-padding-bottom:0 !important;
-}
+        .close-ai{ position: sticky; top: 0; float: right; font-size: 40px; z-index: 10000; }
+        .close-ai:hover { color: #e74c3c; }
 
-.modal-content{
-gap:0 !important;
-}
+        /* ==========================================
+           MODE SMARTPHONE / MOBILE
+        ========================================== */
+        @media screen and (max-width:768px){
+            body{ padding:8px; }
+            .container{ padding:10px; border-radius:15px; }
+            .grid{ grid-template-columns:1fr !important; gap:12px; }
+            .card{ padding:12px; border-radius:12px; }
+            h2{ font-size:18px !important; letter-spacing:1px !important; }
+            h3{ font-size:12px !important; }
+            input, select, button{ font-size:16px; padding:12px; }
+            .table-box{ overflow-x:auto; padding:10px; }
+            .modal-content{ width:96% !important; max-width:none !important; max-height:85vh; height:auto; margin:2vh auto; padding:12px !important; overflow-y:auto; border-radius:15px; }
+            #aiAnalysisContent div{ grid-template-columns:1fr !important; }
+            .ai-header{ padding:12px; font-size:14px; margin-bottom:10px; }
+            button{ margin-top:8px; }
+            .close-ai{ font-size:30px; right:10px; top:5px; position:absolute; }
+            svg{ width:45px; height:45px; }
+            .btn-wa{ font-size:13px; }
+        }
 
-
-#aiDecision{
-margin-top:6px !important;
-margin-bottom:2px !important;
-padding:12px !important;
-border-radius:15px;
-text-align:center;
-min-height:auto;
-}
-
-@keyframes popupMasuk{
-    from{
-        opacity:0;
-        transform:translateY(30px) scale(.9);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0) scale(1);
-    }
-}
-
-/* HEADER AI BERGERAK */
-.ai-header{
-    background: linear-gradient(
-        270deg,
-        #3498db,
-        #9b59b6,
-        #f1c40f,
-        #3498db
-    );
-    background-size:600% 600%;
-    animation:gradientMove 8s ease infinite;
-    padding:15px;
-    color:white;
-    border-radius:15px;
-    text-align:center;
-    margin-bottom:20px;
-}
-
-@keyframes gradientMove{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
-}
-
-/* KOTAK STATUS */
-.status-badge{
-padding:8px 15px;
-border-radius:50px;
-display:inline-block;
-font-size:12px;
-font-weight:bold;
-animation:pulseBadge 1.5s infinite;
-}
-
-@keyframes pulseBadge{
-0%{transform:scale(1);}
-50%{transform:scale(1.05);}
-100%{transform:scale(1);}
-}
-
-.close-ai{
-    position: sticky;
-    top: 0;
-    float: right;
-    font-size: 40px;
-    z-index: 10000;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr 1fr;
-gap:20px;
-}
-
-/* ==========================================
-   MODE SMARTPHONE / MOBILE
-========================================== */
-
-@media screen and (max-width:768px){
-
-body{
-padding:8px;
-}
-
-/* container utama */
-.container{
-padding:10px;
-border-radius:15px;
-}
-
-/* 3 kolom jadi 1 */
-.grid{
-grid-template-columns:1fr !important;
-gap:12px;
-}
-
-/* card lebih rapat */
-.card{
-padding:12px;
-border-radius:12px;
-}
-
-/* judul */
-h2{
-font-size:18px !important;
-letter-spacing:1px !important;
-}
-
-h3{
-font-size:12px !important;
-}
-
-/* input */
-input,
-select,
-button{
-
-font-size:16px;
-padding:12px;
-}
-
-/* tabel HP scroll */
-.table-box{
-overflow-x:auto;
-padding:10px;
-}
-
-/* popup AI HP */
-.modal-content{
-width:96% !important;
-max-width:none !important;
-max-height:85vh;
-height:auto;
-margin:2vh auto;
-padding:12px !important;
-overflow-y:auto;
-border-radius:15px;
-}
-
-/* kotak AI jadi 1 kolom */
-#aiAnalysisContent div{
-
-grid-template-columns:1fr !important;
-}
-
-/* header AI */
-.ai-header{
-
-padding:12px;
-
-font-size:14px;
-
-margin-bottom:10px;
-}
-
-/* tombol */
-button{
-margin-top:8px;
-}
-
-/* close popup */
-.close-ai{
-font-size:30px;
-right:10px;
-top:5px;
-position:absolute;
-}
-
-/* dashboard lingkaran */
-svg{
-width:45px;
-height:45px;
-}
-
-/* WA tombol */
-.btn-wa{
-font-size:13px;
-}
-
-}
-
-.close-ai:hover { color: #e74c3c; }
-
-/* Styling Tabel Shift */
-.shift-log-container { margin-top: 15px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
-.shift-log-table { width: 100%; min-width: unset; font-size: 10px; }
-.shift-log-table th { background: #f8f9fa; color: #333; padding: 5px; }
-.shift-log-table td { padding: 5px; border-bottom: 1px solid #eee; }  
+        /* Styling Tabel Shift */
+        .shift-log-container { margin-top: 15px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+        .shift-log-table { width: 100%; min-width: unset; font-size: 10px; }
+        .shift-log-table th { background: #f8f9fa; color: #333; padding: 5px; }
+        .shift-log-table td { padding: 5px; border-bottom: 1px solid #eee; }  
+        
+        /* ==========================================
+           STYLE LOADING OVERLAY JOSS (TAMBAHAN)
+           ========================================== */
+        @keyframes muterJoss { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+<!-- ==========================================
+     SISTEM LOADING OVERLAY (ANTI SPAM KLIK)
+========================================== -->
+<div id="loadingOverlayJoss" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 999999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(6px); cursor: wait;">
+    <div style="width: 70px; height: 70px; border: 6px solid rgba(255,255,255,0.1); border-top: 6px solid #f1c40f; border-right: 6px solid #3498db; border-radius: 50%; animation: muterJoss 1s linear infinite; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);"></div>
+    <div id="textLoadingJoss" style="color: #fff; font-weight: bold; margin-top: 25px; font-size: 15px; letter-spacing: 2px; animation: pulse 1s infinite; text-shadow: 0 0 10px #000; text-align: center;">MEMUAT DATA...</div>
+</div>
 
 <div class="container">
     <div style="text-align:center; margin-bottom:20px;">
@@ -322,18 +139,10 @@ font-size:13px;
             <input type="number" id="targetKini" oninput="renderAll()">
             <hr>
             <label>Periode Aktif</label>
-
-<div style="
-display:flex;
-gap:5px;
-margin-bottom:10px;
-">
-
-<select id="thnKini" onchange="loadData()"></select>
-
-<select id="blnKini" onchange="loadData()"></select>
-
-</div>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <select id="thnKini" onchange="loadData()"></select>
+                <select id="blnKini" onchange="loadData()"></select>
+            </div>
             <label id="labelTglInput">Tanggal Input (Hari Ini: <span id="tglOto"></span>)</label>
             <input type="number" id="inTgl" oninput="cekKunci()">
             <div id="lockMsg" style="font-size:10px; font-weight:bold;"></div>
@@ -346,143 +155,67 @@ margin-bottom:10px;
                 <label style="color: #1e8449; font-weight:bold;">Realisasi GM % Hari Ini</label>
                 <input type="number" id="realGM" placeholder="Real GM %">
             </div>
-            <button id="btnSave" class="btn-green" onclick="simpanKini()">UPDATE & SIMPAN</button>
-            <button class="btn-wa" onclick="kirimWA()">📲 KIRIM LAPORAN WA</button>
+            
+            <!-- ⚡ TOMBOL SUDAH DIGABUNG JADI SATU DI SINI ⚡ -->
+            <button id="btnSave" class="btn-wa" style="background: linear-gradient(90deg, #27ae60, #25d366); box-shadow: 0 4px #1e8449; font-size: 15px;" onclick="simpanDanKirimWA()">🚀 SIMPAN & KIRIM LAPORAN WA</button>
         </div>
 
         <div class="card" style="border: 2px solid #f1c40f;">
-    <h3 style="display: flex; justify-content: space-between; align-items: center;">
-        3. DASHBOARD VISUAL 📊
-        <button onclick="bukaModalAI()" style="width: auto; padding: 4px 10px; margin: 0; font-size: 10px; background: #2980b9; color: white;">🔍 DETAIL AI</button>
-    </h3>
-    <div id="summaryDashboard"></div>
-    
-    <div id="aiPredictionBox" style="margin-top: 15px; padding: 15px; border-radius: 10px; background: #fffde7; border: 1px solid #f1c40f;">
-        <div style="font-weight: bold; color: #d35400; font-size: 12px; margin-bottom: 8px; display: flex; align-items: center;">
-            🤖 AI PREDICTION (IKT ANALYST)
-        </div>
-        <div id="aiStatusIKT" style="font-size: 16px; font-weight: bold; margin-bottom: 5px;"></div>
-        <div id="aiNote" style="font-size: 11px; line-height: 1.4; color: #2c3e50;"></div>
-        <div id="aiTargetKejar" style="margin-top: 10px; font-size: 10px; padding: 8px; background: rgba(255,255,255,0.5); border-radius: 5px; border-left: 3px solid #e67e22;"></div>
-    </div>
-    <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none; margin-top:10px;">RESET DATA</button>
-</div>
-
-<div id="aiModal" class="modal-ai">
-    <div class="modal-content" style="max-width: 900px; width: 95%; background: #fdfdfd; border-radius: 20px;">
-       <span class="close-ai" onclick="tutupModalAI()">&times;</span>
-       <div class="ai-header">
-   <h2>🤖 AI EXECUTIVE REPORT</h2>
-   <small>IKT Analyst • Smart Prediction Engine</small>
-</div>
-        
-        <div id="aiAnalysisContent" style="margin-top: 20px;">
+            <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                3. DASHBOARD VISUAL 📊
+                <button onclick="bukaModalAI()" style="width: auto; padding: 4px 10px; margin: 0; font-size: 10px; background: #2980b9; color: white;">🔍 DETAIL AI</button>
+            </h3>
+            <div id="summaryDashboard"></div>
+            
+            <div id="aiPredictionBox" style="margin-top: 15px; padding: 15px; border-radius: 10px; background: #fffde7; border: 1px solid #f1c40f;">
+                <div style="font-weight: bold; color: #d35400; font-size: 12px; margin-bottom: 8px; display: flex; align-items: center;">
+                    🤖 AI PREDICTION (IKT ANALYST)
+                </div>
+                <div id="aiStatusIKT" style="font-size: 16px; font-weight: bold; margin-bottom: 5px;"></div>
+                <div id="aiNote" style="font-size: 11px; line-height: 1.4; color: #2c3e50;"></div>
+                <div id="aiTargetKejar" style="margin-top: 10px; font-size: 10px; padding: 8px; background: rgba(255,255,255,0.5); border-radius: 5px; border-left: 3px solid #e67e22;"></div>
             </div>
-        
-<div id="aiDecision"></div>
-
-<div id="aiQuestionBox" style="
-    margin-top:15px;
-    background:#f8f9fa;
-    padding:15px;
-    border-radius:15px;
-    border:1px solid #ddd;
-">
-
-<div style="
-font-size:28px;
-margin-bottom:5px;
-">
-🧠 <b style="font-size:16px;color:#2c3e50">
-Tanya IA IKT
-</b>
-</div>
-
-<div style="
-font-size:12px;
-color:#666;
-margin-bottom:12px;
-">
-Pilih pertanyaan untuk mendapatkan analisa IA berdasarkan data toko saat ini.
-</div>
-
-<select id="pilihanAI"
-style="
-width:100%;
-padding:14px;
-font-size:14px;
-border-radius:10px;
-border:1px solid #ccc;
-">
-
-<option value="">
-Pilih Pertanyaan...
-</option>
-
-<option value="harapan">
-🌱 1. Apakah masih ada harapan untuk menang IKT dengan data ini?
-</option>
-
-<option value="strategi">
-🎯 2. Strategi apa yang harus dikejar dan difokuskan?
-</option>
-
-<option value="prediksi">
-🧮 3. Apakah sampai akhir bulan akan menang?
-</option>
-
-<option value="kenapa">
-❓ 4. Kenapa tidak ada harapan menang IKT?
-</option>
-
-<option value="faktor">
-⚠️ 5. Faktor apa yang mengakibatkan tidak menang?
-</option>
-
-</select>
-
-<button onclick="jawabAI()"
-style="
-margin-top:12px;
-background:linear-gradient(
-90deg,
-#2f80ed,
-#56ccf2
-);
-color:white;
-font-size:15px;
-font-weight:bold;
-border-radius:10px;
-padding:14px;
-">
-
-🔍 ANALISA IA
-
-</button>
-
-<div id="jawabanAI"
-style="
-margin-top:15px;
-display:none;
-padding:18px;
-border-radius:12px;
-background:#eef5ff;
-border-left:5px solid #3498db;
-line-height:1.8;
-font-size:14px;
-">
-ℹ️ Jawaban IA akan muncul di sini
-</div>
-
-</div>
-
-        <div style="text-align: center; margin-top: 20px;">
-            <button onclick="tutupModalAI()" style="width: auto; padding: 10px 40px; background: #34495e; color: white;">TUTUP LAPORAN</button>
+            <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none; margin-top:10px;">RESET DATA</button>
         </div>
-    </div>
-</div>
 
-    </div> <div class="table-box">
+        <div id="aiModal" class="modal-ai">
+            <div class="modal-content" style="max-width: 900px; width: 95%; background: #fdfdfd; border-radius: 20px;">
+               <span class="close-ai" onclick="tutupModalAI()">&times;</span>
+               <div class="ai-header">
+                   <h2>🤖 AI EXECUTIVE REPORT</h2>
+                   <small>IKT Analyst • Smart Prediction Engine</small>
+                </div>
+                
+                <div id="aiAnalysisContent" style="margin-top: 20px;"></div>
+                
+                <div id="aiDecision"></div>
+
+                <div id="aiQuestionBox" style="margin-top:15px; background:#f8f9fa; padding:15px; border-radius:15px; border:1px solid #ddd;">
+                    <div style="font-size:28px; margin-bottom:5px;">🧠 <b style="font-size:16px;color:#2c3e50">Tanya IA IKT</b></div>
+                    <div style="font-size:12px; color:#666; margin-bottom:12px;">Pilih pertanyaan untuk mendapatkan analisa IA berdasarkan data toko saat ini.</div>
+                    <select id="pilihanAI" style="width:100%; padding:14px; font-size:14px; border-radius:10px; border:1px solid #ccc;">
+                        <option value="">Pilih Pertanyaan...</option>
+                        <option value="harapan">🌱 1. Apakah masih ada harapan untuk menang IKT dengan data ini?</option>
+                        <option value="strategi">🎯 2. Strategi apa yang harus dikejar dan difokuskan?</option>
+                        <option value="prediksi">🧮 3. Apakah sampai akhir bulan akan menang?</option>
+                        <option value="kenapa">❓ 4. Kenapa tidak ada harapan menang IKT?</option>
+                        <option value="faktor">⚠️ 5. Faktor apa yang mengakibatkan tidak menang?</option>
+                    </select>
+
+                    <button onclick="jawabAI()" style="margin-top:12px; background:linear-gradient(90deg, #2f80ed, #56ccf2); color:white; font-size:15px; font-weight:bold; border-radius:10px; padding:14px;">🔍 ANALISA IA</button>
+
+                    <div id="jawabanAI" style="margin-top:15px; display:none; padding:18px; border-radius:12px; background:#eef5ff; border-left:5px solid #3498db; line-height:1.8; font-size:14px;">ℹ️ Jawaban IA akan muncul di sini</div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="tutupModalAI()" style="width: auto; padding: 10px 40px; background: #34495e; color: white;">TUTUP LAPORAN</button>
+                </div>
+            </div>
+        </div>
+
+    </div> 
+
+    <div class="table-box">
         <h3 style="font-size: 16px; color: #2c3e50; border-bottom: 2px solid #2980b9; padding-bottom: 10px;">
             📊 LAPORAN SALES HARIAN
         </h3>
@@ -516,13 +249,22 @@ font-size:14px;
 </div>
 
 <script>
+    // ==========================================
+    // FUNGSI KONTROL LOADING OVERLAY
+    // ==========================================
+    function tampilLoading(pesan = "MEMUAT...") {
+        document.getElementById('textLoadingJoss').innerHTML = pesan;
+        document.getElementById('loadingOverlayJoss').style.display = "flex";
+    }
+    function tutupLoading() {
+        document.getElementById('loadingOverlayJoss').style.display = "none";
+    }
+
     let db = JSON.parse(localStorage.getItem('alfaSalesPaten_v10')) || {};
     if(typeof db!=="object") db={};
     const scriptURL = "https://script.google.com/macros/s/AKfycbwZepOIe6PmjYsxYrv-J-im8DG4E2fmOMdeWfeUscPsj-9EYUOr4T3U7Lu3vitphS4l/exec";
     const tglSkrg = new Date().getDate();
     document.getElementById('tglOto').innerText = tglSkrg;
-
-    const qList = ["🔥 Semangat kejar target!", "🚀 Penawaran kunci gacor!", "💪 Tantangan adalah peluang!", "🎯 Tebus murah jos!", "🌟 Awali doa, akhiri bahagia!"];
 
     const blnNama = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
     ['blnLalu','blnKini'].forEach(id => blnNama.forEach((n,i) => { 
@@ -556,346 +298,187 @@ font-size:14px;
         } else { b.disabled = true; b.style.opacity = "0.3"; m.innerText = "⚠️ LOCK (TGL INI)"; m.style.color = "red"; }
     }
 
-    async function simpanKini() {
-    let btn = document.getElementById('btnSave'); 
-    btn.disabled = true; btn.innerText = "⌛ SINKRON DRIVE...";
+    // ==========================================
+    // FUNGSI GABUNGAN: SIMPAN CLOUD + BUKA WA
+    // ==========================================
+    async function simpanDanKirimWA() {
+        let btn = document.getElementById('btnSave'); 
+        btn.disabled = true; 
 
-    let t = document.getElementById('kodeToko').value.toUpperCase();
-    let tgl = parseInt(document.getElementById('inTgl').value)||tglSkrg;
-let yK =
-Number(document.getElementById('thnKini').value);
+        // 1. TAHAP SIMPAN CLOUD
+        tampilLoading("MENYIMPAN DATA KE CLOUD..."); 
 
-let mK =
-Number(document.getElementById('blnKini').value);
+        let t = document.getElementById('kodeToko').value.toUpperCase();
+        let tgl = parseInt(document.getElementById('inTgl').value)||tglSkrg;
+        let yK = Number(document.getElementById('thnKini').value);
+        let mK = Number(document.getElementById('blnKini').value);
+        let yL = yK; let mL = mK - 1;
 
-let yL = yK;
-let mL = mK - 1;
+        if(mL < 1){ mL = 12; yL--; }
 
-if(mL < 1){
-    mL = 12;
-    yL--;
-}
+        let targetBulanan = parseFloat(document.getElementById('targetKini').value) || 0;
+        let tGM = parseFloat(document.getElementById('tgtGM').value) || 0;
+        let rGM = parseFloat(document.getElementById('realGM').value) || 0;
 
-console.log(
-"RENDER AKTIF",
-yK,
-mK,
-"ACUAN",
-yL,
-mL
-);
+        let inS1 = parseFloat(document.getElementById('s1').value) || 0;
+        let inS2 = parseFloat(document.getElementById('s2').value) || 0;
+        let inS3 = (document.getElementById('tipeToko').value === "24jam") ? (parseFloat(document.getElementById('s3').value) || 0) : 0;
+        let totalHariIni = inS1 + inS2 + inS3;
 
-console.log(
-db[t]?.[yL]?.[mL]
-);
-    
-    let targetBulanan = parseFloat(document.getElementById('targetKini').value) || 0;
-    let tGM = parseFloat(document.getElementById('tgtGM').value) || 0;
-    let rGM = parseFloat(document.getElementById('realGM').value) || 0;
-
-    // Ambil Data Shift
-    let inS1 = parseFloat(document.getElementById('s1').value) || 0;
-    let inS2 = parseFloat(document.getElementById('s2').value) || 0;
-    let inS3 = (document.getElementById('tipeToko').value === "24jam") ? (parseFloat(document.getElementById('s3').value) || 0) : 0;
-    let totalHariIni = inS1 + inS2 + inS3;
-
-    // 1. UPDATE DATABASE LOKAL DULU
-    if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {}; 
-    if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
-    
-    db[t][yK][mK].harianKini[tgl] = { s1: inS1, s2: inS2, s3: inS3, total: totalHariIni, gm_persen: rGM };
-    db[t][yK][mK].target = targetBulanan;
-    db[t][yK][mK].targetGM = tGM;
-
-    // 2. HITUNG ULANG AKUMULASI GAP (MTD) DARI TANGGAL 1 s/d HARI INI
-    let dL = db[t][yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
-    let accumGapMTD = 0;
-    for (let i = 1; i <= tgl; i++) {
-        let vL = dL.harianLalu[i] || 0;
-        let rK = db[t][yK][mK].harianKini[i] || { total: 0 };
-        let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0;
-        let tH = Math.round(pL * targetBulanan); // Target Harian
+        if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {}; 
+        if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
         
-       if(rK.total>0 && tH>0){ accumGapMTD+=(rK.total-tH); }
+        db[t][yK][mK].harianKini[tgl] = { s1: inS1, s2: inS2, s3: inS3, total: totalHariIni, gm_persen: rGM };
+        db[t][yK][mK].target = targetBulanan;
+        db[t][yK][mK].targetGM = tGM;
+
+        let dL = db[t][yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
+        let accumGapMTD = 0;
+        for (let i = 1; i <= tgl; i++) {
+            let vL = dL.harianLalu[i] || 0;
+            let rK = db[t][yK][mK].harianKini[i] || { total: 0 };
+            let pL = dL.totalLalu > 0 ? (vL / dL.totalLalu) : 0;
+            let tH = Math.round(pL * targetBulanan); 
+            if(rK.total>0 && tH>0){ accumGapMTD+=(rK.total-tH); }
+        }
+
+        let payload = { action: "save", toko: t, bulan: Number(mK), tahun: Number(yK), key: tgl, target: targetBulanan, gap: accumGapMTD, payload: { s1: inS1, s2: inS2, s3: inS3, total: totalHariIni, gm_persen: rGM, target_gm: tGM } };
+        localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
+        renderAll();
+
+        let saveSuccess = false;
+        try {
+            let res = await fetch(scriptURL,{ method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(payload) });
+            if(!res.ok) throw new Error("Gagal sinkron");
+            saveSuccess = true;
+        } catch(e) {
+            alert("⚠️ Drive gagal/lambat, tapi data lokal aman! Lanjut ke proses kirim WA...");
+            saveSuccess = true; // Tetap lanjut supaya WA bisa dikirim dari database lokal yang udah disave
+        }
+
+        // Kosongkan form input
+        document.getElementById('s1').value=""; document.getElementById('s2').value=""; document.getElementById('s3').value=""; document.getElementById('realGM').value="";
+
+        // 2. TAHAP KIRIM WA JIKA SIMPAN BERHASIL/LOKAL AMAN
+        if(saveSuccess) {
+            tampilLoading("MENYIAPKAN LAPORAN WA...");
+            
+            setTimeout(() => {
+                const tipe = document.getElementById('tipeToko').value;
+                let dK = db[t]?.[yK]?.[mK] || { target: 0, targetGM: 0, harianKini: {} };
+                let vL_Now = dL.harianLalu[tgl] || 0;
+                let pL_Now = dL.totalLalu > 0 ? (vL_Now / dL.totalLalu) : 0;
+                let tH_Now = Math.round(pL_Now * dK.target);
+                
+                let d = dK.harianKini[tgl] || { s1: 0, s2: 0, s3: 0, total: 0, gm_persen: 0 };
+                
+                let tsMTD = 0, tgmMTD = 0, jmlH = new Date(yK, mK, 0).getDate();
+                Object.keys(dK.harianKini).forEach(tg => { 
+                    let data = dK.harianKini[tg]; 
+                    if(data.total > 0){ tsMTD += data.total; tgmMTD += (data.total * (data.gm_persen/100)); }
+                });
+
+                let ach = dK.target > 0 ? ((tsMTD / dK.target) * 100).toFixed(1) : 0;
+                let tfP = ((tgl / jmlH) * 100).toFixed(1); 
+                let speed = (ach - tfP).toFixed(1);
+                let rgmMTD = tsMTD > 0 ? (tgmMTD / tsMTD * 100).toFixed(2) : 0;
+                let gapGMRp = Math.round(tgmMTD - (tsMTD * (dK.targetGM/100)));
+
+                let statusSpeed = speed >= 0 ? "🟢 *AMAN (SPEED POSITIF)*" : "🔴 *OVER (SPEED NEGATIF)*";
+                let statusGM = gapGMRp >= 0 ? "😇 *NABUNG MARGIN*" : "💀 *HUTANG MARGIN*";
+                let sindiran = speed >= 0 ? "Pertahankan! Kasir gass terus jangan kasih kendor!" : "🔥 *KERJA WOY! JANGAN JUALAN BARANG PROMO DOANG!*";
+
+                let pesan = `🚀 *MONITORING SALES [${t}]* 🚀%0A━━━━━━━━━━━━━━━━━━━%0A%0A`;
+                pesan += `📅 *INFO KOMPARASI:*%0A• Hari Ini: ${tgl}/${mK}%0A• *Bulan Lalu: Rp ${vL_Now.toLocaleString()}*%0A• *Target Harian: Rp ${tH_Now.toLocaleString()}*%0A• Kontribusi: ${(pL_Now * 100).toFixed(2)}%25%0A%0A`;
+                pesan += `🕒 *REALISASI PER SHIFT:*%0A`;
+                if(tipe === "24jam") pesan += `• S3 (Malam): Rp ${d.s3.toLocaleString()}%0A`;
+                pesan += `• S1 (Pagi) : Rp ${d.s1.toLocaleString()}%0A• S2 (Siang): Rp ${d.s2.toLocaleString()}%0A• *TOTAL REAL: Rp ${d.total.toLocaleString()}*%0A%0A`;
+                pesan += `🏆 *DASHBOARD PERFORMANCE:*%0A• *ACTUAL MTD:* Rp ${tsMTD.toLocaleString()}%0A• *ACHIEVEMENT:* ${ach}%25%0A• *TIME FACTOR:* ${tfP}%25%0A• *SPEED:* ${speed >= 0 ? '📈 +' : '📉 '}${speed}%25%0A• *STATUS:* ${statusSpeed}%0A%0A`;
+                pesan += `📈 *PERFORMA GM:*%0A• *REAL GM:* ${rgmMTD}%25 (Tgt: ${dK.targetGM}%25)%0A• *GAP GM:* Rp ${gapGMRp.toLocaleString()}%0A• *KONDISI:* ${statusGM}%0A%0A`;
+                pesan += `⚠️ *PESAN UNTUK TEAM:*%0A_${sindiran}_%0A━━━━━━━━━━━━━━━━━━━%0A_Sent via Monitoring Sales App_`;
+
+                // Buka Tab WA
+                window.open(`https://api.whatsapp.com/send?text=${pesan}`, '_blank');
+                
+                // Normalisasi UI
+                btn.disabled = false;
+                tutupLoading();
+                
+                // Alert munculin sesudah window terbuka (agar browser tidak block pop up WA)
+                setTimeout(() => {
+                    alert("✅ DISIMPAN! Laporan WA Terkirim.\n\nAkumulasi MTD: " + accumGapMTD.toLocaleString());
+                }, 500);
+
+            }, 1000);
+        } else {
+            btn.disabled = false;
+            tutupLoading();
+        }
     }
-
-    console.log(
-"MTD GAP:",
-accumGapMTD
-);
-
-    // 3. KIRIM PAYLOAD LENGKAP KE DRIVE (Apps Script)
-    let payload = {
-    action: "save",
-
-    toko: t,
-
-    bulan: Number(mK),
-    tahun: Number(yK),
-
-    key: tgl,
-
-    target: targetBulanan,
-
-    gap: accumGapMTD,
-
-    payload: {
-        s1: inS1,
-        s2: inS2,
-        s3: inS3,
-
-        total: totalHariIni,
-
-        gm_persen: rGM,
-
-        target_gm: tGM
-    }
-};
-
-    localStorage.setItem(
-'alfaSalesPaten_v10',
-JSON.stringify(db)
-);
-
-renderAll();
-
-try {
-
-    let res=await fetch(
-    scriptURL,{
-    method:'POST',
-    headers:{
-    'Content-Type':'text/plain;charset=utf-8'
-    },
-    body:JSON.stringify(payload)
-    });
-
-    if(!res.ok){
-        throw new Error("Gagal sinkron");
-    }
-
-    alert(
-    "✅ DISIMPAN! Akumulasi MTD: "+
-    accumGapMTD.toLocaleString()
-    );
-
-}catch(e){
-
-    alert(
-    "⚠️ Drive gagal, data lokal aman"
-    );
-
-} finally {
-
-    document.getElementById('s1').value="";
-    document.getElementById('s2').value="";
-    document.getElementById('s3').value="";
-    document.getElementById('realGM').value="";
-
-    btn.disabled=false;
-    btn.innerText="UPDATE & SIMPAN";
-
-}
-
-}
 
     function renderAll() {
+        let t = document.getElementById('kodeToko').value.toUpperCase(),
+            tb = document.querySelector("#mainTable tbody");
+        tb.innerHTML = "";
+        if (!t || !db[t]) return;
+        let yK = Number(document.getElementById('thnKini').value);
+        let mK = Number(document.getElementById('blnKini').value);
+        let yL = yK; let mL = mK - 1;
+        if(mL < 1){ mL = 12; yL--; }
 
-    let t = document.getElementById('kodeToko').value.toUpperCase(),
-        tb = document.querySelector("#mainTable tbody");
+        let dL = db[t]?.[yL]?.[mL] || { totalLalu:0, harianLalu:{} };
+        let dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 };
+        let ak = 0; let tk = 0;
 
-    tb.innerHTML = "";
+        let hariData = Object.keys(dK.harianKini || {}).filter(x => Number(x) > 0).map(Number);
+        let tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
 
-    if (!t || !db[t]) return;
-
-   let yK = Number(document.getElementById('thnKini').value);
-let mK = Number(document.getElementById('blnKini').value);
-
-let yL = yK;
-let mL = mK - 1;
-
-if(mL < 1){
-    mL = 12;
-    yL--;
-}
-
-let dL =
-db[t]?.[yL]?.[mL] ||
-{
-    totalLalu:0,
-    harianLalu:{}
-};
-
-let dK =
-db[t]?.[yK]?.[mK] ||
-{
-    target:0,
-    harianKini:{},
-    targetGM:0
-};
-
-console.log(
-"RENDER",
-"AKTIF",
-yK,
-mK,
-"ACUAN",
-yL,
-mL
-);
-
-console.log("dL", dL);
-
-    let ak = 0;
-    let tk = 0;
-
-    let hariData = Object.keys(dK.harianKini || {})
-        .filter(x => Number(x) > 0)
-        .map(Number);
-
-    let tglIn = hariData.length > 0
-        ? Math.max(...hariData)
-        : 0;
-
-        // --- TANDAI: LOGIKA GEMBOK SHIFT 3 ---
         let tipe = document.getElementById('tipeToko').value;
-        if (tipe === "non24") {
-            document.getElementById('rowS3').style.display = "none";
-            document.getElementById('s3').value = 0; // Paksa nol jika bukan 24 jam
-        } else {
-            document.getElementById('rowS3').style.display = "block";
-        }
+        if (tipe === "non24") { document.getElementById('rowS3').style.display = "none"; document.getElementById('s3').value = 0; } 
+        else { document.getElementById('rowS3').style.display = "block"; }
 
-        // VARIABEL BARU UNTUK HITUNG AKUMULASI GM (MTD)
-        let totalSalesMTD = 0;
-        let totalGMRpMTD = 0;
+        let totalSalesMTD = 0; let totalGMRpMTD = 0;
+        let totalHari=new Date(yK,mK,0).getDate();
 
-let totalHari=new Date(yK,mK,0).getDate();
+        for(let i=1;i<=totalHari;i++) {
+            let vL = (dL && dL.harianLalu && dL.harianLalu[i]) ? Number(dL.harianLalu[i]) : 0;
+            let rK = (dK && dK.harianKini && dK.harianKini[i]) ? dK.harianKini[i] : {s1:0,s2:0,s3:0,total:0,gm_persen:0};
+            let totalAcuan = dL.totalLalu || 0;
+            let hariAcuan = Object.keys(dL.harianLalu || {}).length;
 
-for(let i=1;i<=totalHari;i++) {
+            if(hariAcuan > totalHari){
+                let carryOver = 0;
+                for(let x = totalHari + 1; x <= hariAcuan; x++){ carryOver += Number(dL.harianLalu[x]) || 0; }
+                totalAcuan = totalAcuan - carryOver;
+            }
 
-    let vL = (dL && dL.harianLalu && dL.harianLalu[i])
-        ? Number(dL.harianLalu[i])
-        : 0;
-
-    let rK = (dK && dK.harianKini && dK.harianKini[i])
-        ? dK.harianKini[i]
-        : {s1:0,s2:0,s3:0,total:0,gm_persen:0};
-
-let totalAcuan = dL.totalLalu || 0;
-
-// Jika bulan acuan lebih panjang,
-// keluarkan hari carry over dari pembagi
-let hariAcuan =
-Object.keys(dL.harianLalu || {}).length;
-
-if(hariAcuan > totalHari){
-
-    let carryOver = 0;
-
-    for(
-        let x = totalHari + 1;
-        x <= hariAcuan;
-        x++
-    ){
-        carryOver +=
-        Number(
-            dL.harianLalu[x]
-        ) || 0;
-    }
-
-    totalAcuan =
-    totalAcuan - carryOver;
-}
-
-let pL =
-totalAcuan > 0
-? (vL / totalAcuan)
-: 0;
-        tH = Math.round(pL * dK.target),
-        dtK = new Date(yK, mK - 1, i),
-        dtL = new Date(yL, mL - 1, i);
-
-    if (dtK.getMonth() !== mK - 1) continue;
-        
+            let pL = totalAcuan > 0 ? (vL / totalAcuan) : 0;
+            tH = Math.round(pL * dK.target), dtK = new Date(yK, mK - 1, i), dtL = new Date(yL, mL - 1, i);
+            if (dtK.getMonth() !== mK - 1) continue;
+            
             let hL = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtL.getDay()], hK = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtK.getDay()], jK = [0, 5, 6].includes(dtK.getDay()), jL = [0, 5, 6].includes(dtL.getDay());
             
-             // Logika Sales (Tetap)
-            if(i <= tglIn && rK.total > 0 && tH > 0){
-    ak += (rK.total - tH);
-} 
-            if(i<=tglIn){
-            tk += rK.total;
-}
+            if(i <= tglIn && rK.total > 0 && tH > 0){ ak += (rK.total - tH); } 
+            if(i<=tglIn){ tk += rK.total; }
+            if (i <= tglIn && rK.total > 0) { totalSalesMTD += rK.total; totalGMRpMTD += (rK.total * (rK.gm_persen / 100)); }
 
-            // --- KUNCI: HITUNG SEMUA DATA YANG SUDAH ADA (TGL 1 S/D TERAKHIR INPUT) ---
-            if (i <= tglIn && rK.total > 0) {
-    totalSalesMTD += rK.total;
-    totalGMRpMTD += (rK.total * (rK.gm_persen / 100));
-}
-
-            tb.innerHTML += `<tr class="${jK ? 'jsm-row' : ''}"><td>${i}</td><td>${hL} ${jL?'<span class="tag-jsm-lalu">JSM</span>':''}</td><td>${hK} ${jK?'<span class="tag-jsm">JSM</span>':''}</td><td>${vL.toLocaleString()}</td><td>${(pL*100).toFixed(2)}%</td><td>${tH.toLocaleString()}</td><td>${rK.total.toLocaleString()}</td><td style="background:#e8f8f5">${rK.total.toLocaleString()}</td><td style="color:${ak>=0?'green':'red'}">
-${ak.toLocaleString()}
-</td></tr>`;
+            tb.innerHTML += `<tr class="${jK ? 'jsm-row' : ''}"><td>${i}</td><td>${hL} ${jL?'<span class="tag-jsm-lalu">JSM</span>':''}</td><td>${hK} ${jK?'<span class="tag-jsm">JSM</span>':''}</td><td>${vL.toLocaleString()}</td><td>${(pL*100).toFixed(2)}%</td><td>${tH.toLocaleString()}</td><td>${rK.total.toLocaleString()}</td><td style="background:#e8f8f5">${rK.total.toLocaleString()}</td><td style="color:${ak>=0?'green':'red'}">${ak.toLocaleString()}</td></tr>`;
         }
 
-// TAMPILKAN HARI LEBIH DARI BULAN ACUAN
-let hariAcuan =
-Object.keys(dL.harianLalu || {}).length;
+        let hariAcuanExtra = Object.keys(dL.harianLalu || {}).length;
+        if(hariAcuanExtra > totalHari){
+            for(let x = totalHari + 1; x <= hariAcuanExtra; x++){
+                let vExtra = Number(dL.harianLalu[x]) || 0;
+                tb.innerHTML += `<tr style="background:#fff8dc; font-weight:bold;"><td>${x}*</td><td colspan="2">Carry Over Bulan Lalu</td><td>${vExtra.toLocaleString()}</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
+            }
+        }
 
-if(hariAcuan > totalHari){
-
-    for(
-        let x = totalHari + 1;
-        x <= hariAcuan;
-        x++
-    ){
-
-        let vExtra =
-        Number(
-            dL.harianLalu[x]
-        ) || 0;
-
-        tb.innerHTML += `
-        <tr style="
-            background:#fff8dc;
-            font-weight:bold;
-        ">
-            <td>${x}*</td>
-            <td colspan="2">
-                Carry Over Bulan Lalu
-            </td>
-            <td>
-                ${vExtra.toLocaleString()}
-            </td>
-            <td>
-                -
-            </td>
-            <td>
-                -
-            </td>
-            <td>
-                -
-            </td>
-            <td>
-                -
-            </td>
-            <td>
-                -
-            </td>
-        </tr>`;
-    }
-}
-
-        // --- RUMUS DASHBOARD (MTD - MONTH TO DATE) ---
         let aB = dK.target > 0 ? ((tk / dK.target) * 100) : 0;
         let jmlH = new Date(yK,mK,0).getDate();
         let tfP = ((tglIn/jmlH)*100);
         let gapW = (aB-tfP).toFixed(1);
         let gapSales = tk - dK.target;
-
         let tGM = dK.targetGM || 0;
-        // Real GM rata-rata dari tgl 1 sampai data terakhir di Drive
         let rGM_MTD = totalSalesMTD > 0 ? (totalGMRpMTD / totalSalesMTD) * 100 : 0;
         let actGMRp_MTD = totalGMRpMTD;
         let tgtGMRp_MTD = totalSalesMTD * (tGM / 100);
@@ -905,13 +488,7 @@ if(hariAcuan > totalHari){
             <div style="background:#fff; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
                 <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
                     <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="${ak>=0?'#27ae60':'#e74c3c'}" stroke-width="3" stroke-dasharray="${aB}, 100"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${aB.toFixed(1)}%</text></svg><div style="font-size:7px; font-weight:bold; color:#27ae60;">SALES</div></div>
-                    <div style="flex-grow:1; padding-left:12px; font-size:10px;">
-<b>ACT: Rp ${tk.toLocaleString()}</b><br>
-TGT: Rp ${dK.target.toLocaleString()}<br>
-<span style="color:${gapSales>=0?'green':'red'}">
-GAP: Rp ${gapSales.toLocaleString()}
-</span>
-</div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${tk.toLocaleString()}</b><br>TGT: Rp ${dK.target.toLocaleString()}<br><span style="color:${gapSales>=0?'green':'red'}">GAP: Rp ${gapSales.toLocaleString()}</span></div>
                 </div>
                 <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
                     <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#3498db" stroke-width="3" stroke-dasharray="${tfP}, 100"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${tfP.toFixed(1)}%</text></svg><div style="font-size:7px; font-weight:bold; color:#3498db;">WAKTU</div></div>
@@ -925,92 +502,48 @@ GAP: Rp ${gapSales.toLocaleString()}
                     <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="#e67e22" stroke-width="3"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">Rp</text></svg><div style="font-size:7px; font-weight:bold; color:#e67e22;">GM RP</div></div>
                     <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${Math.round(actGMRp_MTD).toLocaleString()}</b><br>TGT MTD: Rp ${Math.round(tgtGMRp_MTD).toLocaleString()}<br><span style="color:${gapGMRp_MTD>=0?'green':'red'}">GAP: Rp ${Math.round(gapGMRp_MTD).toLocaleString()}</span></div>
                 </div>
-            </div>
-`;
-        updateAIPrediction(); // Pindahkan ke sini (di luar tanda kutip backtick)
-}
+            </div>`;
+        updateAIPrediction(); 
+    }
 
-async function tarikDataCloud() {
+    async function tarikDataCloud() {
+        let t = document.getElementById('kodeToko').value.toUpperCase();
+        if (!t) return;
+        let bulan = Number(document.getElementById('blnKini').value);
+        let tahun = Number(document.getElementById('thnKini').value);
 
-let t = document.getElementById('kodeToko').value.toUpperCase();
-if (!t) return;
+        tampilLoading("SINKRONISASI DATA CLOUD..."); // PANGGIL LOADING
+        try {
+            let res = await fetch(`${scriptURL}?action=get&toko=${t}&bulan=${bulan}&tahun=${tahun}`);
+            let cloudData = await res.json();
+            if (cloudData.status !== "success") return;
 
-let bulan = Number(document.getElementById('blnKini').value);
-let tahun = Number(document.getElementById('thnKini').value);
+            if (!db[t]) db[t] = {}; if (!db[t][tahun]) db[t][tahun] = {};
+            db[t][tahun][bulan] = { target: cloudData.data.target || 0, targetGM: cloudData.data.targetGM || 0, harianKini: {} };
 
-let res = await fetch(
-    `${scriptURL}?action=get&toko=${t}&bulan=${bulan}&tahun=${tahun}`
-);
+            if (cloudData.data.harianKini) {
+                Object.keys(cloudData.data.harianKini).forEach(tgl => {
+                    let d = cloudData.data.harianKini[tgl];
+                    db[t][tahun][bulan].harianKini[tgl] = { s1: Number(d.s1) || 0, s2: Number(d.s2) || 0, s3: Number(d.s3) || 0, total: Number(d.total) || 0, gm_persen: Number(d.gm_persen) || 0 };
+                });
+            }
 
-let cloudData = await res.json();
-
-if (cloudData.status !== "success") return;
-
-if (!db[t]) db[t] = {};
-if (!db[t][tahun]) db[t][tahun] = {};
-
-db[t][tahun][bulan] = {
-    target: cloudData.data.target || 0,
-    targetGM: cloudData.data.targetGM || 0,
-    harianKini: {}
-};
-
-if (cloudData.data.harianKini) {
-
-    Object.keys(cloudData.data.harianKini).forEach(tgl => {
-
-        let d = cloudData.data.harianKini[tgl];
-
-        db[t][tahun][bulan].harianKini[tgl] = {
-            s1: Number(d.s1) || 0,
-            s2: Number(d.s2) || 0,
-            s3: Number(d.s3) || 0,
-            total: Number(d.total) || 0,
-            gm_persen: Number(d.gm_persen) || 0
-        };
-
-    });
-
-}
-
-let mL = bulan - 1;
-let yL = tahun;
-
-if (mL < 1) {
-    mL = 12;
-    yL--;
-}
-
-if (!db[t][yL]) db[t][yL] = {};
-
-db[t][yL][mL] = db[t][yL][mL] || {};
-
-db[t][yL][mL].totalLalu =
-    Number(cloudData.data.totalLalu) || 0;
-
-db[t][yL][mL].harianLalu =
-    cloudData.data.harianLalu || {};
-
-console.log(
-"SIMPAN LALU KE",
-yL,
-mL
-);
-
-console.log(
-cloudData.data.harianLalu
-);
-
-localStorage.setItem(
-    'alfaSalesPaten_v10',
-    JSON.stringify(db)
-);
-
-
-}
-
+            let mL = bulan - 1; let yL = tahun;
+            if (mL < 1) { mL = 12; yL--; }
+            if (!db[t][yL]) db[t][yL] = {};
+            db[t][yL][mL] = db[t][yL][mL] || {};
+            db[t][yL][mL].totalLalu = Number(cloudData.data.totalLalu) || 0;
+            db[t][yL][mL].harianLalu = cloudData.data.harianLalu || {};
+            localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
+        } catch(e) {
+            console.error("Gagal tarik dari cloud", e);
+        } finally {
+            tutupLoading(); // TUTUP LOADING
+        }
+    }
 
     window.onload = async function() {
+        tampilLoading("MEMUAT DASHBOARD..."); // PANGGIL LOADING PAS MASUK WEB
         const ses = JSON.parse(sessionStorage.getItem("userArea"));
         if (!ses) { window.location.href = "index.html"; return; }
         document.getElementById("kodeToko").value = ses.toko;
@@ -1028,714 +561,220 @@ localStorage.setItem(
         }
         await loadData();
         cekKunci();
+        tutupLoading(); // TUTUP LOADING
     };
 
-async function loadData() {
+    async function loadData() {
+        let t = document.getElementById('kodeToko').value.toUpperCase();
+        if(!t) return;
+        let yK = document.getElementById('thnKini').value;
+        let mK = document.getElementById('blnKini').value;
 
-    console.log(
-        "LOAD DATA",
-        document.getElementById('thnKini').value,
-        document.getElementById('blnKini').value
-    );
+        await tarikDataCloud();
 
-    let t = document.getElementById('kodeToko').value.toUpperCase();
-    if(!t) return;
+        if(!db[t]) db[t] = {}; if(!db[t][yK]) db[t][yK] = {};
+        if(!db[t][yK][mK]){ db[t][yK][mK] = { target:0, harianKini:{}, targetGM:0 }; }
 
-    let yK = document.getElementById('thnKini').value;
-    let mK = document.getElementById('blnKini').value;
+        document.getElementById('targetKini').value = db[t][yK][mK].target || "";
+        document.getElementById('tgtGM').value = db[t][yK][mK].targetGM || "";
 
-    await tarikDataCloud();
+        let yL = Number(yK); let mL = Number(mK) - 1;
+        if(mL < 1){ mL = 12; yL--; }
+        document.getElementById('totalLalu').value = db[t]?.[yL]?.[mL]?.totalLalu || "";
 
-    if(!db[t]) db[t] = {};
-    if(!db[t][yK]) db[t][yK] = {};
-
-    if(!db[t][yK][mK]){
-        db[t][yK][mK] = {
-            target:0,
-            harianKini:{},
-            targetGM:0
-        };
+        renderAll();
+        updateAIPrediction();
+        cekKunci();
     }
-
-    document.getElementById('targetKini').value =
-        db[t][yK][mK].target || "";
-
-    document.getElementById('tgtGM').value =
-        db[t][yK][mK].targetGM || "";
-
-    let yL = Number(yK);
-    let mL = Number(mK) - 1;
-
-    if(mL < 1){
-        mL = 12;
-        yL--;
-    }
-
-    document.getElementById('totalLalu').value =
-        db[t]?.[yL]?.[mL]?.totalLalu || "";
-
-    renderAll();
-    updateShiftList();
-    updateAIPrediction();
-    cekKunci();
-}
 
     function save() { localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); renderAll(); }
     setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString('id-ID'); }, 1000);
-    function resetDb(){ if(confirm("RESET SEMUA?")){ localStorage.removeItem('alfaSalesPaten_v10'); location.reload(); } }
     
-function simpanLalu(){
-let t=document.getElementById('kodeToko').value.toUpperCase();
-let yL=document.getElementById('thnLalu').value;
-let mL=document.getElementById('blnLalu').value;
+    function resetDb(){ 
+        if(confirm("RESET SEMUA?")){ 
+            tampilLoading("MERESET DATA...");
+            setTimeout(() => {
+                localStorage.removeItem('alfaSalesPaten_v10'); location.reload(); 
+            }, 1000);
+        } 
+    }
+    
+    function simpanLalu(){
+        let t=document.getElementById('kodeToko').value.toUpperCase();
+        let yL=document.getElementById('thnLalu').value;
+        let mL=document.getElementById('blnLalu').value;
+        let tgl=parseInt(document.getElementById('tglHistori').value);
+        let val=parseFloat(document.getElementById('valHistori').value)||0;
+        if(!t||!tgl)return;
 
-let tgl=parseInt(document.getElementById('tglHistori').value);
-let val=parseFloat(document.getElementById('valHistori').value)||0;
+        tampilLoading("MENYIMPAN DATA ACUAN..."); // PANGGIL LOADING
+        setTimeout(() => {
+            if(!db[t]) db[t]={}; if(!db[t][yL]) db[t][yL]={};
+            if(!db[t][yL][mL]){ db[t][yL][mL]={ totalLalu:0, harianLalu:{} }; }
 
-if(!t||!tgl)return;
-
-if(!db[t]) db[t]={};
-if(!db[t][yL]) db[t][yL]={};
-
-if(!db[t][yL][mL]){
-db[t][yL][mL]={
-totalLalu:0,
-harianLalu:{}
-};
-}
-
-db[t][yL][mL].harianLalu[tgl]=val;
-
-let totalInput=parseFloat(
-document.getElementById('totalLalu').value
-)||0;
-
-db[t][yL][mL].totalLalu=
-totalInput>0
-?
-totalInput
-:
-Object.values(
-db[t][yL][mL].harianLalu
-).reduce((a,b)=>a+b,0);
-
-save();
-
-alert("✅ Histori tersimpan");
-}
-
-    function kirimWA() {
-        const t = document.getElementById('kodeToko').value.toUpperCase();
-        const yK = document.getElementById('thnKini').value;
-        const mK = document.getElementById('blnKini').value;
-        const tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
-        const tipe = document.getElementById('tipeToko').value;
-        
-        // Ambil ID Dropdown Histori Bos
-        let yL = document.getElementById('thnLalu').value, mL = document.getElementById('blnLalu').value;
-        let dK = db[t]?.[yK]?.[mK] || { target: 0, targetGM: 0, harianKini: {} };
-        let dL = db[t]?.[yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
-
-        // --- DATA TARGET & ACUAN LALU ---
-        let vL_Now = dL.harianLalu[tglIn] || 0;
-        let pL_Now = dL.totalLalu > 0 ? (vL_Now / dL.totalLalu) : 0;
-        let tH_Now = Math.round(pL_Now * dK.target);
-
-        // --- REALISASI HARI INI ---
-        let d = dK.harianKini[tglIn] || { s1: 0, s2: 0, s3: 0, total: 0, gm_persen: 0 };
-        
-        // --- HITUNG PERFORMANCE (MTD) ---
-        let tsMTD = 0, tgmMTD = 0, jmlH = new Date(yK, mK, 0).getDate();
-        Object.keys(dK.harianKini).forEach(tg => { 
-            let data = dK.harianKini[tg]; 
-            if(data.total > 0){ tsMTD += data.total; tgmMTD += (data.total * (data.gm_persen/100)); }
-        });
-
-        let ach = dK.target > 0 ? ((tsMTD / dK.target) * 100).toFixed(1) : 0;
-        let tfP = ((tglIn / jmlH) * 100).toFixed(1); 
-        let speed = (ach - tfP).toFixed(1);
-        let rgmMTD = tsMTD > 0 ? (tgmMTD / tsMTD * 100).toFixed(2) : 0;
-        let gapGMRp = Math.round(tgmMTD - (tsMTD * (dK.targetGM/100)));
-
-        // --- KATA-KATA STATUS ---
-        let statusSpeed = speed >= 0 ? "🟢 *AMAN (SPEED POSITIF)*" : "🔴 *OVER (SPEED NEGATIF)*";
-        let statusGM = gapGMRp >= 0 ? "😇 *NABUNG MARGIN*" : "💀 *HUTANG MARGIN*";
-        let sindiran = speed >= 0 ? "Pertahankan! Kasir gass terus jangan kasih kendor!" : "🔥 *KERJA WOY! JANGAN JUALAN BARANG PROMO DOANG!*";
-
-        // --- FORMAT PESAN WA ---
-        let pesan = `🚀 *MONITORING SALES [${t}]* 🚀%0A`;
-        pesan += `━━━━━━━━━━━━━━━━━━━%0A%0A`;
-        
-        // --- TAMBAHAN PERBANDINGAN BULAN LALU ---
-        pesan += `📅 *INFO KOMPARASI:*%0A`;
-        pesan += `• Hari Ini: ${tglIn}/${mK}%0A`;
-        pesan += `• *Bulan Lalu: Rp ${vL_Now.toLocaleString()}*%0A`;
-        pesan += `• *Target Harian: Rp ${tH_Now.toLocaleString()}*%0A`;
-        pesan += `• Kontribusi: ${(pL_Now * 100).toFixed(2)}%25%0A%0A`;
-
-        pesan += `🕒 *REALISASI PER SHIFT:*%0A`;
-        if(tipe === "24jam") pesan += `• S3 (Malam): Rp ${d.s3.toLocaleString()}%0A`;
-        pesan += `• S1 (Pagi) : Rp ${d.s1.toLocaleString()}%0A`;
-        pesan += `• S2 (Siang): Rp ${d.s2.toLocaleString()}%0A`;
-        pesan += `• *TOTAL REAL: Rp ${d.total.toLocaleString()}*%0A%0A`;
-
-        pesan += `🏆 *DASHBOARD PERFORMANCE:*%0A`;
-        pesan += `• *ACTUAL MTD:* Rp ${tsMTD.toLocaleString()}%0A`;
-        pesan += `• *ACHIEVEMENT:* ${ach}%25%0A`;
-        pesan += `• *TIME FACTOR:* ${tfP}%25%0A`;
-        pesan += `• *SPEED:* ${speed >= 0 ? '📈 +' : '📉 '}${speed}%25%0A`;
-        pesan += `• *STATUS:* ${statusSpeed}%0A%0A`;
-
-        pesan += `📈 *PERFORMA GM:*%0A`;
-        pesan += `• *REAL GM:* ${rgmMTD}%25 (Tgt: ${dK.targetGM}%25)%0A`;
-        pesan += `• *GAP GM:* Rp ${gapGMRp.toLocaleString()}%0A`;
-        pesan += `• *KONDISI:* ${statusGM}%0A%0A`;
-
-        pesan += `⚠️ *PESAN UNTUK TEAM:*%0A`;
-        pesan += `_${sindiran}_%0A`;
-        pesan += `━━━━━━━━━━━━━━━━━━━%0A`;
-        pesan += `_Sent via Monitoring Sales App_`;
-
-        window.open(`https://api.whatsapp.com/send?text=${pesan}`, '_blank');
+            db[t][yL][mL].harianLalu[tgl]=val;
+            let totalInput=parseFloat(document.getElementById('totalLalu').value)||0;
+            db[t][yL][mL].totalLalu=totalInput>0 ? totalInput : Object.values(db[t][yL][mL].harianLalu).reduce((a,b)=>a+b,0);
+            save();
+            tutupLoading();
+            alert("✅ Histori tersimpan");
+        }, 800);
     }
 
    function bukaModalAI() {
-    const t = document.getElementById('kodeToko').value.toUpperCase();
-    const yK = document.getElementById('thnKini').value;
-    const mK = document.getElementById('blnKini').value;
-    const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
-    
-    // Hitung Data MTD
-let hariData =
-Object.keys(dK.harianKini)
-.filter(x =>
-    dK.harianKini[x] &&
-    dK.harianKini[x].total > 0
-)
-.map(Number);
+        tampilLoading("MEMUAT LAPORAN AI..."); // PANGGIL LOADING
+        setTimeout(() => {
+            const t = document.getElementById('kodeToko').value.toUpperCase();
+            const yK = document.getElementById('thnKini').value;
+            const mK = document.getElementById('blnKini').value;
+            const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
+            
+            let hariData = Object.keys(dK.harianKini).filter(x => dK.harianKini[x] && dK.harianKini[x].total > 0).map(Number);
+            let tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
+            let tk = 0; let tgmMTD = 0;
 
-let tglIn =
-hariData.length > 0
-?
-Math.max(...hariData)
-:
-0;
+            Object.keys(dK.harianKini).forEach(tg => {
+                let data = dK.harianKini[tg];
+                if(parseInt(tg) <= tglIn && data && data.total > 0){ tk += data.total; tgmMTD += (data.total*(data.gm_persen/100)); }
+            });
 
-console.log(
-"AI tglIn =",
-tglIn
-);
+            let aB = dK.target > 0 ? (tk / dK.target * 100) : 0;
+            let rGM = tk > 0 ? (tgmMTD / tk * 100) : 0;
+            let actGMRp = tgmMTD;
+            let tgtGMRp = tk * (dK.targetGM / 100);
+            let gapGMRp = actGMRp - tgtGMRp;
+            let jmlH = new Date(yK, mK, 0).getDate(); 
+            let tfP=(tglIn/jmlH*100);
+            let gapSales=tk-dK.target;
 
-let tk = 0;
-let tgmMTD = 0;
+            let htmlContent = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px;">
+                    <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #27ae60;">
+                        <b style="color: #27ae60;">📊 SALES (ACT vs TGT)</b><br>Actual: Rp ${tk.toLocaleString()}<br>Target: Rp ${dK.target.toLocaleString()}<br>Gap:<span style="color:${gapSales>=0?'green':'red'}">Rp ${gapSales.toLocaleString()}</span>
+                    </div>
+                    <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #3498db;">
+                        <b style="color: #3498db;">📅 TIME FACTOR</b><br>Hari ke: ${tglIn} dari ${jmlH}<br>Progress Waktu: ${tfP.toFixed(1)}%<br>Speed Sales: <span style="color: ${aB >= tfP ? 'green' : 'red'}">${(aB - tfP).toFixed(1)}%</span>
+                    </div>
+                    <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #9b59b6;">
+                        <b style="color: #9b59b6;">💰 GM % (MTD)</b><br>Actual: ${rGM.toFixed(2)}%<br>Target: ${dK.targetGM}%<br>Status: <b>${rGM >= dK.targetGM ? 'NABUNG GM' : 'HUTANG GM'}</b>
+                    </div>
+                    <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #e67e22;">
+                        <b style="color: #e67e22;">💵 GM RUPIAH</b><br>Actual: Rp ${Math.round(actGMRp).toLocaleString()}<br>Target MTD: Rp ${Math.round(tgtGMRp).toLocaleString()}<br>Surplus: <span style="color: ${gapGMRp >= 0 ? 'green' : 'red'}">Rp ${Math.round(gapGMRp).toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
 
-Object.keys(dK.harianKini).forEach(tg => {
+            let decision = ""; let color = ""; let motivasi = "";
 
-    let data = dK.harianKini[tg];
+            if (aB >= 100 && rGM >= dK.targetGM) { decision = "🏆 PREDIKSI: TARGET IKT TERCAPAI"; color = "#27ae60"; motivasi = `✅ Sales sudah mencapai target\n✅ GM % sudah mencapai target\n✅ GM Rupiah aman\n\nSeluruh indikator utama IKT sudah terpenuhi.\nTahap berikutnya tinggal menunggu hasil perhitungan Net Profit dari sistem pusat untuk menentukan hasil akhir IKT bulan berjalan.`; } 
+            else if (aB >= 100 && gapGMRp > 0) { decision = "🥇 PREDIKSI: TINGGAL MENUNGGU NET PROFIT"; color = "#f1c40f"; motivasi = `✅ Sales sudah mencapai target\n✅ GM Rupiah masih surplus\n\nGM % belum mencapai target, namun masih tertolong oleh pencapaian GM Rupiah.\nPeluang menang IKT masih terbuka dan hasil akhir akan ditentukan oleh pencapaian Net Profit bulan berjalan.`; } 
+            else if (aB >= 95 && gapGMRp > 0) { decision = "🟢 PREDIKSI: BERPELUANG BESAR MENANG IKT"; color = "#27ae60"; motivasi = `Sales tinggal sedikit lagi menuju target.\n✅ GM % sudah aman\n✅ GM Rupiah surplus\n✅ Posisi toko sangat kompetitif\n\nFokus utama adalah menutup gap sales sebesar Rp ${Math.abs(gapSales).toLocaleString()} sebelum closing.\nJika target sales berhasil tercapai maka peluang menang IKT sangat besar dan tahap berikutnya tinggal menunggu hasil Net Profit.`; } 
+            else if (aB >= 90) { decision = "🟡 PREDIKSI: MASIH BISA DIKEJAR"; color = "#f39c12"; motivasi = `Achievement sales masih cukup baik namun belum aman.\nMasih terdapat kekurangan sales sebesar Rp ${Math.abs(gapSales).toLocaleString()}.\n\nDiperlukan percepatan transaksi, peningkatan basket size, serta fokus pada program penjualan untuk mengejar target sebelum closing.`; } 
+            else { decision = "🔴 PREDIKSI: TERANCAM GAGAL IKT"; color = "#e74c3c"; motivasi = `Gap sales masih cukup besar terhadap target bulanan.\nKecepatan sales tertinggal dari progress waktu sehingga dibutuhkan recovery yang signifikan.\n\nFokus pada peningkatan transaksi, keranjang belanja, tebus murah, dan item margin tinggi untuk memperkecil ketertinggalan.`; }
 
-    if(
-        parseInt(tg) <= tglIn &&
-        data &&
-        data.total > 0
-    ){
-
-        tk += data.total;
-
-        tgmMTD +=
-        (data.total*(data.gm_persen/100));
-
+            document.getElementById('aiAnalysisContent').innerHTML = `<div style="margin-bottom:10px;">${htmlContent}</div>`;
+            const decEl = document.getElementById('aiDecision');
+            decEl.style.background = color;
+            decEl.innerHTML = `<div class="status-badge">${decision}</div><p style="margin-top:15px; font-size:15px; line-height:1.7;">${motivasi}</p>`;
+            document.getElementById('aiModal').style.display = "block";
+            tutupLoading();
+        }, 800);
     }
 
-});
+    function tutupModalAI() { document.getElementById('aiModal').style.display = "none"; }
+    window.onclick=function(event){ let modal=document.getElementById('aiModal'); if(event.target==modal){ modal.style.display="none"; } }
 
-console.log("AI BULAN", yK, mK);
-console.log("dK", dK);
-console.log(
-"TOTAL HARIAN",
-Object.keys(dK.harianKini)
-);
+    function updateAIPrediction() {
+        const t = document.getElementById('kodeToko').value.toUpperCase();
+        const yK = Number(document.getElementById('thnKini').value);
+        const mK = Number(document.getElementById('blnKini').value);
+        const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
+        let tglIn; const now = new Date();
+        if (yK === now.getFullYear() && mK === (now.getMonth()+1)) { tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg; } 
+        else { let hariData = Object.keys(dK.harianKini || {}).filter(x => !isNaN(x)).map(Number); tglIn = hariData.length > 0 ? Math.max(...hariData) : 0; }
 
-console.log(
-"TARGET",
-dK.target
-);
+        let tk = 0, tgmMTD = 0;
+        Object.keys(dK.harianKini || {}).forEach(tg => {
+            if(isNaN(tg)) return;
+            const data = dK.harianKini[tg];
+            if(data && data.total > 0){ tk += Number(data.total) || 0; tgmMTD += (Number(data.total) || 0) * ((Number(data.gm_persen) || 0)/100); }
+        });
 
-console.log(
-"TARGET GM",
-dK.targetGM
-);
+        const aB = dK.target > 0 ? (tk / dK.target) * 100 : 0;
+        const jmlH = new Date(yK, mK, 0).getDate();
+        const tfP = jmlH > 0 ? (tglIn/jmlH)*100 : 0;
+        const rGM_MTD = tk > 0 ? (tgmMTD / tk) * 100 : 0;
+        const gapGMRp = tgmMTD - (tk * (dK.targetGM/100));
 
-    let aB = dK.target > 0 ? (tk / dK.target * 100) : 0;
-    let rGM = tk > 0 ? (tgmMTD / tk * 100) : 0;
-    let actGMRp = tgmMTD;
-    let tgtGMRp = tk * (dK.targetGM / 100);
-    let gapGMRp = actGMRp - tgtGMRp;
-    let jmlH = new Date(yK, mK, 0).getDate(); 
-    let tfP=(tglIn/jmlH*100);
-    let gapSales=tk-dK.target;
+        let status = "", warna = "", saran = "";
+        if(aB >= 100 && rGM_MTD >= dK.targetGM){ status = "🏆 TARGET IKT TERCAPAI"; warna = "#27ae60"; saran = "✅ Sales mencapai target<br>✅ GM% mencapai target<br>✅ GM Rupiah aman<br><br>Seluruh indikator utama IKT telah terpenuhi. Tinggal menunggu hasil perhitungan Net Profit dari sistem pusat."; } 
+        else if(aB >= 100 && gapGMRp > 0){ status = "🥇 TINGGAL MENUNGGU NET PROFIT"; warna = "#f1c40f"; saran = "✅ Sales mencapai target<br>✅ GM Rupiah surplus<br><br>GM% belum mencapai target namun masih tertolong GM Rupiah. Hasil akhir akan ditentukan oleh Net Profit."; } 
+        else if(aB >= 95 && gapGMRp > 0){ status = "🟢 BERPELUANG BESAR MENANG IKT"; warna = "#27ae60"; saran = "✅ GM% aman<br>✅ GM Rupiah surplus<br>✅ Posisi toko kompetitif<br><br>Tutup kekurangan sales Rp " + Math.abs(dK.target - tk).toLocaleString() + " sebelum closing. Jika target sales tercapai maka peluang menang IKT sangat besar."; } 
+        else if(aB >= 90){ status = "🟡 MASIH BISA DIKEJAR"; warna = "#f39c12"; saran = "Achievement masih cukup baik namun belum aman. Fokus percepatan transaksi, basket size, dan program promo untuk mengejar target."; } 
+        else { status = "🔴 TERANCAM GAGAL IKT"; warna = "#e74c3c"; saran = "Gap sales masih cukup besar. Dibutuhkan recovery signifikan melalui transaksi besar, keranjang belanja, dan tebus murah."; }
 
-    // TAMPILAN RINCIAN (TABLE STYLE)
-    let htmlContent = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px;">
-            <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #27ae60;">
-                <b style="color: #27ae60;">📊 SALES (ACT vs TGT)</b><br>
-                Actual: Rp ${tk.toLocaleString()}<br>
-                Target: Rp ${dK.target.toLocaleString()}<br>
-                Gap:<span style="color:${gapSales>=0?'green':'red'}">Rp ${gapSales.toLocaleString()}</span>
-            </div>
-            <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #3498db;">
-                <b style="color: #3498db;">📅 TIME FACTOR</b><br>
-                Hari ke: ${tglIn} dari ${jmlH}<br>
-                Progress Waktu: ${tfP.toFixed(1)}%<br>
-                Speed Sales: <span style="color: ${aB >= tfP ? 'green' : 'red'}">${(aB - tfP).toFixed(1)}%</span>
-            </div>
-            <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #9b59b6;">
-                <b style="color: #9b59b6;">💰 GM % (MTD)</b><br>
-                Actual: ${rGM.toFixed(2)}%<br>
-                Target: ${dK.targetGM}%<br>
-                Status: <b>${rGM >= dK.targetGM ? 'NABUNG GM' : 'HUTANG GM'}</b>
-            </div>
-            <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #e67e22;">
-                <b style="color: #e67e22;">💵 GM RUPIAH</b><br>
-                Actual: Rp ${Math.round(actGMRp).toLocaleString()}<br>
-                Target MTD: Rp ${Math.round(tgtGMRp).toLocaleString()}<br>
-                Surplus: <span style="color: ${gapGMRp >= 0 ? 'green' : 'red'}">Rp ${Math.round(gapGMRp).toLocaleString()}</span>
-            </div>
-        </div>
-    `;
-
-    // LOGIKA PREDIKSI IKT
-let decision = "";
-let color = "";
-let motivasi = "";
-
-if (aB >= 100 && rGM >= dK.targetGM) {
-
-    decision = "🏆 PREDIKSI: TARGET IKT TERCAPAI";
-    color = "#27ae60";
-
-    motivasi = `
-✅ Sales sudah mencapai target
-✅ GM % sudah mencapai target
-✅ GM Rupiah aman
-
-Seluruh indikator utama IKT sudah terpenuhi.
-
-Tahap berikutnya tinggal menunggu hasil perhitungan Net Profit dari sistem pusat untuk menentukan hasil akhir IKT bulan berjalan.
-`;
-
-} else if (aB >= 100 && gapGMRp > 0) {
-
-    decision = "🥇 PREDIKSI: TINGGAL MENUNGGU NET PROFIT";
-    color = "#f1c40f";
-
-    motivasi = `
-✅ Sales sudah mencapai target
-✅ GM Rupiah masih surplus
-
-GM % belum mencapai target, namun masih tertolong oleh pencapaian GM Rupiah.
-
-Peluang menang IKT masih terbuka dan hasil akhir akan ditentukan oleh pencapaian Net Profit bulan berjalan.
-`;
-
-} else if (aB >= 95 && gapGMRp > 0) {
-
-    decision = "🟢 PREDIKSI: BERPELUANG BESAR MENANG IKT";
-    color = "#27ae60";
-
-    motivasi = `
-Sales tinggal sedikit lagi menuju target.
-
-✅ GM % sudah aman
-✅ GM Rupiah surplus
-✅ Posisi toko sangat kompetitif
-
-Fokus utama adalah menutup gap sales sebesar
-Rp ${Math.abs(gapSales).toLocaleString()} sebelum closing.
-
-Jika target sales berhasil tercapai maka peluang menang IKT sangat besar dan tahap berikutnya tinggal menunggu hasil Net Profit.
-`;
-
-} else if (aB >= 90) {
-
-    decision = "🟡 PREDIKSI: MASIH BISA DIKEJAR";
-    color = "#f39c12";
-
-    motivasi = `
-Achievement sales masih cukup baik namun belum aman.
-
-Masih terdapat kekurangan sales sebesar
-Rp ${Math.abs(gapSales).toLocaleString()}.
-
-Diperlukan percepatan transaksi, peningkatan basket size, serta fokus pada program penjualan untuk mengejar target sebelum closing.
-`;
-
-} else {
-
-    decision = "🔴 PREDIKSI: TERANCAM GAGAL IKT";
-    color = "#e74c3c";
-
-    motivasi = `
-Gap sales masih cukup besar terhadap target bulanan.
-
-Kecepatan sales tertinggal dari progress waktu sehingga dibutuhkan recovery yang signifikan.
-
-Fokus pada peningkatan transaksi, keranjang belanja, tebus murah, dan item margin tinggi untuk memperkecil ketertinggalan.
-`;
-
-}
-
-    document.getElementById('aiAnalysisContent').innerHTML = `
-<div style="
-margin-bottom:10px;
-">
-${htmlContent}
-</div>
-`;
-    
-    const decEl = document.getElementById('aiDecision');
-    decEl.style.background = color;
-   decEl.innerHTML = `
-<div class="status-badge">
-${decision}
-</div>
-
-<p style="
-margin-top:15px;
-font-size:15px;
-line-height:1.7;
-">
-${motivasi}
-</p>
-`;
-
-    document.getElementById('aiModal').style.display = "block";
-}
-
-function updateShiftList() {
-    const t = document.getElementById('kodeToko').value.toUpperCase();
-    const yK = document.getElementById('thnKini').value;
-    const mK = document.getElementById('blnKini').value;
-    const tglIn = document.getElementById('inTgl').value || tglSkrg;
-    const d = db[t]?.[yK]?.[mK]?.harianKini[tglIn] || { s1: 0, s2: 0, s3: 0 };
-    
-    let html = `
-        <tr><td>Shift 1</td><td>Rp ${d.s1.toLocaleString()}</td><td>${d.s1 > 0 ? '✅ Ok' : '➖'}</td></tr>
-        <tr><td>Shift 2</td><td>Rp ${d.s2.toLocaleString()}</td><td>${d.s2 > 0 ? '✅ Ok' : '➖'}</td></tr>
-        <tr><td>Shift 3</td><td>Rp ${d.s3.toLocaleString()}</td><td>${d.s3 > 0 ? '✅ Ok' : '➖'}</td></tr>
-    `;
-    let el=document.getElementById('listShiftKini'); if(el){ el.innerHTML=html; }
-}
-
-function tutupModalAI() {
-    document.getElementById('aiModal').style.display = "none";
-}
-
-// Tambahan: Agar pop-up bisa ditutup jika klik di luar kotak putih
-window.onclick=function(event){
-let modal=document.getElementById('aiModal');
-if(event.target==modal){
-modal.style.display="none";
-}
-}
-
-function updateAIPrediction() {
-    const t = document.getElementById('kodeToko').value.toUpperCase();
-    const yK = Number(document.getElementById('thnKini').value);
-    const mK = Number(document.getElementById('blnKini').value);
-    const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
-
-    // Tentukan tglIn sesuai bulan
-    let tglIn;
-    const now = new Date();
-    if (yK === now.getFullYear() && mK === (now.getMonth()+1)) {
-        // Bulan berjalan
-        tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
-    } else {
-        // Bulan lalu / histori
-        let hariData = Object.keys(dK.harianKini || {})
-            .filter(x => !isNaN(x))
-            .map(Number);
-        tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
+        const stEl = document.getElementById('aiStatusIKT'); const ntEl = document.getElementById('aiNote'); const tgEl = document.getElementById('aiTargetKejar');
+        if(stEl && ntEl && tgEl){ stEl.innerHTML = status; stEl.style.color = warna; ntEl.innerHTML = "Sales: " + aB.toFixed(1) + "% | Waktu: " + tfP.toFixed(1) + "% | GM: " + rGM_MTD.toFixed(2) + "%"; tgEl.innerHTML = "<b>💡 CATATAN IA:</b><br>" + saran; }
     }
 
-    let tk = 0, tgmMTD = 0;
-    Object.keys(dK.harianKini || {}).forEach(tg => {
-        if(isNaN(tg)) return;
-        const data = dK.harianKini[tg];
-        if(data && data.total > 0){
-            tk += Number(data.total) || 0;
-            tgmMTD += (Number(data.total) || 0) * ((Number(data.gm_persen) || 0)/100);
-        }
-    });
+    function jawabAI(){
+        const q = document.getElementById("pilihanAI").value;
+        const box = document.getElementById("jawabanAI");
+        if(!q){ box.style.display="block"; box.innerHTML="⚠️ Pilih pertanyaan terlebih dahulu"; return; }
 
-    const aB = dK.target > 0 ? (tk / dK.target) * 100 : 0;
-    const jmlH = new Date(yK, mK, 0).getDate();
-    const tfP = jmlH > 0 ? (tglIn/jmlH)*100 : 0;
-    const rGM_MTD = tk > 0 ? (tgmMTD / tk) * 100 : 0;
-    const gapGMRp = tgmMTD - (tk * (dK.targetGM/100));
+        tampilLoading("IA SEDANG MENGANALISA..."); // PANGGIL LOADING
+        setTimeout(() => {
+            const t = document.getElementById('kodeToko').value.toUpperCase();
+            const yK = document.getElementById('thnKini').value;
+            const mK = document.getElementById('blnKini').value;
+            const dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 };
+            let total=0;
+            let tglIn = parseInt(document.getElementById('inTgl').value)||tglSkrg;
 
-    let status = "", warna = "", saran = "";
+            Object.keys(dK.harianKini).forEach(tg=>{ let x = dK.harianKini[tg]; if(parseInt(tg)<=tglIn){ total += x.total||0; } });
 
-    if(aB >= 100 && rGM_MTD >= dK.targetGM){
-        status = "🏆 TARGET IKT TERCAPAI";
-        warna = "#27ae60";
-        saran =
-            "✅ Sales mencapai target<br>" +
-            "✅ GM% mencapai target<br>" +
-            "✅ GM Rupiah aman<br><br>" +
-            "Seluruh indikator utama IKT telah terpenuhi. Tinggal menunggu hasil perhitungan Net Profit dari sistem pusat.";
-    } else if(aB >= 100 && gapGMRp > 0){
-        status = "🥇 TINGGAL MENUNGGU NET PROFIT";
-        warna = "#f1c40f";
-        saran =
-            "✅ Sales mencapai target<br>" +
-            "✅ GM Rupiah surplus<br><br>" +
-            "GM% belum mencapai target namun masih tertolong GM Rupiah. Hasil akhir akan ditentukan oleh Net Profit.";
-    } else if(aB >= 95 && gapGMRp > 0){
-        status = "🟢 BERPELUANG BESAR MENANG IKT";
-        warna = "#27ae60";
-        saran =
-            "✅ GM% aman<br>" +
-            "✅ GM Rupiah surplus<br>" +
-            "✅ Posisi toko kompetitif<br><br>" +
-            "Tutup kekurangan sales Rp " + Math.abs(dK.target - tk).toLocaleString() +
-            " sebelum closing. Jika target sales tercapai maka peluang menang IKT sangat besar.";
-    } else if(aB >= 90){
-        status = "🟡 MASIH BISA DIKEJAR";
-        warna = "#f39c12";
-        saran =
-            "Achievement masih cukup baik namun belum aman. Fokus percepatan transaksi, basket size, dan program promo untuk mengejar target.";
-    } else {
-        status = "🔴 TERANCAM GAGAL IKT";
-        warna = "#e74c3c";
-        saran =
-            "Gap sales masih cukup besar. Dibutuhkan recovery signifikan melalui transaksi besar, keranjang belanja, dan tebus murah.";
-    }
+            let ach = dK.target>0 ? (total/dK.target)*100 : 0;
+            let jmlH = new Date(yK,mK,0).getDate();
+            let tfP = (tglIn/jmlH)*100;
+            let gapW = ach-tfP;
+            let sisa = Math.max(1, new Date(yK,mK,0).getDate()-tglIn+1);
+            let gap = Math.max(0, dK.target-total);
+            let isi="";
 
-    // Render ke HTML (Dashboard & Pop Up)
-    const stEl = document.getElementById('aiStatusIKT');
-    const ntEl = document.getElementById('aiNote');
-    const tgEl = document.getElementById('aiTargetKejar');
+            if(dK.target<=0){ box.style.display="block"; box.innerHTML="⚠️ Isi target bulanan terlebih dahulu"; tutupLoading(); return; }
 
-    if(stEl && ntEl && tgEl){
-        stEl.innerHTML = status;
-        stEl.style.color = warna;
-        ntEl.innerHTML = "Sales: " + aB.toFixed(1) + "% | Waktu: " + tfP.toFixed(1) + "% | GM: " + rGM_MTD.toFixed(2) + "%";
-        tgEl.innerHTML = "<b>💡 CATATAN IA:</b><br>" + saran;
-    }
-}
-
-function jawabAI(){
-    const q = document.getElementById("pilihanAI").value;
-    const box = document.getElementById("jawabanAI");
-
-    if(!q){
-        box.style.display="block";
-        box.innerHTML="⚠️ Pilih pertanyaan terlebih dahulu";
-        return;
-    }
-
-    const t = document.getElementById('kodeToko').value.toUpperCase();
-    const yK = document.getElementById('thnKini').value;
-    const mK = document.getElementById('blnKini').value;
-    const dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 };
-
-    let total=0;
-    let tglIn = parseInt(document.getElementById('inTgl').value)||tglSkrg;
-
-    Object.keys(dK.harianKini).forEach(tg=>{
-        let x = dK.harianKini[tg];
-        if(parseInt(tg)<=tglIn){
-            total += x.total||0;
-        }
-    });
-
-let ach = dK.target>0 ? (total/dK.target)*100 : 0;
-
-let jmlH =
-new Date(yK,mK,0).getDate();
-
-let tfP =
-(tglIn/jmlH)*100;
-
-let gapW =
-ach-tfP;
-
-let sisa =
-Math.max(
-1,
-new Date(yK,mK,0).getDate()-tglIn+1
-);
-
-let gap =
-Math.max(
-0,
-dK.target-total
-);
-
-let isi="";
-
-    if(dK.target<=0){
-        box.style.display="block";
-        box.innerHTML="⚠️ Isi target bulanan terlebih dahulu";
-        return;
-    }
-
-    switch(q){
-        case "harapan":
-            let perHari = Math.ceil(gap / Math.max(1,sisa));
-            if(ach>=95){
-                isi=`🏆 PELUANG MENANG SANGAT BESAR.
-Achievement saat ini: ${ach.toFixed(1)}%
-Masih ada ${sisa} hari kerja aktif.
-Kebutuhan sales sekitar: Rp ${perHari.toLocaleString()} per hari.
-Posisi toko sudah sangat dekat dengan target. Fokus menjaga speed sales dan konsistensi transaksi sampai closing akhir bulan.`;
-            }else if(ach>=85){
-                isi=`✅ MASIH ADA HARAPAN MENANG.
-Achievement saat ini: ${ach.toFixed(1)}%
-Masih ada ${sisa} hari kerja aktif.
-Untuk mencapai target dibutuhkan sekitar: Rp ${perHari.toLocaleString()} per hari.
-Posisi memang tertinggal, namun peluang masih terbuka. Fokus pada keranjang belanja, tebus murah, dan transaksi bernilai besar.`;
-            }else{
-                isi=`⚠️ PELUANG MASIH ADA NAMUN BERAT.
-Achievement saat ini: ${ach.toFixed(1)}%
-Masih ada ${sisa} hari kerja aktif.
-Kebutuhan sales mencapai: Rp ${perHari.toLocaleString()} per hari.
-Diperlukan percepatan sales yang cukup tinggi agar toko kembali ke jalur target.`;
+            switch(q){
+                case "harapan":
+                    let perHari = Math.ceil(gap / Math.max(1,sisa));
+                    if(ach>=95){ isi=`🏆 PELUANG MENANG SANGAT BESAR.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nKebutuhan sales sekitar: Rp ${perHari.toLocaleString()} per hari.\nPosisi toko sudah sangat dekat dengan target. Fokus menjaga speed sales dan konsistensi transaksi sampai closing akhir bulan.`; }
+                    else if(ach>=85){ isi=`✅ MASIH ADA HARAPAN MENANG.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nUntuk mencapai target dibutuhkan sekitar: Rp ${perHari.toLocaleString()} per hari.\nPosisi memang tertinggal, namun peluang masih terbuka. Fokus pada keranjang belanja, tebus murah, dan transaksi bernilai besar.`; }
+                    else{ isi=`⚠️ PELUANG MASIH ADA NAMUN BERAT.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nKebutuhan sales mencapai: Rp ${perHari.toLocaleString()} per hari.\nDiperlukan percepatan sales yang cukup tinggi agar toko kembali ke jalur target.`; }
+                break;
+                case "strategi":
+                    if(ach>=90){ isi=`🎯 STRATEGI UTAMA SAAT INI\n• Pertahankan speed sales harian\n• Jaga GM tetap di atas target\n• Push keranjang belanja\n• Maksimalkan attach selling kasir\n• Hindari penurunan transaksi di akhir bulan\nFokus menjaga momentum karena posisi toko sudah cukup baik.`; }
+                    else if(ach>=75){ isi=`🎯 STRATEGI YANG HARUS DIFOKUSKAN\n• Push Tebus Murah\n• Naikkan basket size pelanggan\n• Fokus item kebutuhan harian\n• Maksimalkan transaksi member\n• Recovery jam sepi\nTarget masih realistis jika speed sales meningkat pada sisa hari.`; }
+                    else{ isi=`🚨 STRATEGI PENYELAMATAN TARGET\n• Kejar transaksi bernilai besar\n• Push seluruh program promo\n• Fokus item fast moving\n• Tingkatkan attach selling kasir\n• Recovery setiap jam operasional\nDibutuhkan percepatan sales yang signifikan untuk mengejar target.`; }
+                break;
+                case "prediksi":
+                    let prediksi = Math.round((total/Math.max(1,tglIn-1))*new Date(yK,mK,0).getDate());
+                    let selisih = prediksi-dK.target;
+                    if(prediksi>=dK.target){ isi=`📈 PROYEKSI MENANG.\nPrediksi akhir bulan: Rp ${prediksi.toLocaleString()}\nTarget: Rp ${dK.target.toLocaleString()}\nPotensi surplus: Rp ${selisih.toLocaleString()}\nJika kecepatan sales tetap terjaga sampai closing maka target berpotensi tercapai.`; }
+                    else{ isi=`📊 PROYEKSI BELUM TERCAPAI.\nPrediksi akhir bulan: Rp ${prediksi.toLocaleString()}\nTarget: Rp ${dK.target.toLocaleString()}\nPotensi kekurangan: Rp ${Math.abs(selisih).toLocaleString()}\nDiperlukan percepatan sales pada sisa hari operasional.`; }
+                break;
+                case "kenapa":
+                    isi=`📉 ANALISA POSISI SAAT INI\nTarget sales belum tercapai.\nAchievement saat ini: ${ach.toFixed(1)}%\nKekurangan target: Rp ${gap.toLocaleString()}\nKecepatan sales masih berada di bawah progress waktu.\n\nNamun peluang belum sepenuhnya tertutup karena:\n• Masih ada ${sisa} hari operasional\n• GM % saat ini sudah NABUNG\n• GM Rupiah masih surplus\n\nFokus utama adalah menutup kekurangan sales sebelum closing akhir bulan.`;
+                break;
+                case "faktor":
+                    isi=`🔍 FAKTOR YANG PALING MEMPENGARUHI IKT\n• Gap sales terhadap target masih tinggi\n• Achievement saat ini: ${ach.toFixed(1)}%\n• Waktu tersisa: ${sisa} hari\n• Kecepatan sales perlu ditingkatkan\n• GM saat ini bukan faktor utama\nFaktor dominan saat ini adalah pencapaian sales terhadap target bulanan.`;
+                break;
+                default: isi="Silakan pilih pertanyaan terlebih dahulu.";
             }
-        break;
 
-        case "strategi":
-            if(ach>=90){
-                isi=`🎯 STRATEGI UTAMA SAAT INI
-• Pertahankan speed sales harian
-• Jaga GM tetap di atas target
-• Push keranjang belanja
-• Maksimalkan attach selling kasir
-• Hindari penurunan transaksi di akhir bulan
-Fokus menjaga momentum karena posisi toko sudah cukup baik.`;
-            }else if(ach>=75){
-                isi=`🎯 STRATEGI YANG HARUS DIFOKUSKAN
-• Push Tebus Murah
-• Naikkan basket size pelanggan
-• Fokus item kebutuhan harian
-• Maksimalkan transaksi member
-• Recovery jam sepi
-Target masih realistis jika speed sales meningkat pada sisa hari.`;
-            }else{
-                isi=`🚨 STRATEGI PENYELAMATAN TARGET
-• Kejar transaksi bernilai besar
-• Push seluruh program promo
-• Fokus item fast moving
-• Tingkatkan attach selling kasir
-• Recovery setiap jam operasional
-Dibutuhkan percepatan sales yang signifikan untuk mengejar target.`;
-            }
-        break;
-
-case "prediksi":
-
-let prediksi=
-Math.round(
-(total/Math.max(1,tglIn-1))*
-new Date(yK,mK,0).getDate()
-);
-
-let selisih=
-prediksi-dK.target;
-
-if(prediksi>=dK.target){
-
-isi=`
-📈 PROYEKSI MENANG.
-
-Prediksi akhir bulan:
-
-Rp ${prediksi.toLocaleString()}
-
-Target:
-
-Rp ${dK.target.toLocaleString()}
-
-Potensi surplus:
-
-Rp ${selisih.toLocaleString()}
-
-Jika kecepatan sales tetap terjaga sampai closing maka target berpotensi tercapai.
-`;
-
-}else{
-
-isi=`
-📊 PROYEKSI BELUM TERCAPAI.
-
-Prediksi akhir bulan:
-
-Rp ${prediksi.toLocaleString()}
-
-Target:
-
-Rp ${dK.target.toLocaleString()}
-
-Potensi kekurangan:
-
-Rp ${Math.abs(selisih).toLocaleString()}
-
-Diperlukan percepatan sales pada sisa hari operasional.
-`;
-
-}
-
-break;
-
-case "kenapa":
-
-isi=`
-📉 ANALISA POSISI SAAT INI
-
-Target sales belum tercapai.
-
-Achievement saat ini:
-${ach.toFixed(1)}%
-
-Kekurangan target:
-Rp ${gap.toLocaleString()}
-
-Kecepatan sales masih berada di bawah progress waktu.
-
-Namun peluang belum sepenuhnya tertutup karena:
-
-• Masih ada ${sisa} hari operasional
-
-• GM % saat ini sudah NABUNG
-
-• GM Rupiah masih surplus
-
-Fokus utama adalah menutup kekurangan sales sebelum closing akhir bulan.
-`;
-
-break;
-
-        case "faktor":
-            isi=`🔍 FAKTOR YANG PALING MEMPENGARUHI IKT
-• Gap sales terhadap target masih tinggi
-• Achievement saat ini: ${ach.toFixed(1)}%
-• Waktu tersisa: ${sisa} hari
-• Kecepatan sales perlu ditingkatkan
-• GM saat ini bukan faktor utama
-Faktor dominan saat ini adalah pencapaian sales terhadap target bulanan.`;
-        break;
-
-        default:
-            isi="Silakan pilih pertanyaan terlebih dahulu.";
+            box.style.display = "block";
+            box.innerHTML = isi;
+            tutupLoading();
+        }, 1200);
     }
-
-    // ✅ Tambahkan ini supaya jawaban tampil
-    box.style.display = "block";
-    box.innerHTML = isi;
-}
-
 </script>
 </body>
 </html>
