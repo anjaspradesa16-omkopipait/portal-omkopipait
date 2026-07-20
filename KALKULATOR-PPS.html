@@ -4,63 +4,328 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator PPS - Anti-Flop</title>
+    <meta name="author" content="om_kopipait">
+    <meta name="copyright" content="om_kopipait">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; padding: 15px; }
         .container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
         header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 4px solid #dc2626; }
-        header h1 { font-size: 24px; color: #0f172a; text-transform: uppercase; }
-        .instruction-box { background-color: #eff6ff; border-left: 5px solid #3b82f6; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; color: #1e3a8a; }
+        header h1 { font-size: 24px; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; }
+        header p { font-size: 14px; color: #475569; margin-top: 5px; font-weight: 600; }
+        .quote-box { background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px; margin-bottom: 20px; border-radius: 6px; text-align: center; }
+        .quote-box p { font-size: 14px; font-weight: 700; color: #991b1b; font-style: italic; margin: 3px 0; }
+        .instruction-box { background-color: #eff6ff; border-left: 5px solid #3b82f6; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; color: #1e3a8a; line-height: 1.6; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .form-group { display: flex; flex-direction: column; }
-        .form-group input { padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 15px; text-align: center; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background-color: #0f172a; color: #ffffff; padding: 12px; text-transform: uppercase; }
-        td { padding: 12px; border: 1px solid #cbd5e1; text-align: center; }
-        .input-edit-normal { background: #f8fafc; border: 2px solid #94a3b8; width: 100%; padding: 8px; border-radius: 6px; font-weight: 700; }
-        .block-yellow-edit { background: #fef08a !important; border: 2px solid #ca8a04 !important; width: 100%; padding: 10px; border-radius: 6px; font-size: 16px; font-weight: 800; text-align: center; }
-        .dashboard-final { background: #f8fafc; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center; }
+        .form-group label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase; }
+        .form-group input { padding: 10px 12px; border: 2px solid #cbd5e1; background: #ffffff; border-radius: 6px; font-size: 15px; color: #0f172a; outline: none; font-weight: 700; text-align: center; }
+        .form-group input:focus { border-color: #3b82f6; }
+        .table-responsive { overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 850px; }
+        th { background-color: #0f172a; color: #ffffff; padding: 12px 6px; font-weight: 700; text-transform: uppercase; font-size: 11px; border: 1px solid #cbd5e1; text-align: center; }
+        th.sec-bobot { background-color: #047857; }
+        th.sec-input { background-color: #1d4ed8; }
+        th.sec-target { background-color: #b45309; }
+        th.sec-output { background-color: #c2410c; }
+        td { padding: 12px 8px; border: 1px solid #cbd5e1; vertical-align: middle; background: #ffffff; color: #0f172a; }
+        .input-edit-normal { background: #f8fafc; color: #0f172a; border: 2px solid #94a3b8; font-weight: 700; text-align: center; width: 100%; padding: 8px; border-radius: 6px; font-size: 14px; }
+        .input-edit-normal:focus { border-color: #3b82f6; background: #ffffff; }
+        .block-yellow-edit { background: #fef08a !important; border: 2px solid #ca8a04 !important; color: #854d0e !important; font-weight: 800 !important; text-align: center; width: 100%; padding: 10px; border-radius: 6px; font-size: 16px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .block-yellow-edit:focus { background: #fde047 !important; border-color: #a16207 !important; outline: none; }
+        .badge-bobot { background: #e6f4ea; color: #065f46; padding: 4px 8px; border-radius: 4px; font-weight: 700; border: 1px solid #a7f3d0; display: inline-block; font-size: 12px; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: bold; }
+        .alert-tag { padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-top: 6px; display: block; font-weight: 600; line-height: 1.4; }
+        .alert-sg { background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+        .alert-psm { background-color: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; }
+        .dashboard-final { background: #f8fafc; color: #0f172a; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border: 2px solid #e2e8f0; margin-bottom: 20px; }
+        .dashboard-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #475569; font-weight: 700; }
+        .dashboard-value { font-size: 38px; font-weight: 800; margin-top: 5px; }
+        .status-pill { padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 13px; text-transform: uppercase; display: inline-block; margin-top: 10px; text-align: center; }
+        .status-safe { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+        .status-warning { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .status-flop { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        .strategy-tip { font-size: 13px; color: #334155; max-width: 480px; line-height: 1.6; background: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; font-weight: 600; }
+        @media (max-width: 768px) { .dashboard-final { flex-direction: column; text-align: center; } .strategy-tip { max-width: 100%; } }
     </style>
 </head>
-<body>
+
+<body oncontextmenu="return false;">
+
 <div class="container">
-    <header><h1>⚡ KALKULATOR PPS ANTI-FLOP ⚡</h1></header>
+    <header>
+        <h1>⚡ KALKULATOR PPS ANTI-FLOP ⚡</h1>
+        <p>Toko dan jabatan hanya titipan (tidak ada yang harus disombongkan) — Kendali Penuh Target di Tangan Anda</p>
+    </header>
+
+    <div class="quote-box">
+        <p>"Target hanya angka. Tetapi harus tetap dikejar"</p>
+        <p>"Semangat kita. semangat semua anak toko. Menuju active toko 🔥"</p>
+    </div>
+
     <div class="instruction-box">
-        <strong>💡 PETUNJUK:</strong> Masukkan data target dan aktual untuk melihat GAP yang harus dikejar.
+        <strong>💡 PETUNJUK INPUT DATA - SAMBIL NGOPI-PAIT:</strong><br>
+        • Masukkan sisa hari kerja pada kotak di bawah.<br>
+        • Masukkan data target toko terlebih dahulu.<br>
+        • Masukkan data pencapaian ACTUAL/riil dari atasan/online pada kolom abu-abu.<br>
+        • Baru masukan angka pada BLOK KUNING. untuk mengatur simulasi target (%) toko yang ingin dikejar.<br>
+        • Akan menghasilkan GAP qty/aksi nyata yang harus dikejar berdasarkan sisa HK (Hari Kerja) dan target (%) yang ingin dikejar.
     </div>
-    <div class="form-group">
-        <label>Sisa Hari Kerja Berjalan</label>
-        <input type="number" id="remainingDays" value="0" oninput="calculateAntiFlop()">
+
+    <div class="meta-grid">
+        <div class="form-group">
+            <label>Sisa Hari Kerja Berjalan</label>
+            <input type="number" id="remainingDays" value="0" min="0" oninput="calculateAntiFlop()">
+        </div>
     </div>
-    <table>
-        <thead>
-            <tr><th>Indikator</th><th>Target Toko</th><th>Data Aktual</th><th>Simulasi Target %</th><th>GAP (Pcs)</th></tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>PWP (Purchase With Purchase)</td>
-                <td><input type="number" id="pwp_target_qty" class="input-edit-normal" value="0" oninput="calculateAntiFlop()"></td>
-                <td><input type="number" id="pwp_actual_qty" class="input-edit-normal" value="0" oninput="calculateAntiFlop()"></td>
-                <td><input type="number" id="pwp_sim_target" class="block-yellow-edit" value="100" oninput="calculateAntiFlop()"></td>
-                <td id="gap_pcs_pwp">0</td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 24%;">Indikator Performa</th>
+                    <th colspan="2" class="sec-bobot">Sistem Poin</th>
+                    <th colspan="2" class="sec-input">Tarikan Data Aktual Saat ini</th>
+                    <th colspan="1" class="sec-target">Simulasi Toko</th>
+                    <th colspan="3" class="sec-output">Aksi Nyata Lapangan (Pcs)</th>
+                </tr>
+                <tr>
+                    <th class="sec-bobot" style="width: 6%;">Bobot</th>
+                    <th class="sec-bobot" style="width: 8%;">Satuan</th>
+                    <th class="sec-input" style="width: 13%;">Target Toko</th>
+                    <th class="sec-input" style="width: 14%;">Data Aktual Saat Ini</th>
+                    <th class="sec-target" style="width: 13%;">Simulasi Target %</th>
+                    <th class="sec-output" style="width: 11%;">Ach. Bobot</th>
+                    <th class="sec-output" style="width: 11%;">Kekurangan (GAP)</th>
+                    <th class="sec-output" style="width: 11%;">Kejar Per Hari</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- APC Row -->
+                <tr>
+                    <td class="font-bold" style="background:#f8fafc;">APC (Rata-rata Belanja)</td>
+                    <td class="text-center"><span class="badge-bobot">25%</span></td>
+                    <td class="text-center" style="font-size:11px; color:#475569;">Rupiah (Rp)</td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Target Rp (Online)</span>
+                        <input type="number" id="apc_target_rp" class="input-edit-normal" value="48948" oninput="calculateAntiFlop()">
+                    </td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">AVG Rp (Daily Perf)</span>
+                        <input type="number" id="apc_actual_rp" class="input-edit-normal" value="48498" oninput="calculateAntiFlop()">
+                    </td>
+                    <td style="background:#f1f5f9; text-align:center; font-weight:800; color:#1d4ed8; font-size:15px;" id="apc_current_ach_pct">99.08%</td>
+                    <td class="text-center font-bold" id="ach_bobot_apc" style="color:#0f172a; font-size:14px;">24.77</td>
+                    <td colspan="2" style="background:#f8fafc; text-align:center; font-size:11px; color:#475569; font-style:italic; font-weight:600;">
+                        Jaga kestabilan struk belanja di kasir.
+                    </td>
+                </tr>
+
+                <!-- PWP Row -->
+                <tr>
+                    <td class="font-bold" style="background:#f8fafc;">PWP (Purchase With Purchase)
+                     <span class="alert-tag alert-psm">💡 WAJIB: Kasir wajib tawarkan item PWP ke konsumen belanja lebih dari 50k & 75K !!!</span>
+                    </td>
+                    <td class="text-center"><span class="badge-bobot">25%</span></td>
+                    <td class="text-center" style="font-size:11px; color:#475569;">Item Barang</td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Target Bulat (Pcs)</span>
+                        <input type="number" id="pwp_target_qty" class="input-edit-normal" value="426" oninput="calculateAntiFlop()">
+                    </td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Actual Terjual (Pcs)</span>
+                        <input type="number" id="pwp_actual_qty" class="input-edit-normal" value="226" oninput="calculateAntiFlop()">
+                        <span style="font-size:11px; color:#1d4ed8; font-weight:700; display:block; text-align:center; margin-top:2px;" id="pwp_current_pct">(53.05%)</span>
+                    </td>
+                    <td><input type="number" id="pwp_sim_target" class="block-yellow-edit" value="100" oninput="calculateAntiFlop()"></td>
+                    <td class="text-center font-bold" id="ach_bobot_pwp" style="font-size:14px;">25.00</td>
+                    <td class="text-center font-bold" id="gap_pcs_pwp" style="color:#c2410c; font-size:14px;">0</td>
+                    <td class="text-center font-bold" id="perhari_pcs_pwp" style="background:#fff7ed; color:#c2410c; font-size:14px;">0</td>
+                </tr>
+
+                <!-- PSM Row -->
+                <tr>
+                    <td class="font-bold" style="background:#f8fafc;">PSM (Spesial Mingguan)
+                     <span class="alert-tag alert-psm">💡 WAJIB: Kasir wajib tawarkan item PSM agar ACTIVE lebih banyak. supaya GAP lebih ringan</span>
+                    </td>
+                    <td class="text-center"><span class="badge-bobot">20%</span></td>
+                    <td class="text-center" style="font-size:11px; color:#475569;">Item Barang</td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Target Bulat (Pcs)</span>
+                        <input type="number" id="psm_target_qty" class="input-edit-normal" value="315" oninput="calculateAntiFlop()">
+                    </td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Actual Terjual (Pcs)</span>
+                        <input type="number" id="psm_actual_qty" class="input-edit-normal" value="237" oninput="calculateAntiFlop()">
+                        <span style="font-size:11px; color:#1d4ed8; font-weight:700; display:block; text-align:center; margin-top:2px;" id="psm_current_pct">(75.24%)</span>
+                    </td>
+                    <td><input type="number" id="psm_sim_target" class="block-yellow-edit" value="100" oninput="calculateAntiFlop()"></td>
+                    <td class="text-center font-bold" id="ach_bobot_psm" style="font-size:14px;">20.00</td>
+                    <td class="text-center font-bold" id="gap_pcs_psm" style="color:#c2410c; font-size:14px;">0</td>
+                    <td class="text-center font-bold" id="perhari_pcs_psm" style="background:#fff7ed; color:#c2410c; font-size:14px;">0</td>
+                </tr>
+
+                <!-- Serba Gratis Row -->
+                <tr>
+                    <td class="font-bold" style="background:#f8fafc;">
+                        Serba Gratis (SG)
+                        <span class="alert-tag alert-sg">🛑 WARNING: Scan hadiah gratisan ke sistem, jangan sampai loss!</span>
+                    </td>
+                    <td class="text-center"><span class="badge-bobot">30%</span></td>
+                    <td class="text-center" style="font-size:11px; color:#475569;">Item Barang</td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Target Bulat (Pcs)</span>
+                        <input type="number" id="sg_target_qty" class="input-edit-normal" value="187" oninput="calculateAntiFlop()">
+                    </td>
+                    <td>
+                        <span style="font-size:10px; color:#64748b; font-weight:700;">Actual Terjual (Pcs)</span>
+                        <input type="number" id="sg_actual_qty" class="input-edit-normal" value="56" oninput="calculateAntiFlop()">
+                        <span style="font-size:11px; color:#1d4ed8; font-weight:700; display:block; text-align:center; margin-top:2px;" id="sg_current_pct">(29.95%)</span>
+                    </td>
+                    <td><input type="number" id="sg_sim_target" class="block-yellow-edit" value="100" oninput="calculateAntiFlop()"></td>
+                    <td class="text-center font-bold" id="ach_bobot_sg" style="font-size:14px;">30.00</td>
+                    <td class="text-center font-bold" id="gap_pcs_sg" style="color:#c2410c; font-size:14px;">0</td>
+                    <td class="text-center font-bold" id="perhari_pcs_sg" style="background:#fff7ed; color:#c2410c; font-size:14px;">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <div class="dashboard-final">
-        <div class="dashboard-title">Estimasi Skor Akhir</div>
-        <div id="final_score" style="font-size: 38px; font-weight: 800;">0.00%</div>
+        <div>
+            <div class="dashboard-title">Estimasi Skor Akhir Hasil Simulasi</div>
+            <div id="final_score" class="dashboard-value" style="color:#059669;">100.00%</div>
+            <div id="status_pill" class="status-pill status-safe">Lolos Flop</div>
+        </div>
+        <div class="strategy-tip" id="strategy_advice">
+            Strategi berjalan aman.
+        </div>
     </div>
+
+<footer>
+    <p>© 2026 om_kopipait</p>
+    <p>Kalkulator Strategi Anti Flop</p>
+    <p>All Rights Reserved</p>
+</footer>
 </div>
+
 <script>
     function calculateAntiFlop() {
         const remDays = parseInt(document.getElementById('remainingDays').value) || 0;
-        const pTarget = parseInt(document.getElementById('pwp_target_qty').value) || 0;
-        const pAct = parseInt(document.getElementById('pwp_actual_qty').value) || 0;
-        const pSim = parseFloat(document.getElementById('pwp_sim_target').value) || 0;
-        
+        const apcTar = parseFloat(document.getElementById('apc_target_rp').value) || 0;
+        const apcAct = parseFloat(document.getElementById('apc_actual_rp').value) || 0;
+        let apcPct = 0;
+        if (apcTar > 0) {
+            apcPct = (apcAct / apcTar) * 100;
+        }
+        document.getElementById('apc_current_ach_pct').innerText = apcPct.toFixed(2) + "%";
+        const bApc = (apcPct / 100) * 25;
+        document.getElementById('ach_bobot_apc').innerText = bApc.toFixed(2);
+
+        const pTarget = Math.max(0, parseInt(document.getElementById('pwp_target_qty').value) || 0);
+        const pAct = Math.max(0, parseInt(document.getElementById('pwp_actual_qty').value) || 0);
+
+        document.getElementById('pwp_current_pct').innerText =
+            pTarget > 0 ? "(" + ((pAct / pTarget) * 100).toFixed(2) + "%)" : "(0%)";
+
+        const mTarget = Math.max(0, parseInt(document.getElementById('psm_target_qty').value) || 0);
+        const mAct = Math.max(0, parseInt(document.getElementById('psm_actual_qty').value) || 0);
+
+        document.getElementById('psm_current_pct').innerText =
+            mTarget > 0 ? "(" + ((mAct / mTarget) * 100).toFixed(2) + "%)" : "(0%)";
+
+        const sTarget = Math.max(0, parseInt(document.getElementById('sg_target_qty').value) || 0);
+        const sAct = Math.max(0, parseInt(document.getElementById('sg_actual_qty').value) || 0);
+
+        document.getElementById('sg_current_pct').innerText =
+            sTarget > 0 ? "(" + ((sAct / sTarget) * 100).toFixed(2) + "%)" : "(0%)";
+
+        const pSim = Math.max(0, parseFloat(document.getElementById('pwp_sim_target').value) || 0);
+        const mSim = Math.max(0, parseFloat(document.getElementById('psm_sim_target').value) || 0);
+        const sSim = Math.max(0, parseFloat(document.getElementById('sg_sim_target').value) || 0);
+
+        const bPwp = (pSim / 100) * 25;
+        const bPsm = (mSim / 100) * 20;
+        const bSg = (sSim / 100) * 30;
+        document.getElementById('ach_bobot_pwp').innerText = bPwp.toFixed(2);
+        document.getElementById('ach_bobot_psm').innerText = bPsm.toFixed(2);
+        document.getElementById('ach_bobot_sg').innerText = bSg.toFixed(2);
+
         const gP = Math.max(0, Math.round((pSim/100)*pTarget) - pAct);
+        const gM = Math.max(0, Math.round((mSim/100)*mTarget) - mAct);
+        const gS = Math.max(0, Math.round((sSim/100)*sTarget) - sAct);
         document.getElementById('gap_pcs_pwp').innerText = gP + " pcs";
-        document.getElementById('final_score').innerText = pSim.toFixed(2) + "%";
+        document.getElementById('gap_pcs_psm').innerText = gM + " pcs";
+        document.getElementById('gap_pcs_sg').innerText = gS + " pcs";
+
+        document.getElementById('perhari_pcs_pwp').innerText =
+            (remDays > 0 && gP > 0 ? Math.ceil(gP / remDays) : 0) + " /hari";
+
+        document.getElementById('perhari_pcs_psm').innerText =
+            (remDays > 0 && gM > 0 ? Math.ceil(gM / remDays) : 0) + " /hari";
+
+        document.getElementById('perhari_pcs_sg').innerText =
+            (remDays > 0 && gS > 0 ? Math.ceil(gS / remDays) : 0) + " /hari";
+
+        const totalScore = bApc + bPwp + bPsm + bSg;
+        const scoreEl = document.getElementById('final_score');
+        const pillEl = document.getElementById('status_pill');
+        scoreEl.innerText = totalScore.toFixed(2) + "%";
+
+        if (totalScore >= 95) {
+            scoreEl.style.color = "#059669";
+            pillEl.innerText = "🏆 AMAN (ZONA BONUS / ACTIVE TOKO)";
+            pillEl.className = "status-pill status-safe";
+        } else if (totalScore >= 80) {
+            scoreEl.style.color = "#d97706";
+            pillEl.innerText = "👍 LOLOS FLOP (ZONA TENANG AREA)";
+            pillEl.className = "status-pill status-warning";
+        } else {
+            scoreEl.style.color = "#dc2626";
+            pillEl.innerText = "🚨 FLOP / TERBAWAH AREA (ZONA MERAH)";
+            pillEl.className = "status-pill status-flop";
+        }
+
+        const adv = document.getElementById('strategy_advice');
+        const sgPerHari = remDays > 0 ? Math.ceil(gS / remDays) : 0;
+        if (sSim > 100) {
+            adv.innerHTML = `<strong>🎯 ANALISIS SUBSIDI SILANG AKTIF:</strong> Anda menaikkan target Serba Gratis ke <strong>${sSim}%</strong> untuk menambal item lain. Sisa yang harus dijual: <strong>${gS} pcs</strong> (<strong>${sgPerHari} pcs/hari</strong>).`;
+        } else if (totalScore < 80) {
+            adv.innerHTML = `<strong>⚠️ PERINGATAN STRATEGI:</strong> Skor saat ini (${totalScore.toFixed(2)}%) masih di bawah target kelolosan. Naikkan angka pada <strong>BLOK KUNING</strong> agar toko keluar dari kata FLOP!`;
+        } else {
+            adv.innerHTML = `<strong>✅ ANALISIS STRATEGI AMAN:</strong> Komposisi target ini sukses menyelamatkan toko dari status terbawah area. Gas infokan ke anak-anak toko!`;
+        }
     }
+    
+    window.onload = function() {
+        document.getElementById('remainingDays').value = 0;
+        // APC
+        document.getElementById('apc_target_rp').value = 0;
+        document.getElementById('apc_actual_rp').value = 0;
+        // PWP
+        document.getElementById('pwp_target_qty').value = 0;
+        document.getElementById('pwp_actual_qty').value = 0;
+        document.getElementById('pwp_sim_target').value = 0;
+        // PSM
+        document.getElementById('psm_target_qty').value = 0;
+        document.getElementById('psm_actual_qty').value = 0;
+        document.getElementById('psm_sim_target').value = 0;
+        // SG
+        document.getElementById('sg_target_qty').value = 0;
+        document.getElementById('sg_actual_qty').value = 0;
+        document.getElementById('sg_sim_target').value = 0;
+
+        // Reset persentase
+        document.getElementById('apc_current_ach_pct').innerText = '0%';
+        document.getElementById('pwp_current_pct').innerText = '(0%)';
+        document.getElementById('psm_current_pct').innerText = '(0%)';
+        document.getElementById('sg_current_pct').innerText = '(0%)';
+
+        calculateAntiFlop();
+    };
 </script>
 </body>
 </html>
