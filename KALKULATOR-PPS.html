@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator PPS - Anti-Flop</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; padding: 15px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+        header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 4px solid #dc2626; }
+        header h1 { font-size: 24px; color: #0f172a; text-transform: uppercase; }
+        .instruction-box { background-color: #eff6ff; border-left: 5px solid #3b82f6; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; color: #1e3a8a; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group input { padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 15px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background-color: #0f172a; color: #ffffff; padding: 12px; text-transform: uppercase; }
+        td { padding: 12px; border: 1px solid #cbd5e1; text-align: center; }
+        .input-edit-normal { background: #f8fafc; border: 2px solid #94a3b8; width: 100%; padding: 8px; border-radius: 6px; font-weight: 700; }
+        .block-yellow-edit { background: #fef08a !important; border: 2px solid #ca8a04 !important; width: 100%; padding: 10px; border-radius: 6px; font-size: 16px; font-weight: 800; text-align: center; }
+        .dashboard-final { background: #f8fafc; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><h1>⚡ KALKULATOR PPS ANTI-FLOP ⚡</h1></header>
+    <div class="instruction-box">
+        <strong>💡 PETUNJUK:</strong> Masukkan data target dan aktual untuk melihat GAP yang harus dikejar.
+    </div>
+    <div class="form-group">
+        <label>Sisa Hari Kerja Berjalan</label>
+        <input type="number" id="remainingDays" value="0" oninput="calculateAntiFlop()">
+    </div>
+    <table>
+        <thead>
+            <tr><th>Indikator</th><th>Target Toko</th><th>Data Aktual</th><th>Simulasi Target %</th><th>GAP (Pcs)</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>PWP (Purchase With Purchase)</td>
+                <td><input type="number" id="pwp_target_qty" class="input-edit-normal" value="0" oninput="calculateAntiFlop()"></td>
+                <td><input type="number" id="pwp_actual_qty" class="input-edit-normal" value="0" oninput="calculateAntiFlop()"></td>
+                <td><input type="number" id="pwp_sim_target" class="block-yellow-edit" value="100" oninput="calculateAntiFlop()"></td>
+                <td id="gap_pcs_pwp">0</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="dashboard-final">
+        <div class="dashboard-title">Estimasi Skor Akhir</div>
+        <div id="final_score" style="font-size: 38px; font-weight: 800;">0.00%</div>
+    </div>
+</div>
+<script>
+    function calculateAntiFlop() {
+        const remDays = parseInt(document.getElementById('remainingDays').value) || 0;
+        const pTarget = parseInt(document.getElementById('pwp_target_qty').value) || 0;
+        const pAct = parseInt(document.getElementById('pwp_actual_qty').value) || 0;
+        const pSim = parseFloat(document.getElementById('pwp_sim_target').value) || 0;
+        
+        const gP = Math.max(0, Math.round((pSim/100)*pTarget) - pAct);
+        document.getElementById('gap_pcs_pwp').innerText = gP + " pcs";
+        document.getElementById('final_score').innerText = pSim.toFixed(2) + "%";
+    }
+</script>
+</body>
+</html>
