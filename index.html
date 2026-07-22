@@ -8,7 +8,8 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 30px 15px; color: white; overflow-x: hidden; }
         
-        .menu-box { background: rgba(0,0,0,0.85); padding: 30px 20px; border-radius: 25px; border: 2px solid #f39c12; text-align: center; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: auto; }
+        .menu-box { background: rgba(0,0,0,0.85); padding: 30px 20px; border-radius: 25px; border: 2px solid #f39c12; text-align: center; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: auto; transition: all 0.4s ease-in-out; }
+        
         #clock-container { margin-bottom: 20px; padding: 15px; background: rgba(243,156,18,0.1); border-radius: 15px; border: 1px solid rgba(243,156,18,0.3); }
         #jam { font-size: 36px; font-weight: bold; color: #f39c12; display: block; }
         #tanggal { font-size: 14px; color: #ecf0f1; margin-top: 5px; display: block; }
@@ -46,9 +47,67 @@
             font-size: 16px; font-weight: bold; color: #f39c12; font-style: italic; 
             text-align: center; max-width: 80%; line-height: 1.5;
         }
+        
+        /* CSS MODAL POPUP MUSIK KOPIPAIT */
+        #music-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.92); z-index: 9998;
+            display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .music-modal-box {
+            background: #111; border: 2px solid #f39c12; border-radius: 20px; 
+            padding: 30px 20px; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* -------------------------------------------------------------
+           CSS MODE LAPORAN - KUNCI AGAR TIDAK GEPENG
+           ------------------------------------------------------------- */
+        .menu-box.mode-laporan {
+            max-width: 98vw !important; /* Supaya melebar mentok di layar laptop */
+            height: 96vh !important;    /* Tinggi otomatis mengambil 96% layar */
+            padding: 15px !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        /* Memaksa kontainer menu & iframe untuk memanjang ke bawah (flex-grow: 1) */
+        .menu-box.mode-laporan #menu-ui,
+        .menu-box.mode-laporan #wadah-laporan {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-grow: 1 !important;
+            height: 100% !important;
+        }
+
+        .menu-box.mode-laporan #wadah-iframe {
+            flex-grow: 1 !important;
+            height: 100% !important;
+            min-height: 400px; /* Batas aman supaya tidak gepeng di browser aneh */
+        }
+
+        /* Khusus Layar Sempit (HP) agar Layar Penuh 100% */
+        @media (max-width: 768px) {
+            .menu-box.mode-laporan {
+                max-width: 100vw !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+            body.mode-laporan-aktif {
+                padding: 0 !important;
+                overflow: hidden !important; 
+            }
+        }
     </style>
 </head>
-<body onclick="playMusic()">
+<body>
+
+    <!-- SISTEM AUDIO MP3 (Pastikan file source.mp3 di-upload se-folder ya) -->
+    <audio id="bgAudio" loop preload="auto">
+        <source src="source.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- LAYAR LOADING -->
     <div id="loading-overlay">
@@ -56,9 +115,17 @@
         <div id="loading-text">Tunggu sebentar...</div>
     </div>
 
-    <div id="music-container" style="display:none;"></div>
+    <!-- POP-UP NOTIFIKASI MUSIK & KOPIPAIT -->
+    <div id="music-modal">
+        <div class="music-modal-box">
+            <div style="font-size:40px; margin-bottom:10px;">☕🎶</div>
+            <h3 style="color:#f39c12; margin:0 0 15px 0; font-size:20px;">Waktunya Laporan!</h3>
+            <p id="music-quote" style="color:#ecf0f1; font-size:14px; line-height:1.6; font-style:italic; margin-bottom:25px;"></p>
+            <button onclick="startMusicAndCloseModal()" class="btn-masuk" style="background:linear-gradient(45deg, #27ae60, #2ecc71); margin-top:0; margin-bottom:12px;">🎵 PUTAR MUSIK SEKARANG</button>
+        </div>
+    </div>
 
-    <div class="menu-box">
+    <div class="menu-box" id="main-box">
         <div id="clock-container">
             <span id="jam">00:00:00</span>
             <span id="tanggal">Memuat Tanggal...</span>
@@ -67,16 +134,15 @@
         <div id="auth-ui"></div>
         <div id="menu-ui" style="display:none;"></div>
 
-        <div class="motivation">"Target hanyalah angka.<br>Tetapi harus tetap dikejar."</div>
+        <div class="motivation" id="teks-motivasi">"Target hanyalah angka.<br>Tetapi harus tetap dikejar."</div>
         
-        <div class="copyright">
+        <div class="copyright" id="footer-copy">
             Copyright &copy; 2026 <b>Omkopipait</b><br>
             "Semua dibikin pake IA. Mending scrol Facebook & Tiktok."
         </div>
     </div>
 
     <script>
-        // MASUKKAN URL DEPLOY BARU DI SINI
         const urlAppsScript = "https://script.google.com/macros/s/AKfycbwvWbek3tcsEyoh_aS6HpTXoq44_G-vpoVszOkD9om7CI3684vLfuWz5SLyu_7zRAb4/exec";
 
         let loadingTimer;
@@ -85,6 +151,15 @@
             "Jangan lupa berdoa... 🤲", 
             "Jangan lupa sholat... 🕌", 
             "Jangan lupa makan... 🍛"
+        ];
+        
+        const kopipaitQuotes = [
+            "Sebelum mulai laporan, yuk klik putar musiknya biar tambah semangat! Jangan lupa siapin segelas kopipaitnya! ☕",
+            "Laporan numpuk? Tenang... Play musiknya dulu, tarik napas, dan nikmati kopipaitmu hari ini! 🎵☕",
+            "Biar narik datanya makin syahdu, dengerin musik dulu yuk! Siapin mental dan sebatang inspirasi plus kopipait! 🚀☕",
+            "Kerja keras boleh, tapi jangan lupa rileks. Klik putar musik, seruput kopipait, dan hajar laporan shift ini! 🔥☕",
+            "Hari baru, semangat baru! Jangan biarkan sistem loading bikin suntuk. Putar lagunya, temani dengan secangkir kopipait! ☕🎶",
+            "Target emang harus dikejar, tapi kewarasan juga harus dijaga. Putar musiknya, sruput kopipaitnya, gass laporannya! ☕🎧"
         ];
         
         function showLoading() {
@@ -110,13 +185,26 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        let musicStarted = false;
-        function playMusic() {
-            if (!musicStarted) {
-                const id = "S26idZ_Vv8I"; 
-                document.getElementById('music-container').innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}" frameborder="0" allow="autoplay"></iframe>`;
-                musicStarted = true;
+        function showMusicPrompt() {
+            if(!sessionStorage.getItem('musicPromptShown')) {
+                const randQuote = kopipaitQuotes[Math.floor(Math.random() * kopipaitQuotes.length)];
+                document.getElementById('music-quote').innerText = `"${randQuote}"`;
+                document.getElementById('music-modal').style.display = 'flex';
             }
+        }
+
+        function startMusicAndCloseModal() {
+            const music = document.getElementById('bgAudio');
+            music.volume = 0.8;
+            music.play().catch(e => console.log("Gagal muter musik, pastikan file source.mp3 ada!"));
+            
+            document.getElementById('music-modal').style.display = 'none';
+            sessionStorage.setItem('musicPromptShown', 'true');
+        }
+
+        function closeMusicModalOnly() {
+            document.getElementById('music-modal').style.display = 'none';
+            sessionStorage.setItem('musicPromptShown', 'true');
         }
 
         function init() {
@@ -274,9 +362,6 @@
             }
         }
 
-        // ==========================================
-        // UPDATE BARU: HAPUS TILANG SAAT DAFTAR ULANG
-        // ==========================================
         async function doRegister() {
             const nama = document.getElementById('regNama').value.trim();
             const toko = document.getElementById('regToko').value.trim().toUpperCase();
@@ -298,7 +383,6 @@
                 hideLoading();
                 
                 if (hasilText.startsWith("SUKSES")) {
-                    // PEMUTIHAN: Kalau pendaftaran tembus, otomatis blokirnya dihapus!
                     localStorage.removeItem('lockout_' + email);
                     localStorage.removeItem('attempts_' + email);
                     
@@ -354,6 +438,8 @@
                     localStorage.setItem("permanentUser", JSON.stringify({email: email}));
                     localStorage.setItem("lastLoginDate", new Date().toDateString());
                     
+                    sessionStorage.removeItem('musicPromptShown');
+                    
                     alert(`Selamat datang, ${userObj.nama}!\nLogin berhasil.`);
                     location.reload();
                 } else if (hasilText.includes("Email atau Password salah")) {
@@ -379,12 +465,50 @@
             }
         }
 
+        // FUNGSI MEMBUKA LAPORAN (BERSIH DENGAN CSS CLASS)
+        function bukaLaporan(urlTarget) {
+            // Sembunyikan pernak-pernik menu
+            document.getElementById('header-profil').style.display = 'none';
+            document.getElementById('menu-grid').style.display = 'none';
+            document.getElementById('teks-motivasi').style.display = 'none';
+            document.getElementById('footer-copy').style.display = 'none';
+            document.getElementById('clock-container').style.display = 'none';
+            
+            // Tambahkan CSS class untuk merubah kotak jadi Full Screen
+            document.getElementById('main-box').classList.add('mode-laporan');
+            document.body.classList.add('mode-laporan-aktif');
+            
+            // Masukkan link laporan & tampilkan wadah
+            document.getElementById('frame-laporan').src = urlTarget;
+            
+            // Ganti display ke flex agar div iframe merenggang ke bawah
+            document.getElementById('wadah-laporan').style.display = 'flex';
+        }
+
+        // FUNGSI KEMBALI KE MENU (MENUTUP LAPORAN)
+        function tutupLaporan() {
+            // Sembunyikan & bersihkan iframe laporan
+            document.getElementById('wadah-laporan').style.display = 'none';
+            document.getElementById('frame-laporan').src = ''; 
+            
+            // Hapus CSS Class untuk mengembalikan kotak jadi kecil kembali
+            document.getElementById('main-box').classList.remove('mode-laporan');
+            document.body.classList.remove('mode-laporan-aktif');
+            
+            // Munculkan kembali pernak-pernik menu
+            document.getElementById('header-profil').style.display = 'block';
+            document.getElementById('menu-grid').style.display = 'grid';
+            document.getElementById('teks-motivasi').style.display = 'block';
+            document.getElementById('footer-copy').style.display = 'block';
+            document.getElementById('clock-container').style.display = 'block';
+        }
+
         function showMenu(user) {
             document.getElementById('auth-ui').innerHTML = '';
             document.getElementById('menu-ui').style.display = 'block';
 
             document.getElementById('menu-ui').innerHTML = `
-                <div style="background: linear-gradient(135deg, rgba(243,156,18,0.2), rgba(0,0,0,0.5)); padding: 20px; border-radius: 20px; border: 1px solid #f39c12; margin-bottom: 25px; box-shadow: inset 0 0 15px rgba(243,156,18,0.2);">
+                <div id="header-profil" style="background: linear-gradient(135deg, rgba(243,156,18,0.2), rgba(0,0,0,0.5)); padding: 20px; border-radius: 20px; border: 1px solid #f39c12; margin-bottom: 25px; box-shadow: inset 0 0 15px rgba(243,156,18,0.2);">
                     <div style="font-size: 12px; color: #bdc3c7; text-transform: uppercase; letter-spacing: 2px;">Selamat Datang</div>
                     <div style="font-size: 24px; font-weight: bold; color: #f39c12; margin: 5px 0;">Halo, ${user.nama.toUpperCase()} [${user.toko}]</div>
                     <div style="font-size: 14px; color: #ecf0f1; opacity: 0.8;">Jabatan: <b>${user.role.toUpperCase() === 'ADMIN' ? 'KEPALA TOKO' : 'CREW STORE'}</b></div>
@@ -392,15 +516,30 @@
                     
                     <button onclick="sessionStorage.clear();location.reload();" style="background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 15px; border-radius: 50px; font-size: 10px; cursor: pointer; margin-top: 15px; font-weight: bold; transition: 0.3s;">LOGOUT SISTEM</button>
                 </div>
-                <div style="display: grid; gap: 15px;">
-                    <a href="MONITORING-PPS.html?mode=${user.role}" class="btn-menu btn-pps" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px;"><span>📊</span> MONITORING PPS</a>
-                    <a href="MONITORING-SALES.html?mode=${user.role}" class="btn-menu btn-sales" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px;"><span>💰</span> MONITORING SALES</a>
-                    <a href="MONITORING-KEBERSIHAN.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #27ae60, #2ecc71); border-bottom:4px solid #1e7e43;"><span>🧼</span> MONITORING KEBERSIHAN</a>
-                    <a href="MONITORING-CEKLIS.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #d35400, #e67e22); border-bottom:4px solid #a04000;"><span>📋</span> CEKLIS SHIFT</a>
-                    <a href="MONITORING-LIBUR.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #e84393, #fd79a8); border-bottom:4px solid #b8326b;"><span>🏖️</span> MONITORING LIBUR</a>               
-                    <a href="MONITORING-NEWMEMBER.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #16a085, #1abc9c); border-bottom:4px solid #0e6655;"><span>💎</span> MONITORING NEW MEMBER</a>
+
+                <!-- DAFTAR TOMBOL MENU -->
+                <div id="menu-grid" style="display: grid; gap: 15px;">
+                    <a href="javascript:void(0)" onclick="bukaLaporan('MONITORING-PPS.html?mode=${user.role}')" class="btn-menu btn-pps" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px;"><span>📊</span> MONITORING PPS</a>
+                    <a href="javascript:void(0)" onclick="bukaLaporan('MONITORING-SALES.html?mode=${user.role}')" class="btn-menu btn-sales" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px;"><span>💰</span> MONITORING SALES</a>
+                    <a href="javascript:void(0)" onclick="bukaLaporan('MONITORING-KEBERSIHAN.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}')" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #27ae60, #2ecc71); border-bottom:4px solid #1e7e43;"><span>🧼</span> MONITORING KEBERSIHAN</a>
+                    <a href="javascript:void(0)" onclick="bukaLaporan('MONITORING-CEKLIS.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}')" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #d35400, #e67e22); border-bottom:4px solid #a04000;"><span>📋</span> CEKLIS SHIFT</a>
+                    <a href="javascript:void(0)" onclick="bukaLaporan('MONITORING-LIBUR.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}')" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #e84393, #fd79a8); border-bottom:4px solid #b8326b;"><span>🏖️</span> MONITORING LIBUR</a>               
+                    <a href="javascript:void(0)" onclick="bukaLaporan('MONITORING-NEWMEMBER.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}')" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #16a085, #1abc9c); border-bottom:4px solid #0e6655;"><span>💎</span> MONITORING NEW MEMBER</a>
+                    <a href="javascript:void(0)" onclick="bukaLaporan('KALKULATOR-PPS.html?mode=${user.role}&toko=${user.toko}&nama=${user.nama}')" class="btn-menu" style="margin:0; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(45deg, #8e44ad, #9b59b6); border-bottom:4px solid #732d91; color: white;"><span>🧮</span> KALKULATOR PPS</a>
+                </div>
+
+                <!-- WADAH LAYAR TANCAP LAPORAN (Diatur ukurannya oleh CSS flex) -->
+                <div id="wadah-laporan" style="display:none; flex-direction:column; width:100%;">
+                    <button onclick="tutupLaporan()" style="margin-bottom:10px; padding:15px; background: linear-gradient(45deg, #c0392b, #e74c3c); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; flex-shrink: 0; box-shadow: 0 4px 15px rgba(192,57,43,0.4);">« KEMBALI KE MENU PORTAL</button>
+                    
+                    <!-- Ini wadah putih iframe yang sekarang ikut merenggang -->
+                    <div id="wadah-iframe" style="background:white; border-radius:10px; padding:0; overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">
+                        <iframe id="frame-laporan" src="" style="width:100%; height:100%; border:none; display:block;"></iframe>
+                    </div>
                 </div>
             `;
+            
+            showMusicPrompt();
         }
         init();
     </script>
