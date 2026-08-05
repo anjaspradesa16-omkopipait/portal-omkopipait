@@ -107,6 +107,49 @@
         .badge-bad { background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 11px; display: inline-block; }
         .progress-container { background: #dcdde1; border-radius: 20px; height: 22px; width: 100%; margin-top: 5px; overflow: hidden; position: relative; }
         .progress-bar { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; font-size: 11px; transition: width 1s ease-in-out; }
+    
+    /* ================= CSS POP-UP & SCROLL TAMBAHAN ================= */
+.modal-overlay {
+    display: none; position: fixed; z-index: 9999; inset: 0; background: rgba(0,0,0,0.8);
+    justify-content: center; align-items: center; padding: 20px;
+}
+.modal-content {
+    background: white; width: 100%; max-width: 900px; max-height: 90vh;
+    border-radius: 15px; 
+    padding: 20px; 
+    padding-top: 55px; /* JARAK DITAMBAH AGAR TULISAN TURUN & TIDAK TERTIMPA (X) */
+    overflow-y: auto; position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.close-btn {
+    position: absolute; top: 12px; right: 15px; font-size: 26px; font-weight: bold;
+    color: #e74c3c; cursor: pointer; border: none; 
+    background: #f4f7f6; /* Tambahan background agar menutupi garis jika bersinggungan */
+    border-radius: 50%; width: 35px; height: 35px; 
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 1000;
+}
+.btn-popup {
+    background: #8e44ad; color: white; padding: 10px 15px; border: none; border-radius: 6px;
+    cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px; width: 100%; display:block; text-align:center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+/* Scroll Vertikal untuk Tabel Bulanan */
+.table-scroll {
+    max-height: 350px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd;
+}
+
+/* ================= EFEK TEKS KELAP-KELIP ================= */
+@keyframes teksWarnaWarni {
+    0% { color: #e74c3c; text-shadow: 0 0 5px rgba(231,76,60,0.5); }
+    25% { color: #f39c12; text-shadow: 0 0 10px rgba(243,156,18,0.8); }
+    50% { color: #2ecc71; text-shadow: 0 0 5px rgba(46,204,113,0.5); }
+    75% { color: #9b59b6; text-shadow: 0 0 10px rgba(155,89,182,0.8); }
+    100% { color: #e74c3c; text-shadow: 0 0 5px rgba(231,76,60,0.5); }
+}
+.judul-kelap-kelip {
+    animation: teksWarnaWarni 2s infinite;
+}
     </style>
 </head>
 <body>
@@ -180,29 +223,53 @@
             </div>
 
             <!-- ================= ADMIN & CREW: PROGRESS PERSONIL ================= -->
-            <div class="card" id="cardAdminRapor" style="display: none;">
-                <h3 style="color:#27ae60;">📊 ANALISA KONTRIBUSI PERSONIL</h3>
-                <div style="font-size:11px; color:#666; margin-bottom:10px;">Total laporan ceklis yang dikerjakan bulan ini per orang:</div>
-                <div id="raporPersonilArea" style="max-height: 250px; overflow-y: auto;"></div>
-            </div>
+<div class="card" id="cardAdminRapor" style="display: none;">
+    <h3 class="judul-kelap-kelip" style="text-align:center; border-bottom:none;">📊 ANALISA KONTRIBUSI PERSONIL</h3>
+    <!-- Tombol Pop up Rapor -->
+    <button class="btn-popup" onclick="bukaPopupRapor()">🖨️ BUKA POP-UP UNTUK SCREENSHOT (FULL)</button>
+    <div style="font-size:11px; color:#666; margin-bottom:10px;">Total laporan ceklis yang dikerjakan bulan ini per orang:</div>
+    <div id="raporPersonilArea" style="max-height: 250px; overflow-y: auto;"></div>
+</div>
 
         </div>
 
         <!-- ================= ADMIN & CREW: TABEL REKAP 31 HARI ================= -->
-        <div id="wrapperHarian" style="display: none;">
-            <h3 style="color:#2c3e50;">📈 MONITORING BULANAN (TANGGAL 1 - 31)</h3>
-            <table id="tabelPPS">
-                <thead>
-                    <tr>
-                        <th>Tgl</th>
-                        <th>Shift 1</th>
-                        <th>Shift 2</th>
-                        <th id="thShift3">Shift 3</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyRekap31"></tbody>
-            </table>
-        </div>
+<div id="wrapperHarian" style="display: none; margin-top: 20px; background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd;">
+    <h3 class="judul-kelap-kelip" style="text-align:center; border-bottom:none;">📈 MONITORING BULANAN (FULL VIEW)</h3>
+    <!-- Tombol Pop up Tabel -->
+    <button class="btn-popup" style="background:#2980b9;" onclick="bukaPopupTabel()">🖨️ BUKA POP-UP SCREENSHOT (1 BULAN FULL)</button>
+    <!-- Tambahan div untuk scroll vertikal -->
+    <div class="table-scroll">
+        <table id="tabelPPS">
+            <thead>
+                <tr>
+                    <th>Tgl</th>
+                    <th>Shift 1</th>
+                    <th>Shift 2</th>
+                    <th id="thShift3">Shift 3</th>
+                </tr>
+            </thead>
+            <tbody id="bodyRekap31"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= WADAH POP-UP (MODAL) ================= -->
+<div id="modalRapor" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-btn" onclick="tutupPopup('modalRapor')">&times;</button>
+        <h3 style="color:#27ae60; text-align:center; border-bottom:none;">📊 ANALISA KONTRIBUSI PERSONIL</h3>
+        <div id="popupRaporKonten" style="margin-top: 15px;"></div>
+    </div>
+</div>
+
+<div id="modalTabel" class="modal-overlay">
+    <div class="modal-content" style="max-width: 1200px;">
+        <button class="close-btn" onclick="tutupPopup('modalTabel')">&times;</button>
+        <h3 style="color:#2c3e50; text-align:center; border-bottom:none;">📈 MONITORING BULANAN (FULL VIEW)</h3>
+        <div id="popupTabelKonten" style="overflow-x: auto; margin-top: 15px;"></div>
+    </div>
+</div>
 
         <div style="text-align: center; margin: 30px 0 10px 0;">
             <a href="index.html" style="background: #f39c12; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: none; border: 2px solid #fff;">⬅ KEMBALI KE MENU UTAMA</a>
@@ -620,9 +687,11 @@ async function tarikSetupCloud() {
                 waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
                 waText += `💡 _(Laporan ini sah dan disertai dengan lampiran foto grid)_ 📸`;
 
-                setTimeout(() => { 
-                    window.location.href = `whatsapp://send?text=${encodeURIComponent(waText)}`; 
-                }, 1000);
+setTimeout(() => { 
+    // MENGGUNAKAN API BROWSER RESMI WA AGAR TEKS TIDAK HILANG & MENDUKUNG SEMUA DEVICE
+    const urlWA = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+    window.open(urlWA, '_blank'); 
+}, 1500);
                 
                 document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
                 document.querySelectorAll('.foto-wajib').forEach(fl => fl.value = "");
@@ -638,6 +707,26 @@ async function tarikSetupCloud() {
         }
 
         window.onload = init;
+
+// ================= FUNGSI BUKA / TUTUP POP-UP =================
+function bukaPopupRapor() {
+    // Kopi isi dari rapor area ke dalam popup
+    document.getElementById('popupRaporKonten').innerHTML = document.getElementById('raporPersonilArea').innerHTML;
+    // Buka pop-up
+    document.getElementById('modalRapor').style.display = 'flex';
+}
+
+function bukaPopupTabel() {
+    // Kopi seluruh tabel agar tampil utuh ke dalam popup
+    const tabelHtml = document.getElementById('tabelPPS').outerHTML;
+    document.getElementById('popupTabelKonten').innerHTML = tabelHtml;
+    // Buka pop-up
+    document.getElementById('modalTabel').style.display = 'flex';
+}
+
+function tutupPopup(id) {
+    document.getElementById(id).style.display = 'none';
+}
     </script>
 </body>
 </html>
