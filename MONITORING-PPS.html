@@ -112,6 +112,74 @@
         }
         .loading-teks { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
         .loading-subteks { font-size: 12px; color: #f1c40f; margin-top: 10px; font-weight: normal; }
+    
+    /* =========================
+   TAMBAHAN CSS SCROLL & LAPORAN HARIAN
+=========================*/
+.table-scroll-container {
+    max-height: 400px; /* Bikin tabel scrollable (bisa diubah ukurannya) */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    background: white;
+}
+/* Efek menyala untuk shift yang sudah lapor */
+.status-hijau { 
+    background-color: #2ecc71 !important; 
+    color: white !important; 
+    font-weight: bold; 
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2); 
+}
+.status-merah { 
+    background-color: #e74c3c !important; 
+    color: white !important; 
+    font-weight: bold; 
+}
+.status-kuning {
+    background-color: #f1c40f !important;
+    color: black !important;
+    font-weight: bold;
+}
+.tabel-laporan th, .tabel-laporan td { 
+    padding: 8px; 
+    text-align: center; 
+    border: 1px solid #eee; 
+    font-size: 11px;
+}
+
+/* =========================
+   DESAIN CHIP/TAG NAMA PERSONIL
+=========================*/
+.kru-tag {
+    background: #8e44ad;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+}
+.kru-tag span {
+    cursor: pointer;
+    background: #e74c3c;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    transition: 0.2s;
+}
+.kru-tag span:hover {
+    transform: scale(1.2);
+    background: #c0392b;
+}
     </style>
 </head>
 <body>
@@ -139,8 +207,16 @@
                 <option value="3">Toko 24 Jam</option>
                 <option value="2">Toko Non-24 Jam</option>
             </select>
-            <label>Daftar Personil (Pisah Koma)</label>
-            <textarea id="listKru" rows="2" oninput="saveKru()"></textarea>
+<label>Daftar Personil Toko</label>
+<textarea id="listKru" style="display:none;"></textarea>
+
+<!-- CLASS btn-admin-only DITAMBAHKAN DI SINI AGAR HILANG JIKA CREW LOGIN -->
+<div class="btn-admin-only" style="display:flex; gap:5px; margin-top:4px;">
+    <input type="text" id="inputNamaKru" placeholder="Ketik 1 nama, lalu klik Tambah..." onkeypress="if(event.key === 'Enter') tambahKru()">
+    <button onclick="tambahKru()" style="width:auto; margin-top:0; background:#3498db; color:white; padding:8px 15px;">+ TAMBAH</button>
+</div>
+
+<div id="wadahKru" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
                      
             <div class="btn-admin-only" style="margin-top:10px; padding:10px; background:#f9f9f9; border-radius:8px; border: 1px solid #ddd;">
                 <select id="wkTarget" onchange="switchWeek()">
@@ -216,9 +292,48 @@
         </div>
     </div>
 
-    <div id="wrapperHarian">
+<div id="wrapperHarian">
         <h3 style="margin-top:20px; color:#2c3e50;">📊 MONITORING PROGRES HARIAN TOKO</h3>
-        <table id="tabelPPS"><thead id="headPPS"></thead><tbody id="bodyPPS"></tbody></table>
+        <!-- Tombol Pop Up untuk Progres Harian -->
+        <button onclick="bukaModalTabel('modalHarian')" style="background:#3498db; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; margin-bottom:5px; font-weight:bold; width: 100%;">
+            📸 POP UP FULL 1 BULAN (UNTUK SS)
+        </button>
+        <!-- Bungkus tabel dengan div scroll -->
+        <div class="table-scroll-container" id="scrollHarian">
+            <table id="tabelPPS"><thead id="headPPS"></thead><tbody id="bodyPPS"></tbody></table>
+        </div>
+    </div>
+
+    <!-- DASHBOARD BARU: MONITORING LAPORAN SHIFT -->
+    <div id="wrapperLaporanHarian" style="margin-top: 30px;">
+        <h3 style="color:#8e44ad;">⏰ MONITORING LAPORAN SHIFT HARIAN</h3>
+        <!-- Tombol Pop Up untuk Laporan Shift -->
+        <button onclick="bukaModalTabel('modalLaporan')" style="background:#9b59b6; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; margin-bottom:5px; font-weight:bold; width: 100%;">
+            📸 POP UP FULL LAPORAN (UNTUK SS)
+        </button>
+        <div class="table-scroll-container" id="scrollLaporan">
+            <table id="tabelLaporan" class="tabel-laporan" style="width: 100%; border-collapse: collapse;">
+                <thead id="headLaporan"></thead>
+                <tbody id="bodyLaporan"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- WADAH UNTUK MODAL POP UP SS -->
+    <div id="modalHarian" class="modal-rapor" style="display:none;">
+        <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;">
+            <span class="btn-tutup" onclick="tutupModalTabel('modalHarian')">×</span>
+            <h3 style="text-align:center;">📸 PROGRES HARIAN FULL 1 BULAN</h3>
+            <div id="cloneHarian" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <div id="modalLaporan" class="modal-rapor" style="display:none;">
+        <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;">
+            <span class="btn-tutup" onclick="tutupModalTabel('modalLaporan')">×</span>
+            <h3 style="text-align:center;">📸 LAPORAN SHIFT FULL 1 BULAN</h3>
+            <div id="cloneLaporan" style="overflow-x:auto;"></div>
+        </div>
     </div>
 
     <canvas id="canvasJoin"></canvas>
@@ -606,9 +721,78 @@ function generateRanking(){
         updateUI();
     }
 
-    function updateKruList() {
-        // Fungsi update list ke dropdown dimatikan, karena kotak nama kasir sekarang ditarik otomatis dari session login & dikunci mati.
+// ==========================================
+// CEK HAK AKSES (ADMIN / KT / COS / KORWIL)
+// ==========================================
+function isUserAdmin() {
+    const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
+    const role = (userSesi.role || "").toLowerCase();
+    return (role.includes("admin") || role.includes("kepala toko") || role.includes("kt") || role.includes("cos") || role.includes("korwil"));
+}
+
+// ==========================================
+// FUNGSI RENDER & ATUR DAFTAR PERSONIL BARU
+// ==========================================
+function updateKruList() {
+    const wadah = document.getElementById('wadahKru');
+    if(!wadah) return;
+    const listKruRaw = document.getElementById('listKru').value;
+    const kArr = listKruRaw.split(',').map(x => x.trim()).filter(Boolean);
+    
+    // Cek siapa yang sedang login
+    const isAuthorized = isUserAdmin();
+
+    let html = '';
+    kArr.forEach(nama => {
+        if(isAuthorized) {
+            // Jika KT/Admin: Tampilkan nama beserta tombol Hapus (✖)
+            html += `<div class="kru-tag">
+                        ${nama} 
+                        <span onclick="hapusKru('${nama}')" title="Hapus ${nama}">✖</span>
+                     </div>`;
+        } else {
+            // Jika Crew/ACOS: Tampilkan nama saja tanpa tombol Hapus
+            html += `<div class="kru-tag" style="padding-right: 12px;">${nama}</div>`;
+        }
+    });
+    wadah.innerHTML = html;
+}
+
+function tambahKru() {
+    if(!isUserAdmin()) return alert("🚨 AKSES DITOLAK! Hanya Pejabat Toko (Admin/KT/COS) yang bisa menambah personil.");
+
+    const input = document.getElementById('inputNamaKru');
+    let namaBaru = input.value.trim().toUpperCase(); 
+    if(!namaBaru) return;
+
+    const listAsli = document.getElementById('listKru').value;
+    let kArr = listAsli.split(',').map(x => x.trim()).filter(Boolean);
+
+    if(kArr.includes(namaBaru)) {
+        alert("🚨 Nama kasir " + namaBaru + " sudah ada di daftar!");
+        return;
     }
+
+    kArr.push(namaBaru);
+    document.getElementById('listKru').value = kArr.join(','); 
+    
+    input.value = ''; 
+    saveKru(); 
+}
+
+function hapusKru(namaHapus) {
+    if(!isUserAdmin()) return alert("🚨 AKSES DITOLAK! Hanya Pejabat Toko (Admin/KT/COS) yang bisa menghapus personil.");
+
+    if(!confirm(`Yakin ingin menghapus ${namaHapus} dari daftar personil?`)) return;
+
+    const listAsli = document.getElementById('listKru').value;
+    let kArr = listAsli.split(',').map(x => x.trim()).filter(Boolean);
+
+    kArr = kArr.filter(n => n !== namaHapus);
+
+    document.getElementById('listKru').value = kArr.join(',');
+    saveKru(); 
+}
 
     function saveKru() {
         const k = getK(); if(!k.tk) return;
@@ -1244,6 +1428,7 @@ rHtml += trendHtml;
 
 const rArea = document.getElementById('raporArea');
 if(rArea) rArea.innerHTML = rHtml;
+renderLaporanHarian(); 
 }
 
 function pctVS(real,target){ return target>0 ? Math.round((real/target)*100) : 0; }
@@ -1423,6 +1608,95 @@ function bukaRapor() {
                 <button onclick="tutupRapor()" style="width:100%; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">TUTUP</button>
             </div>
         </div>`;
+}
+// ==========================================
+// FUNGSI POP UP TABEL UNTUK SCREENSHOT
+// ==========================================
+function bukaModalTabel(idModal) {
+    const modal = document.getElementById(idModal);
+    if(idModal === 'modalHarian') {
+        document.getElementById('cloneHarian').innerHTML = '<table style="width:100%; border-collapse:collapse; font-size:11px;" border="1">' + document.getElementById('tabelPPS').innerHTML + '</table>';
+    } else if (idModal === 'modalLaporan') {
+        document.getElementById('cloneLaporan').innerHTML = '<table class="tabel-laporan" style="width:100%; border-collapse:collapse; font-size:11px;" border="1">' + document.getElementById('tabelLaporan').innerHTML + '</table>';
+    }
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Matikan scroll background
+}
+
+function tutupModalTabel(idModal) {
+    document.getElementById(idModal).style.display = 'none';
+    document.body.style.overflow = 'auto'; // Nyalakan scroll background
+}
+
+// ==========================================
+// FUNGSI RENDER DASHBOARD LAPORAN SHIFT (REVISI GACOR)
+// ==========================================
+function renderLaporanHarian() {
+    const k = getK(); if(!k.tk) return;
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    const tipeToko = document.getElementById('tipeToko').value; 
+    const jmlShift = (tipeToko === "3") ? 3 : 2; // Cek 24 jam atau Non-24 jam
+    const harianData = db[k.yr][k.mn][k.tk].harian || {};
+
+    const head = document.getElementById('headLaporan');
+    const body = document.getElementById('bodyLaporan');
+    
+    // Bikin Header Tabel
+    let headHTML = `<tr style="background:#34495e; color:white;"><th>Tgl</th>`;
+    for(let s=1; s<=jmlShift; s++) {
+        headHTML += `<th>Shift ${s}</th>`;
+    }
+    headHTML += `<th>Status Harian</th></tr>`;
+    head.innerHTML = headHTML;
+
+    // Bikin Isi Tabel
+    body.innerHTML = "";
+    for(let i=1; i<=dM; i++) {
+        const h = harianData[i] || {};
+        let rowHTML = `<td><b>${i}</b></td>`;
+        let shiftLaporCount = 0;
+
+        for(let s=1; s<=jmlShift; s++) {
+            const shiftKode = `s${s}`;
+            let namaKasir = []; // Wadah untuk nampung nama kasir yang lapor
+            
+            // Cari data di hari tersebut yang sesuai shift dan mengambil namanya
+            Object.keys(h).forEach(key => {
+                if(key.startsWith(shiftKode + '_') && key.endsWith('_nama')) {
+                    // Masukkan nama ke dalam wadah, jadikan huruf besar semua biar rapi
+                    namaKasir.push(h[key].toUpperCase());
+                }
+            });
+
+            // Cek apakah ada kasir yang lapor di shift ini
+            if(namaKasir.length > 0) {
+                shiftLaporCount++;
+                // Gabungkan nama-nama kasir (jika > 1) dengan koma
+                let listNama = namaKasir.join(', ');
+                
+                // Tampilkan label SUDAH beserta nama kasirnya di bawahnya
+                rowHTML += `<td class="status-hijau" style="line-height:1.6;">
+                    ✅ SUDAH<br>
+                    <span style="font-size:9.5px; background:rgba(0,0,0,0.25); padding:2px 5px; border-radius:4px; display:inline-block; margin-top:2px;">
+                        👤 ${listNama}
+                    </span>
+                </td>`;
+            } else {
+                rowHTML += `<td class="status-merah">🐌 KUSUT</td>`;
+            }
+        }
+
+        // Cek Kesimpulan per Hari
+        if(shiftLaporCount === jmlShift) {
+            rowHTML += `<td class="status-hijau">🌟 COMPLETE</td>`;
+        } else if (shiftLaporCount > 0) {
+            rowHTML += `<td class="status-kuning">⏳ BELUM FULL</td>`;
+        } else {
+            rowHTML += `<td class="status-merah">❌ KOSONG</td>`;
+        }
+
+        body.innerHTML += `<tr>${rowHTML}</tr>`;
+    }
 }
 </script>
 </body>
