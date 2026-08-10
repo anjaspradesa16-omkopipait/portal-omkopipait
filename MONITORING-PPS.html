@@ -665,16 +665,19 @@ function generateRanking(){
             }
         }
 
-        // ==========================================
         // KUNCI KASIR OTOMATIS DARI DATA LOGIN
-        // ==========================================
         const inKasir = document.getElementById("kasirAktif");
         if (inKasir && userSesi) {
-            // Mengambil nama dari session (nama / username / user). Jika kosong akan tertulis TIDAK_DIKETAHUI
             let namaKasir = userSesi.nama || userSesi.username || userSesi.user || "TIDAK_DIKETAHUI";
             inKasir.value = namaKasir.toUpperCase();
+            
+            // BUKA KUNCI KASIR KHUSUS UNTUK COS / KORWIL (ADMIN) BIAR BISA BANTU INPUT
+            if (userSesi.role === "admin") {
+                inKasir.readOnly = false;
+                inKasir.style.backgroundColor = "#ffffff";
+                inKasir.style.cursor = "text";
+            }
         }
-        // ==========================================
 
         initPPS();
         
@@ -756,6 +759,35 @@ function updateKruList() {
         }
     });
     wadah.innerHTML = html;
+
+    // --- REVISI GACOR: UBAH KOLOM KASIR JADI DROPDOWN KHUSUS COS/KORWIL ---
+    let inKasir = document.getElementById("kasirAktif");
+    if (inKasir && isAuthorized) {
+        // Simpan nama kasir yang sedang tampil
+        let nilaiSekarang = inKasir.value; 
+
+        // Ubah elemen <input> jadi <select> (Dropdown) agar anti-typo
+        if (inKasir.tagName === "INPUT") {
+            const newSelect = document.createElement("select");
+            newSelect.id = "kasirAktif";
+            // Desain dibikin persis kayak kotak aslinya, tapi bisa diklik
+            newSelect.style.cssText = "width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 13px; font-weight:bold; background-color: #fff; cursor: pointer; text-transform:uppercase;";
+            
+            // Saat nama kasir diganti, otomatis me-refresh data laporannya!
+            newSelect.onchange = function() { loadReal(); }; 
+            
+            inKasir.parentNode.replaceChild(newSelect, inKasir);
+            inKasir = newSelect;
+        }
+        
+        // Isi isi Dropdown otomatis dari data Daftar Personil Toko
+        let optHtml = `<option value="">-- Pilih Kasir --</option>`;
+        kArr.forEach(n => {
+            let selected = (n === nilaiSekarang) ? "selected" : "";
+            optHtml += `<option value="${n}" ${selected}>${n}</option>`;
+        });
+        inKasir.innerHTML = optHtml;
+    }
 }
 
 function tambahKru() {
