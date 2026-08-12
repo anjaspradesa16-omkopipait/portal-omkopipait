@@ -349,7 +349,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbx7ig6HmET2v2cJpK6EncYweZ6voyo9nmmLBlz9_6RHvuWIBSrLc7skmgGq55PBPTMRLw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwVKuU1I5pfWGHHCberlgUnHZWXzKihT0X9dnUkGEScxwmPQVy4gH9loP7WRT2UbeuLBw/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -968,7 +968,7 @@ function getLogic(tgl, it, yr, mn) {
     }
 }
 
-function simpanReal() {
+    function simpanReal() {
         const k = getK(); const tgl = document.getElementById('tglInput').value;
         const ksr = document.getElementById('kasirAktif').value;
         const shf = document.getElementById('shfInput').value;
@@ -1012,7 +1012,7 @@ function simpanReal() {
         
         saveDisk();
 
-        showLoading("Menyimpan Data Harian ke Cloud..."); 
+        showLoading("Menyimpan Data Harian ke Cloud..."); // MUNCULKAN LOADING
 
         const payload = { 
             toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
@@ -1471,7 +1471,7 @@ function pctGrowth(sekarang,lalu){
         } else { setInputState(true); }
     }
 
-async function kirimWA() {
+    async function kirimWA() {
     try {
         const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
         const shf = document.getElementById('shfInput').value; 
@@ -1520,33 +1520,7 @@ async function kirimWA() {
             db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
         }
 
-        // === BUG FIX: UPDATE NOTE KE DATABASE LOKAL ===
-        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
-        if(!db[k.yr][k.mn][k.tk].harian[tgl][shfKey]) db[k.yr][k.mn][k.tk].harian[tgl][shfKey] = {};
-        
-        db[k.yr][k.mn][k.tk].harian[tgl][shfKey+'_note'] = note; 
-        db[k.yr][k.mn][k.tk].harian[tgl][shfKey+'_nama'] = ksr;
-        
-        saveDisk(); // Simpan ke local storage
-
-        // === BUG FIX: SILENT SYNC KE CLOUD (Otomatis save alasan tanpa dobel klik) ===
-        const dH = db[k.yr][k.mn][k.tk].harian[tgl][shfKey] || {};
-        const payloadSync = { 
-            toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
-            namaPersonil: ksr, note: note, 
-            pwp: dH.PWP ?? (document.getElementById('r_PWP').value || 0), 
-            psm: dH.PSM ?? (document.getElementById('r_PSM').value || 0), 
-            serba: dH.SERBA_GRATIS ?? (document.getElementById('r_SERBA_GRATIS').value || 0), 
-            suger: dH.SUGER ?? (document.getElementById('r_SUGER').value || 0), 
-            ceban: dH.CEBAN ?? (document.getElementById('r_CEBAN').value || 0), 
-            jam: db[k.yr][k.mn][k.tk].harian[tgl][shfKey+'_jam'] || new Date().getTime(), 
-            tipeData: "PPS_HARIAN_SAVE_V2" 
-        };
-
-        // Tembak ke cloud tanpa memunculkan layar loading
-        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadSync) })
-        .catch(e => console.log("Silent Sync Gagal"));
-        // =========================================================================
+        saveDisk();
 
         let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0}; 
         const dM = new Date(k.yr, k.mn, 0).getDate();
@@ -1604,6 +1578,7 @@ async function kirimWA() {
 
     } catch (err) { alert("🚨 ERROR: " + err.message); }
 }
+
 
 function tutupRapor() {
     const modal = document.getElementById('modalRapor');
