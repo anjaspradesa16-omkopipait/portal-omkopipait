@@ -968,12 +968,20 @@ function getLogic(tgl, it, yr, mn) {
     }
 }
 
-    function simpanReal() {
+function simpanReal() {
         const k = getK(); const tgl = document.getElementById('tglInput').value;
         const ksr = document.getElementById('kasirAktif').value;
         const shf = document.getElementById('shfInput').value;
 
         if(!tgl || !ksr || ksr === "-- Pilih Kasir --") return alert("Pilih Tanggal & Kasir!");
+
+        // === BUG FIX: WAJIB UPLOAD 2 FOTO SEBELUM SIMPAN ===
+        const i1 = document.getElementById('pBuku');
+        const i2 = document.getElementById('pSIS');
+        if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) {
+            return alert("🚨 UPLOAD 2 FOTO DULU BOSKU!\nBukti Foto Report PPS & Buku Monitoring wajib diisi sebelum bisa menyimpan data shift.");
+        }
+        // ====================================================
 
         const shfKey = shf + "_" + ksr.replace(/\s+/g, '_'); 
 
@@ -1004,7 +1012,7 @@ function getLogic(tgl, it, yr, mn) {
         
         saveDisk();
 
-        showLoading("Menyimpan Data Harian ke Cloud..."); // MUNCULKAN LOADING
+        showLoading("Menyimpan Data Harian ke Cloud..."); 
 
         const payload = { 
             toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
@@ -1026,46 +1034,6 @@ function getLogic(tgl, it, yr, mn) {
             hideLoading();
             alert("Gagal koneksi ke cloud!");
         });
-    }
-
-    function pullDataFromCloud() {
-        const k = getK(); if(!k.tk) return;
-        
-        showLoading("Mengambil Data Terbaru dari Cloud..."); // MUNCULKAN LOADING SAAT BUKA
-
-        fetch(`${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}`)
-        .then(res => res.json())
-        .then(data => {
-            console.log("DATA CLOUD", data);
-            console.log("BULAN LALU DARI CLOUD", data.bulanLalu);
-            if(data && data.target) {
-                db[k.yr][k.mn][k.tk].target = data.target;
-                db[k.yr][k.mn][k.tk].harian = data.harian || {};
-                db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
-                db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
-                db[k.yr][k.mn][k.tk].bulanLalu = data.bulanLalu || {};
-                db[k.yr][k.mn][k.tk].bulanLaluDetail = data.bulanLaluDetail || {};
-                db[k.yr][k.mn][k.tk].bulanLaluKasir = data.bulanLaluKasir || {};
-                db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni = data.bulanLaluSampaiHariIni || {};
-
-                localStorage.setItem('dbPPS_v30', JSON.stringify(db));
-                
-                // HANYA LIST KRU DAN TIPE TOKO YANG DITIMPA
-                document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
-                document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
-                
-                updateKruList();
-                updateShiftOption();
-                switchWeek();
-                updateUI();
-            }
-            hideLoading(); // Hilangkan loading kalau sukses
-        }).catch(e => {
-            console.log("Cloud Pull Error");
-            hideLoading(); // Hilangkan loading walau error
-        });
-
-        console.log("DATA BULAN LALU", db[k.yr]?.[k.mn]?.[k.tk]?.bulanLalu);
     }
 
     function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
@@ -1503,7 +1471,7 @@ function pctGrowth(sekarang,lalu){
         } else { setInputState(true); }
     }
 
-    async function kirimWA() {
+async function kirimWA() {
     try {
         const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
         const shf = document.getElementById('shfInput').value; 
@@ -1552,7 +1520,33 @@ function pctGrowth(sekarang,lalu){
             db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
         }
 
-        saveDisk();
+        // === BUG FIX: UPDATE NOTE KE DATABASE LOKAL ===
+        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
+        if(!db[k.yr][k.mn][k.tk].harian[tgl][shfKey]) db[k.yr][k.mn][k.tk].harian[tgl][shfKey] = {};
+        
+        db[k.yr][k.mn][k.tk].harian[tgl][shfKey+'_note'] = note; 
+        db[k.yr][k.mn][k.tk].harian[tgl][shfKey+'_nama'] = ksr;
+        
+        saveDisk(); // Simpan ke local storage
+
+        // === BUG FIX: SILENT SYNC KE CLOUD (Otomatis save alasan tanpa dobel klik) ===
+        const dH = db[k.yr][k.mn][k.tk].harian[tgl][shfKey] || {};
+        const payloadSync = { 
+            toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
+            namaPersonil: ksr, note: note, 
+            pwp: dH.PWP ?? (document.getElementById('r_PWP').value || 0), 
+            psm: dH.PSM ?? (document.getElementById('r_PSM').value || 0), 
+            serba: dH.SERBA_GRATIS ?? (document.getElementById('r_SERBA_GRATIS').value || 0), 
+            suger: dH.SUGER ?? (document.getElementById('r_SUGER').value || 0), 
+            ceban: dH.CEBAN ?? (document.getElementById('r_CEBAN').value || 0), 
+            jam: db[k.yr][k.mn][k.tk].harian[tgl][shfKey+'_jam'] || new Date().getTime(), 
+            tipeData: "PPS_HARIAN_SAVE_V2" 
+        };
+
+        // Tembak ke cloud tanpa memunculkan layar loading
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadSync) })
+        .catch(e => console.log("Silent Sync Gagal"));
+        // =========================================================================
 
         let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0}; 
         const dM = new Date(k.yr, k.mn, 0).getDate();
