@@ -1036,6 +1036,46 @@ function getLogic(tgl, it, yr, mn) {
         });
     }
 
+        function pullDataFromCloud() {
+        const k = getK(); if(!k.tk) return;
+        
+        showLoading("Mengambil Data Terbaru dari Cloud..."); // MUNCULKAN LOADING SAAT BUKA
+
+        fetch(`${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log("DATA CLOUD", data);
+            console.log("BULAN LALU DARI CLOUD", data.bulanLalu);
+            if(data && data.target) {
+                db[k.yr][k.mn][k.tk].target = data.target;
+                db[k.yr][k.mn][k.tk].harian = data.harian || {};
+                db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
+                db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+                db[k.yr][k.mn][k.tk].bulanLalu = data.bulanLalu || {};
+                db[k.yr][k.mn][k.tk].bulanLaluDetail = data.bulanLaluDetail || {};
+                db[k.yr][k.mn][k.tk].bulanLaluKasir = data.bulanLaluKasir || {};
+                db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni = data.bulanLaluSampaiHariIni || {};
+
+                localStorage.setItem('dbPPS_v30', JSON.stringify(db));
+                
+                // HANYA LIST KRU DAN TIPE TOKO YANG DITIMPA
+                document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
+                document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
+                
+                updateKruList();
+                updateShiftOption();
+                switchWeek();
+                updateUI();
+            }
+            hideLoading(); // Hilangkan loading kalau sukses
+        }).catch(e => {
+            console.log("Cloud Pull Error");
+            hideLoading(); // Hilangkan loading walau error
+        });
+
+        console.log("DATA BULAN LALU", db[k.yr]?.[k.mn]?.[k.tk]?.bulanLalu);
+    }
+
     function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
 
     function updateUI() {
@@ -1520,9 +1560,31 @@ function pctGrowth(sekarang,lalu){
             db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
         }
 
+        // --- TAMBAHAN FIX BUG ALASAN KE CLOUD ---
+        // 1. Simpan alasan (note) ke database lokal agar tidak hilang
+        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
+        if(!db[k.yr][k.mn][k.tk].harian[tgl][shfKey]) db[k.yr][k.mn][k.tk].harian[tgl][shfKey] = {};
+        db[k.yr][k.mn][k.tk].harian[tgl][shfKey + '_note'] = note;
         saveDisk();
 
-        let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0}; 
+        // 2. Tembak/Push langsung ke cloud berbarengan saat klik Kirim WA
+        const waktuSekarang = db[k.yr][k.mn][k.tk].harian[tgl][shfKey + '_jam'] || new Date().getTime();
+        const payloadWA = { 
+            toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
+            namaPersonil: ksr, note: note, 
+            pwp: document.getElementById('r_PWP').value || 0, 
+            psm: document.getElementById('r_PSM').value || 0, 
+            serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
+            suger: document.getElementById('r_SUGER').value || 0, 
+            ceban: document.getElementById('r_CEBAN').value || 0, 
+            jam: waktuSekarang, 
+            tipeData: "PPS_HARIAN_SAVE_V2" 
+        };
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadWA) })
+            .catch(() => console.log("Gagal push alasan ke cloud"));
+        // ----------------------------------------
+
+        let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
         const dM = new Date(k.yr, k.mn, 0).getDate();
         for(let i=1; i<=dM; i++){
             const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
