@@ -198,10 +198,10 @@
         <div class="card">
             <h3>1. SETUP ADMIN & TARGET</h3>
             <div style="display:flex;gap:5px;flex-wrap:wrap;">
-                <select id="thnArsip" onchange="initPPS()"><option value="2026">2026</option></select>
-                <select id="blnArsip" onchange="initPPS()"></select>
+                <select id="thnArsip" onchange="initPPS(); pullDataFromCloud();"><option value="2026">2026</option></select>
+                <select id="blnArsip" onchange="initPPS(); pullDataFromCloud();"></select>
             </div>
-            <input type="text" id="kodeToko" placeholder="KODE TOKO" oninput="initPPS()">
+            <input type="text" id="kodeToko" placeholder="KODE TOKO" onchange="initPPS(); pullDataFromCloud();">
             <label>Tipe Toko</label>
             <select id="tipeToko" onchange="saveTipe()">
                 <option value="3">Toko 24 Jam</option>
@@ -349,7 +349,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwVKuU1I5pfWGHHCberlgUnHZWXzKihT0X9dnUkGEScxwmPQVy4gH9loP7WRT2UbeuLBw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbzQPIQ_sSZdPapNcqYk8Uir9dkxHfyUJQa1NuaBgg324b8HPo4F9p4E9m5rL0r09c6vNw/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -1036,45 +1036,92 @@ function getLogic(tgl, it, yr, mn) {
         });
     }
 
-        function pullDataFromCloud() {
-        const k = getK(); if(!k.tk) return;
-        
-        showLoading("Mengambil Data Terbaru dari Cloud..."); // MUNCULKAN LOADING SAAT BUKA
+// ==========================================
+// FUNGSI MENARIK DATA (ANTI-CRASH & ANTI-SPAM)
+// ==========================================
+let isFetchingCloud = false; // Bumper/Gembok agar tidak narik data dobel-dobel
 
-        fetch(`${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}`)
-        .then(res => res.json())
-        .then(data => {
-            console.log("DATA CLOUD", data);
-            console.log("BULAN LALU DARI CLOUD", data.bulanLalu);
-            if(data && data.target) {
-                db[k.yr][k.mn][k.tk].target = data.target;
-                db[k.yr][k.mn][k.tk].harian = data.harian || {};
-                db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
-                db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
-                db[k.yr][k.mn][k.tk].bulanLalu = data.bulanLalu || {};
-                db[k.yr][k.mn][k.tk].bulanLaluDetail = data.bulanLaluDetail || {};
-                db[k.yr][k.mn][k.tk].bulanLaluKasir = data.bulanLaluKasir || {};
-                db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni = data.bulanLaluSampaiHariIni || {};
-
-                localStorage.setItem('dbPPS_v30', JSON.stringify(db));
-                
-                // HANYA LIST KRU DAN TIPE TOKO YANG DITIMPA
-                document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
-                document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
-                
-                updateKruList();
-                updateShiftOption();
-                switchWeek();
-                updateUI();
-            }
-            hideLoading(); // Hilangkan loading kalau sukses
-        }).catch(e => {
-            console.log("Cloud Pull Error");
-            hideLoading(); // Hilangkan loading walau error
-        });
-
-        console.log("DATA BULAN LALU", db[k.yr]?.[k.mn]?.[k.tk]?.bulanLalu);
+function pullDataFromCloud() {
+    const k = getK(); if(!k.tk) return;
+    
+    // Cegah request beruntun yang bikin Google ngambek (Error 429/Server Sibuk)
+    if (isFetchingCloud) {
+        console.warn("Sedang menarik data, harap tunggu...");
+        return; 
     }
+    isFetchingCloud = true;
+    
+    showLoading("Mengambil Data Terbaru dari Cloud..."); 
+
+    // Anti-Cache agar selalu minta data segar
+    const urlAntiCache = `${urlRaportGlobal}?toko=${k.tk}&yr=${k.yr}&mn=${k.mn}&t=${new Date().getTime()}`;
+
+    fetch(urlAntiCache)
+    .then(async res => {
+        // Tangkap jika server Google menolak (misal: Limit/Sibuk)
+        if (!res.ok) throw new Error("HTTP Error " + res.status);
+        
+        const text = await res.text();
+        try {
+            return JSON.parse(text); // Paksa terjemahkan ke JSON
+        } catch (err) {
+            console.error("BALASAN GOOGLE BUKAN DATA, MELAINKAN INI:", text);
+            throw new Error("Google memblokir koneksi (Server Sibuk / Terlalu banyak klik)");
+        }
+    })
+    .then(data => {
+        isFetchingCloud = false; // Buka gembok
+        
+        if(data && data.status === "error") {
+            alert("🚨 PESAN DARI CLOUD:\n" + (data.message || data.msg));
+            hideLoading();
+            return;
+        }
+
+        if(data) {
+            if(!db[k.yr]) db[k.yr] = {};
+            if(!db[k.yr][k.mn]) db[k.yr][k.mn] = {};
+            if(!db[k.yr][k.mn][k.tk]) db[k.yr][k.mn][k.tk] = { target: {1:{},2:{},3:{},4:{}}, harian: {}, kru: "", tipe: "3", reasons: [] };
+
+            db[k.yr][k.mn][k.tk].target = data.target || db[k.yr][k.mn][k.tk].target;
+            db[k.yr][k.mn][k.tk].harian = data.harian || db[k.yr][k.mn][k.tk].harian;
+            db[k.yr][k.mn][k.tk].kru = data.kru || db[k.yr][k.mn][k.tk].kru;
+            db[k.yr][k.mn][k.tk].tipe = data.tipe || db[k.yr][k.mn][k.tk].tipe;
+            
+            db[k.yr][k.mn][k.tk].bulanLalu = data.bulanLalu || {};
+            db[k.yr][k.mn][k.tk].bulanLaluDetail = data.bulanLaluDetail || {};
+            db[k.yr][k.mn][k.tk].bulanLaluKasir = data.bulanLaluKasir || {};
+            db[k.yr][k.mn][k.tk].bulanLaluSampaiHariIni = data.bulanLaluSampaiHariIni || {};
+
+            localStorage.setItem('dbPPS_v30', JSON.stringify(db));
+            
+            document.getElementById('listKru').value = db[k.yr][k.mn][k.tk].kru;
+            document.getElementById('tipeToko').value = db[k.yr][k.mn][k.tk].tipe;
+            
+            updateKruList();
+            updateShiftOption();
+            switchWeek();
+            
+            // Pengamanan tambahan saat render Tabel
+            try {
+                updateUI(); 
+            } catch(uiErr) {
+                console.error("UI ERROR:", uiErr);
+                alert("Data berhasil ditarik, tapi ada error saat memproses tabel. Cek Console!");
+            }
+        }
+        hideLoading(); 
+    }).catch(e => {
+        isFetchingCloud = false; // Buka gembok kalau eror
+        console.error("Cloud Pull Error", e);
+        
+        // Pop-up sekarang akan kasih tahu alasan detailnya
+        alert("🚨 GAGAL TERHUBUNG KE CLOUD!\nPenyebab: " + e.message);
+        hideLoading(); 
+        
+        try { updateUI(); } catch(ex){} 
+    });
+}
 
     function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
 
