@@ -618,93 +618,105 @@ async function tarikSetupCloud() {
             });
         }
 
-        // ================= KIRIM LAPORAN =================
-        async function kirimLaporan() {
-            if(isSubmitting) return;
+// ================= KIRIM LAPORAN =================
+async function kirimLaporan() {
+    if(isSubmitting) return;
 
-            const btnKirim = document.querySelector('.btn-wa');
-            const nama = globalUser.nama; 
-            const shift = document.getElementById('shfInput').value;
-            const arrJob = setupMaster.jobdesk;
+    const btnKirim = document.querySelector('.btn-wa');
+    const nama = globalUser.nama; 
+    const shift = document.getElementById('shfInput').value;
+    const arrJob = setupMaster.jobdesk;
 
-            if(arrJob.length === 0) return alert("Belum ada tugas disetup.");
+    if(arrJob.length === 0) return alert("Belum ada tugas disetup.");
 
-            let semuaCek = true, semuaFoto = true;
-            let arrayKirim = [];
-            let fileFotos = [];
+    let semuaCek = true, semuaFoto = true;
+    let arrayKirim = [];
+    let fileFotos = [];
 
-            for (let i = 0; i < arrJob.length; i++) {
-                if(!document.getElementById(`chk_${i}`).checked) semuaCek = false;
-                
-                const fileInput = document.getElementById(`foto_${i}`);
-                if(fileInput.files.length === 0) semuaFoto = false;
-                else fileFotos.push(fileInput.files[0]);
-            }
+    for (let i = 0; i < arrJob.length; i++) {
+        if(!document.getElementById(`chk_${i}`).checked) semuaCek = false;
+        
+        const fileInput = document.getElementById(`foto_${i}`);
+        if(fileInput.files.length === 0) semuaFoto = false;
+        else fileFotos.push(fileInput.files[0]);
+    }
 
-            if(!semuaCek) return alert("PERINGATAN: Masih ada tugas yang BELUM DICEKLIS! Pastikan semua perintah kepala toko dijalankan tanpa terkecuali.");
-            if(!semuaFoto) return alert("PERINGATAN: Bukti Foto wajib diupload sepenuhnya! Tidak boleh ada foto yang kosong.");
+    if(!semuaCek) return alert("PERINGATAN: Masih ada tugas yang BELUM DICEKLIS! Pastikan semua perintah kepala toko dijalankan tanpa terkecuali.");
+    if(!semuaFoto) return alert("PERINGATAN: Bukti Foto wajib diupload sepenuhnya! Tidak boleh ada foto yang kosong.");
 
-            isSubmitting = true;
-            btnKirim.disabled = true;
-            btnKirim.style.opacity = "0.5";
-            btnKirim.innerText = "⏳ MENGIRIM... (MOHON TUNGGU)";
+    isSubmitting = true;
+    btnKirim.disabled = true;
+    btnKirim.style.opacity = "0.5";
+    btnKirim.innerText = "⏳ MENGIRIM... (MOHON TUNGGU)";
 
-            showLoad();
-            try {
-                await buatGridDanDownload(fileFotos, nama, shift);
+    showLoad();
+    
+    try {
+        await buatGridDanDownload(fileFotos, nama, shift);
 
-                for (let i = 0; i < arrJob.length; i++) {
-                    arrayKirim.push({ namaJobdesk: arrJob[i], status: "Selesai" });
-                }
-
-                await fetchToCloud({
-                    action: "submitLaporan",
-                    kodeToko: globalUser.toko,
-                    bulan: blnSekarang,
-                    tgl: tglSekarang,
-                    shift: shift,
-                    namaCrew: nama,
-                    laporan: arrayKirim
-                });
-
-                hideLoad();
-                isSubmitting = false;
-                btnKirim.disabled = false;
-                btnKirim.style.opacity = "1";
-                btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
-
-                let waText = `✨ *LAPORAN CEKLIS AWAL SHIFT* ✨\n`;
-                waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
-                waText += `🏪 *Toko:* ${globalUser.toko}\n`;
-                waText += `📅 *Tanggal:* ${tglSekarang}/${blnSekarang}/${today.getFullYear()}\n`;
-                waText += `⏰ *Shift:* ${shift}\n`;
-                waText += `🧑‍🚀 *Personil:* ${nama}\n`;
-                waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
-                waText += `*📋 STATUS TUGAS:* \n`;
-                
-                arrJob.forEach(job => { waText += ` ✅ _${job}_\n`; });
-                
-                waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
-                waText += `💡 _(Laporan ini sah dan disertai dengan lampiran foto grid)_ 📸`;
-
-setTimeout(() => { 
-    // MENGGUNAKAN API BROWSER RESMI WA AGAR TEKS TIDAK HILANG & MENDUKUNG SEMUA DEVICE
-    const urlWA = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
-    window.open(urlWA, '_blank'); 
-}, 1500);
-                
-                document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
-                document.querySelectorAll('.foto-wajib').forEach(fl => fl.value = "");
-            } catch (e) {
-                alert("Gagal koneksi, coba lagi!");
-                hideLoad();
-                
-                isSubmitting = false;
-                btnKirim.disabled = false;
-                btnKirim.style.opacity = "1";
-                btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
-            }
+        for (let i = 0; i < arrJob.length; i++) {
+            arrayKirim.push({ namaJobdesk: arrJob[i], status: "Selesai" });
         }
+
+        // Proses pengiriman ke Cloud
+        await fetchToCloud({
+            action: "submitLaporan",
+            kodeToko: globalUser.toko,
+            bulan: blnSekarang,
+            tgl: tglSekarang,
+            shift: shift,
+            namaCrew: nama,
+            laporan: arrayKirim
+        });
+
+        hideLoad();
+        
+        // Reset Form
+        document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.foto-wajib').forEach(fl => fl.value = "");
+
+        isSubmitting = false;
+        btnKirim.disabled = false;
+        btnKirim.style.opacity = "1";
+        btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
+
+        // Persiapkan teks WhatsApp
+        let waText = `✨ *LAPORAN CEKLIS AWAL SHIFT* ✨\n`;
+        waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        waText += `🏪 *Toko:* ${globalUser.toko}\n`;
+        waText += `📅 *Tanggal:* ${tglSekarang}/${blnSekarang}/${new Date().getFullYear()}\n`;
+        waText += `⏰ *Shift:* ${shift}\n`;
+        waText += `🧑‍🚀 *Personil:* ${nama}\n`;
+        waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        waText += `*📋 STATUS TUGAS:* \n`;
+        
+        arrJob.forEach(job => { waText += ` ✅ _${job}_\n`; });
+        
+        waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        waText += `💡 _(Laporan ini sah dan disertai dengan lampiran foto grid)_ 📸`;
+
+        // URL menggunakan wa.me (lebih optimal untuk mobile & desktop)
+        const urlWA = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+        // CARA BARU: Menggunakan elemen <a> agar tidak diblokir browser
+        const linkWA = document.createElement('a');
+        linkWA.href = urlWA;
+        linkWA.target = '_blank';
+        document.body.appendChild(linkWA);
+        linkWA.click();
+        document.body.removeChild(linkWA);
+
+    } catch (e) {
+        console.error(e); // Tambahkan log untuk memudahkan pengecekan jika ada error di cloud
+        alert("Gagal koneksi, coba lagi!");
+        hideLoad();
+        
+        isSubmitting = false;
+        btnKirim.disabled = false;
+        btnKirim.style.opacity = "1";
+        btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
+    }
+}
 
         window.onload = init;
 
