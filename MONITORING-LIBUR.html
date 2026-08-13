@@ -590,10 +590,9 @@ async function prosesSimpanDanKirimWA() {
         await tarikDataAwal(); 
 
         hideLoad();
-        
         alert("✅ Laporan Berhasil! Grid foto telah diunduh.\nSistem membuka WhatsApp...");
 
-        // --- REVISI: MENGGUNAKAN JALUR NATIVE DEEP LINK WHATSAPP ---
+        // Persiapkan teks WhatsApp
         let waText = `✨ *LAPORAN CEKLIS LIBUR* ✨\n`;
         waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
         waText += `🏪 *Toko:* ${toko.toUpperCase()}\n`;
@@ -606,11 +605,18 @@ async function prosesSimpanDanKirimWA() {
         waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
         waText += `💡 _(Laporan sah dilampirkan dengan foto grid otomatis)_ 📸`;
 
-        // Jalur Native Deep Link (Anti-stuck)
-        setTimeout(() => { 
-            window.location.href = `whatsapp://send?text=${encodeURIComponent(waText)}`; 
-        }, 1000);
+        // URL menggunakan wa.me (lebih optimal untuk mobile & desktop)
+        const urlWA = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+        // CARA BARU: Menggunakan elemen <a> agar tidak diblokir browser
+        const linkWA = document.createElement('a');
+        linkWA.href = urlWA;
+        linkWA.target = '_blank';
+        document.body.appendChild(linkWA);
+        linkWA.click();
+        document.body.removeChild(linkWA);
     }
+
 
     function renderRaporPersonil() {
         const area = document.getElementById('raporPersonilArea');
