@@ -194,7 +194,10 @@
 <div class="container">
     <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">DASHBOARD MONITORING PPS v34.0</h2>
     
-    <div class="grid">
+<div class="grid">
+        <!-- ================================== -->
+        <!-- KARTU 1: SETUP ADMIN & TARGET -->
+        <!-- ================================== -->
         <div class="card">
             <h3>1. SETUP ADMIN & TARGET</h3>
             <div style="display:flex;gap:5px;flex-wrap:wrap;">
@@ -207,16 +210,16 @@
                 <option value="3">Toko 24 Jam</option>
                 <option value="2">Toko Non-24 Jam</option>
             </select>
-<label>Daftar Personil Toko</label>
-<textarea id="listKru" style="display:none;"></textarea>
+            
+            <label>Daftar Personil Toko</label>
+            <textarea id="listKru" style="display:none;"></textarea>
 
-<!-- CLASS btn-admin-only DITAMBAHKAN DI SINI AGAR HILANG JIKA CREW LOGIN -->
-<div class="btn-admin-only" style="display:flex; gap:5px; margin-top:4px;">
-    <input type="text" id="inputNamaKru" placeholder="Ketik 1 nama, lalu klik Tambah..." onkeypress="if(event.key === 'Enter') tambahKru()">
-    <button onclick="tambahKru()" style="width:auto; margin-top:0; background:#3498db; color:white; padding:8px 15px;">+ TAMBAH</button>
-</div>
+            <div class="btn-admin-only" style="display:flex; gap:5px; margin-top:4px;">
+                <input type="text" id="inputNamaKru" placeholder="Ketik 1 nama, lalu klik Tambah..." onkeypress="if(event.key === 'Enter') tambahKru()">
+                <button onclick="tambahKru()" style="width:auto; margin-top:0; background:#3498db; color:white; padding:8px 15px;">+ TAMBAH</button>
+            </div>
 
-<div id="wadahKru" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+            <div id="wadahKru" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
                      
             <div class="btn-admin-only" style="margin-top:10px; padding:10px; background:#f9f9f9; border-radius:8px; border: 1px solid #ddd;">
                 <select id="wkTarget" onchange="switchWeek()">
@@ -225,22 +228,53 @@
                     <option value="3">Periode 2 (PWP/PSM/SERBA/SUGER/CEBAN)</option>
                     <option value="4">PSM ONLY (W4)</option>
                 </select>
-                <div id="boxPWP"><label>Target PWP (Pcs)</label><input type="number" id="t_PWP"></div>
-                <label>Target PSM (Pcs)</label><input type="number" id="t_PSM">
-                <div id="boxSERBA"><label>Target SERBAGRATIS (Pcs)</label><input type="number" id="t_SERBA_GRATIS"></div>
-                <div id="boxSUGER"><label>Target SUGER (Pcs)</label><input type="number" id="t_SUGER"></div>
-                <div id="boxCEBAN"><label>Target CEBAN (Pcs)</label><input type="number" id="t_CEBAN"></div>
-                <button class="btn-save" onclick="simpanTarget()">💾 SIMPAN TARGET</button>
+                
+                <!-- TAMBAHAN INPUT SYARAT % -->
+                <div style="background:#e8f4f8; padding:10px; border-radius:5px; margin-top:10px; border:1px solid #b3d4fc;">
+                    <h4 style="margin:0 0 10px 0; font-size:12px; color:#2980b9; text-align:center;">🎯 ISI TARGET QTY (PCS) & SYARAT STD (%)</h4>
+                    
+                    <div id="boxPWP" style="display:flex; gap:5px; margin-bottom:5px;">
+                        <div style="flex:1;"><label>Target PWP (Pcs)</label><input type="number" id="t_PWP"></div>
+                        <div style="flex:1;"><label>Syarat PWP (%)</label><input type="number" id="p_PWP" placeholder="Contoh: 5"></div>
+                    </div>
+                    
+                    <div style="display:flex; gap:5px; margin-bottom:5px;">
+                        <div style="flex:1;"><label>Target PSM (Pcs)</label><input type="number" id="t_PSM"></div>
+                        <div style="flex:1;"><label>Syarat PSM (%)</label><input type="number" id="p_PSM" placeholder="Contoh: 3"></div>
+                    </div>
+                    
+                    <div id="boxSERBA" style="display:flex; gap:5px; margin-bottom:5px;">
+                        <div style="flex:1;"><label>Target SERBA (Pcs)</label><input type="number" id="t_SERBA_GRATIS"></div>
+                        <div style="flex:1;"><label>Syarat SERBA (%)</label><input type="number" id="p_SERBA_GRATIS" placeholder="Contoh: 2"></div>
+                    </div>
+                    
+                    <div id="boxSUGER" style="display:flex; gap:5px; margin-bottom:5px;">
+                        <div style="flex:1;"><label>Target SUGER (Pcs)</label><input type="number" id="t_SUGER"></div>
+                        <div style="flex:1;"><label>Syarat SUGER (%)</label><input type="number" id="p_SUGER" placeholder="Contoh: 2.5"></div>
+                    </div>
+                    
+                    <div id="boxCEBAN" style="display:flex; gap:5px; margin-bottom:5px;">
+                        <div style="flex:1;"><label>Target CEBAN (Pcs)</label><input type="number" id="t_CEBAN"></div>
+                        <div style="flex:1;"><label>Syarat CEBAN (%)</label><input type="number" id="p_CEBAN" placeholder="Contoh: 1.5"></div>
+                    </div>
+                </div>
+
+                <button class="btn-save" onclick="simpanTarget()" style="margin-top:15px;">💾 SIMPAN TARGET & SYARAT</button>
             </div>
+            
+            <!-- INI TOMBOL DAN PENUTUP YANG TADI HILANG -->
             <button class="btn-danger btn-admin-only" onclick="resetSemuaData()">⚠️ RESET SEMUA DATA</button>
         </div>
 
+
+        <!-- ================================== -->
+        <!-- KARTU 2: INPUT HASIL SHIFT -->
+        <!-- ================================== -->
         <div class="card">
             <h3 style="color:#e67e22;">2. INPUT HASIL SHIFT</h3>
             <label id="labelTglInput">Tanggal Input (BEBAS)</label>
             <input type="number" id="tglInput" placeholder="1-31" min="1" max="31" oninput="loadReal();">
             
-            <!-- UBAHAN KUNCI KASIR: Diubah jadi teks mati dari data login -->
             <label>Kasir Bertugas</label>
             <input type="text" id="kasirAktif" readonly style="background-color:#e0e0e0; font-weight:bold; cursor:not-allowed; border:1px solid #ccc; text-transform:uppercase;">
             
@@ -250,11 +284,33 @@
                 <option value="s1" selected>Shift 1</option>
                 <option value="s2">Shift 2</option>
             </select>
-            <label>Real PWP (Pcs)</label><input type="number" id="r_PWP" oninput="checkTargetStatus()">
-            <label>Real PSM (Pcs)</label><input type="number" id="r_PSM" oninput="checkTargetStatus()">
-            <label>Real SERBAGRATIS (Pcs)</label><input type="number" id="r_SERBA_GRATIS" oninput="checkTargetStatus()">
-            <label>Real SUGER (Pcs)</label><input type="number" id="r_SUGER" oninput="checkTargetStatus()">
-            <label>Real CEBAN (Pcs)</label><input type="number" id="r_CEBAN" oninput="checkTargetStatus()">
+            
+            <label>Real PWP (Pcs)</label>
+            <input type="number" id="r_PWP" oninput="checkTargetStatus()">
+            <div id="info_PWP" style="font-size:10.5px; color:#d35400; margin-bottom:6px; font-weight:bold;">🎯 Target Shift: - | Syarat: -</div>
+
+            <label>Real PSM (Pcs)</label>
+            <input type="number" id="r_PSM" oninput="checkTargetStatus()">
+            <div id="info_PSM" style="font-size:10.5px; color:#d35400; margin-bottom:6px; font-weight:bold;">🎯 Target Shift: - | Syarat: -</div>
+
+            <label>Real SERBAGRATIS (Pcs)</label>
+            <input type="number" id="r_SERBA_GRATIS" oninput="checkTargetStatus()">
+            <div id="info_SERBA_GRATIS" style="font-size:10.5px; color:#d35400; margin-bottom:6px; font-weight:bold;">🎯 Target Shift: - | Syarat: -</div>
+
+            <label>Real SUGER (Pcs)</label>
+            <input type="number" id="r_SUGER" oninput="checkTargetStatus()">
+            <div id="info_SUGER" style="font-size:10.5px; color:#d35400; margin-bottom:6px; font-weight:bold;">🎯 Target Shift: - | Syarat: -</div>
+
+            <label>Real CEBAN (Pcs)</label>
+            <input type="number" id="r_CEBAN" oninput="checkTargetStatus()">
+            <div id="info_CEBAN" style="font-size:10.5px; color:#d35400; margin-bottom:6px; font-weight:bold;">🎯 Target Shift: - | Syarat: -</div>
+            
+            <!-- TAMBAHAN INPUT QTY STD OLEH KASIR -->
+            <div style="background:#fff3cd; padding:10px; border-radius:5px; margin-top:10px; border:1px solid #ffeeba;">
+                <label style="color:#856404; font-size:12px;">🧾 QTY STD (Total Struk Shift Ini)</label>
+                <input type="number" id="r_STD" placeholder="Wajib Diisi... Contoh: 150" oninput="checkTargetStatus()" style="border-color:#ffc107;">
+            </div>
+
             <label>📸 Upload 2 Bukti Foto (REPORT PPS&BUKU MONITORING PPS)</label>
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <input type="file" id="imgBuku" accept="image/*" onchange="previewImg(this, 'pBuku')">
@@ -275,6 +331,10 @@
             🏆 RANKING PENJUALAN</button>
         </div>
 
+
+        <!-- ================================== -->
+        <!-- KARTU 3: ANALISA & BROADCAST -->
+        <!-- ================================== -->
         <div class="card">
             <h3 style="color:#27ae60;">3. ANALISA & BROADCAST</h3>
             <button class="btn-wa" id="btnWA" onclick="kirimWA()">🚀 KIRIM LAPORAN WA</button>
@@ -282,11 +342,10 @@
             <textarea id="noteWA" placeholder="Alasan jika item tidak target..." rows="2" style="margin-top:5px;"></textarea>
             <hr>
 
-<div id="alertKasirArea"></div>
-
-<div id="vsBulanArea" hidden></div>
-<div id="akumulasiArea" hidden></div>
-<div id="raporArea" hidden></div>
+            <div id="alertKasirArea"></div>
+            <div id="vsBulanArea" hidden></div>
+            <div id="akumulasiArea" hidden></div>
+            <div id="raporArea" hidden></div>
 
             <a id="manualWA" target="_blank" href="#">⚠️ WA TIDAK TERBUKA? KLIK SINI</a>
         </div>
@@ -294,20 +353,17 @@
 
 <div id="wrapperHarian">
         <h3 style="margin-top:20px; color:#2c3e50;">📊 MONITORING PROGRES HARIAN TOKO</h3>
-        <!-- Tombol Pop Up untuk Progres Harian -->
-        <button onclick="bukaModalTabel('modalHarian')" style="background:#3498db; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; margin-bottom:5px; font-weight:bold; width: 100%;">
-            📸 POP UP FULL 1 BULAN (UNTUK SS)
-        </button>
-        <!-- Bungkus tabel dengan div scroll -->
-        <div class="table-scroll-container" id="scrollHarian">
-            <table id="tabelPPS"><thead id="headPPS"></thead><tbody id="bodyPPS"></tbody></table>
-        </div>
-    </div>
         
-        <!-- TOMBOL FILTER BARU -->
-        <button onclick="bukaFilterHarian()" style="background:#e67e22; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; margin-bottom:5px; font-weight:bold; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-            🔍 FILTER PROGRES HARIAN (BY ITEM & PERIODE)
-        </button>
+        <!-- BUNGKUS KEDUA TOMBOL BIAR BERSEBELAHAN -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button onclick="bukaModalTabel('modalHarian')" style="flex: 1; background:#3498db; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+                📸 POP UP FULL (SS)
+            </button>
+            
+            <button onclick="bukaFilterHarian()" style="flex: 1; background:#e67e22; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                🔍 FILTER HARIAN BY TARGET / SYARAT
+            </button>
+        </div>
 
         <!-- Bungkus tabel dengan div scroll -->
         <div class="table-scroll-container" id="scrollHarian">
@@ -330,29 +386,35 @@
         </div>
     </div>
 
-    <!-- WADAH UNTUK MODAL POP UP SS -->
+<!-- WADAH UNTUK MODAL POP UP SS -->
     <div id="modalHarian" class="modal-rapor" style="display:none;">
-        <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;">
-            <span class="btn-tutup" onclick="tutupModalTabel('modalHarian')">×</span>
-            <h3 style="text-align:center;">📸 PROGRES HARIAN FULL 1 BULAN</h3>
+        <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;" id="ssHarianArea">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <b style="font-size:16px;">📸 PROGRES HARIAN FULL 1 BULAN</b>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button onclick="kirimWAPopupCustom('ssHarianArea', 'PROGRES_HARIAN')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+                    <span class="btn-tutup" onclick="tutupModalTabel('modalHarian')">×</span>
+                </div>
+            </div>
             <div id="cloneHarian" style="overflow-x:auto;"></div>
         </div>
     </div>
 
     <div id="modalLaporan" class="modal-rapor" style="display:none;">
-        <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;">
-            <span class="btn-tutup" onclick="tutupModalTabel('modalLaporan')">×</span>
-            <h3 style="text-align:center;">📸 LAPORAN SHIFT FULL 1 BULAN</h3>
+        <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;" id="ssLaporanArea">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <b style="font-size:16px;">📸 LAPORAN SHIFT FULL 1 BULAN</b>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button onclick="kirimWAPopupCustom('ssLaporanArea', 'LAPORAN_SHIFT_HARIAN')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+                    <span class="btn-tutup" onclick="tutupModalTabel('modalLaporan')">×</span>
+                </div>
+            </div>
             <div id="cloneLaporan" style="overflow-x:auto;"></div>
         </div>
     </div>
 
     <canvas id="canvasJoin"></canvas>
 
-    <div style="text-align: center; margin-top: 30px; padding-bottom: 20px; clear: both;">
-        <a href="index.html" style="background: #f39c12; color: white; padding: 15px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); display: none; border: 2px solid #fff; transition: 0.3s;">
-            ⬅ KEMBALI KE MENU UTAMA
-        </a>
     </div>
 </div>
 
@@ -360,7 +422,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbzQPIQ_sSZdPapNcqYk8Uir9dkxHfyUJQa1NuaBgg324b8HPo4F9p4E9m5rL0r09c6vNw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbw9kkW_8pyWa9j9Wsdg7b0VD9Di0ZOg6HSi27T3JpHIHjJ7ufSD9rJT3ue9BWaCgnEwqA/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -406,30 +468,25 @@ const k=getK();
 
 const html=`
 <div class="modal-rapor" id="rankingModal" style="display:block;">
-<div class="modal-content">
+<div class="modal-content" id="ssRankingArea">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <b style="font-size:16px;">🏆 RANKING PENJUALAN</b>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button onclick="kirimWAPopupCustom('ssRankingArea', 'RANKING_PENJUALAN')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+            <span class="btn-tutup" onclick="tutupRanking()" style="font-size:24px; cursor:pointer;">×</span>
+        </div>
+    </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
 <select id="rankItem">
-<option value="PWP">PWP</option>
-<option value="PSM">PSM</option>
-<option value="SERBA_GRATIS">SERBA GRATIS</option>
-<option value="SUGER">SUGER</option>
-<option value="CEBAN">CEBAN</option>
+<option value="PWP">PWP</option><option value="PSM">PSM</option><option value="SERBA_GRATIS">SERBA GRATIS</option><option value="SUGER">SUGER</option><option value="CEBAN">CEBAN</option>
 </select>
-
 <select id="rankPeriode">
-<option value="1">PERIODE 1 (1-15)</option>
-<option value="2">PERIODE 2 (16-AKHIR)</option>
-<option value="3">PSM WEEK 1</option>
-<option value="4">PSM WEEK 2</option>
-<option value="5">PSM WEEK 3</option>
-<option value="6">PSM WEEK 4</option>
+<option value="1">PERIODE 1 (1-15)</option><option value="2">PERIODE 2 (16-AKHIR)</option><option value="3">PSM WEEK 1</option><option value="4">PSM WEEK 2</option><option value="5">PSM WEEK 3</option><option value="6">PSM WEEK 4</option>
 </select>
-
-<button onclick="generateRanking()">TAMPILKAN</button>
+<button onclick="generateRanking()" style="padding:8px;">TAMPILKAN</button>
 </div>
 <hr>
-<div id="rankingArea">Pilih Item & Periode</div>
-<button onclick="tutupRanking()" style="margin-top:10px;background:#e74c3c;color:white;">TUTUP</button>
+<div id="rankingArea" style="max-height:60vh; overflow-y:auto;">Pilih Item & Periode</div>
 </div></div>`;
 
 document.body.insertAdjacentHTML('beforeend',html);
@@ -466,15 +523,15 @@ function bukaAkumulasi() {
     modal.style.pointerEvents = 'auto';
     document.body.style.overflow = 'hidden';
     modal.innerHTML = `
-        <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
+        <div class="modal-content" id="ssAkumulasiArea" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
                 <b style="font-size:18px;">📊 AKUMULASI TOKO</b>
-                <span onclick="tutupAkumulasi()" style="font-size:30px; cursor:pointer;">&times;</span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button onclick="kirimWAPopupCustom('ssAkumulasiArea', 'AKUMULASI_TOKO')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+                    <span onclick="tutupAkumulasi()" style="font-size:30px; cursor:pointer;">&times;</span>
+                </div>
             </div>
-            <div style="padding:15px;">${areaAsli.innerHTML}</div>
-            <div style="padding:15px; border-top:1px solid #ddd; text-align:center;">
-                <button onclick="tutupAkumulasi()" style="width:100%; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">TUTUP</button>
-            </div>
+            <div style="padding:15px; background:#e9ecef;">${areaAsli.innerHTML}</div>
         </div>
     `;
 }
@@ -499,9 +556,15 @@ function bukaVSBulan(){
     modal.className='modal-rapor';
     modal.style.display='block';
     modal.innerHTML=`
-    <div class="modal-content">
-        <span class="btn-tutup" onclick="tutupVSBulan()">×</span>
-        ${area.innerHTML}
+    <div class="modal-content" id="ssVSBulanArea" style="max-height:90vh; overflow-y:auto; padding:0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
+            <b style="font-size:18px;">📈 VS BULAN LALU</b>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button onclick="kirimWAPopupCustom('ssVSBulanArea', 'VS_BULAN_LALU')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+                <span onclick="tutupVSBulan()" style="font-size:30px; cursor:pointer;">&times;</span>
+            </div>
+        </div>
+        <div style="padding:15px; background:#e9ecef;">${area.innerHTML}</div>
     </div>`;
 }
 
@@ -897,7 +960,11 @@ function getLogic(tgl, it, yr, mn) {
     function switchWeek() {
         const k = getK(); const wkBaru = document.getElementById('wkTarget').value;
         const tgt = db[k.yr][k.mn][k.tk].target[wkBaru] || {};
-        items.forEach(it => { const el = document.getElementById(`t_${it}`); if(el) el.value = tgt[it] || ""; });
+        items.forEach(it => { 
+            const el = document.getElementById(`t_${it}`); if(el) el.value = tgt[it] || ""; 
+            // BARU: Munculkan Target Syarat %
+            const elP = document.getElementById(`p_${it}`); if(elP) elP.value = tgt[`p_${it}`] || ""; 
+        });
         const show = (wkBaru == 1 || wkBaru == 3);
         ['boxPWP','boxSERBA','boxSUGER','boxCEBAN'].forEach(id => document.getElementById(id).style.display = show ? 'block' : 'none');
     }
@@ -906,23 +973,26 @@ function getLogic(tgl, it, yr, mn) {
         const k = getK(); const wk = document.getElementById('wkTarget').value;
         if(!k.tk) return alert("Kode Toko Kosong!");
         
-        items.forEach(it => { const el = document.getElementById(`t_${it}`); if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; });
+        items.forEach(it => { 
+            const el = document.getElementById(`t_${it}`); if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; 
+            // BARU: Simpan Target Syarat %
+            const elP = document.getElementById(`p_${it}`); if(elP) db[k.yr][k.mn][k.tk].target[wk][`p_${it}`] = parseFloat(elP.value) || 0; 
+        });
         saveDisk(); 
         
-        showLoading("Menyimpan Target ke Cloud..."); // MUNCULKAN LOADING
+        showLoading("Menyimpan Target & Syarat ke Cloud..."); 
         
         const payload = { toko: k.tk, yr: k.yr, mn: k.mn, wk: wk, targets: db[k.yr][k.mn][k.tk].target[wk], kru: db[k.yr][k.mn][k.tk].kru, tipe: db[k.yr][k.mn][k.tk].tipe, tipeData: "PPS_TARGET" };
         
         fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
         .then(() => {
             hideLoading();
-            alert("Target Disimpan & Sinkron Cloud! 📊");
+            alert("Target QTY & Syarat % Disimpan & Sinkron Cloud! 📊");
         }).catch(() => {
             hideLoading();
             alert("Gagal koneksi ke cloud!");
         });
     }
-
     function loadReal() {
         const k = getK(); if(!k.tk) return;
         const tgl = document.getElementById('tglInput').value; 
@@ -937,6 +1007,10 @@ function getLogic(tgl, it, yr, mn) {
             const el = document.getElementById(`r_${it}`); 
             if(el) el.value = (hS[shfKey] && hS[shfKey][it] !== undefined) ? hS[shfKey][it] : ""; 
         });
+        
+        // BARU: Load QTY STD
+        const elSTD = document.getElementById('r_STD');
+        if(elSTD) elSTD.value = (hS[shfKey] && hS[shfKey]['STD'] !== undefined) ? hS[shfKey]['STD'] : "";
         
         document.getElementById('noteWA').value = hS[shfKey+'_note'] || "";
         checkTargetStatus();
@@ -953,38 +1027,71 @@ function getLogic(tgl, it, yr, mn) {
     if([...shf.options].some(o=>o.value===old)){ shf.value=old; }
   }
 
-   function checkTargetStatus() {
-    const k = getK(); const tgl = parseInt(document.getElementById('tglInput').value); if(!tgl) return false;
-    const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+function checkTargetStatus() {
+    const k = getK(); 
+    const tgl = parseInt(document.getElementById('tglInput').value); 
+    const tipe = parseInt(db[k.yr]?.[k.mn]?.[k.tk]?.tipe) || 3;
+    const jmlShift = (tipe === 3) ? 3 : 2;
+    const stdShiftVal = parseFloat(document.getElementById('r_STD')?.value) || 0;
+
     let failItems = [];
 
     items.forEach(it => {
         const log = getLogic(tgl, it, k.yr, k.mn);
-        const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
-        if(tTotal > 0) {
-            const tS = getTargetDinamis(k, tgl, it, tTotal, tipe, log); // <-- Target Shift Dinamis
-            if((parseFloat(document.getElementById(`r_${it}`).value) || 0) < tS)
-                failItems.push(it.replace('_',' '));
+        const tTotal = parseFloat(db[k.yr]?.[k.mn]?.[k.tk]?.target[log.wk]?.[it]) || 0;
+        const pSyarat = parseFloat(db[k.yr]?.[k.mn]?.[k.tk]?.target[log.wk]?.[`p_${it}`]) || 0;
+        
+        let tS = 0;
+        let tSyaratQty = 0;
+
+        if(tgl) {
+            tS = getTargetDinamis(k, tgl, it, tTotal, jmlShift, log); // Target Shift Dinamis (Kuota Pcs)
+            tSyaratQty = Math.ceil(stdShiftVal * (pSyarat / 100)); // Target Syarat Berdasarkan STD Shift
+        }
+
+// UPDATE TEKS INFO DI BAWAH KOLOM MASING-MASING ITEM
+        const infoEl = document.getElementById(`info_${it}`);
+        if(infoEl) {
+            if(!tgl) {
+                infoEl.innerHTML = `🎯 Target Shift: - | Syarat: -`;
+            } else {
+                infoEl.innerHTML = `🎯 Target Shift: <b>${tS} Pcs</b> | Syarat: <b>${pSyarat}%</b>`;
+            }
+        }
+
+        // Cek status tercapai atau belum untuk peringatan
+        const realVal = parseFloat(document.getElementById(`r_${it}`)?.value) || 0;
+        if(tS > 0 && realVal < tS) {
+            failItems.push(it.replace('_',' '));
         }
     });
 
     const lbl = document.getElementById('labelWarning');
-    if(failItems.length > 0) {
-        lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`;
-        lbl.style.display = 'block';
-        return true;
-    } else {
-        lbl.style.display = 'none';
-        return false;
+    if(lbl) {
+        if(failItems.length > 0) {
+            lbl.innerText = `⚠️ ITEM [${failItems.join(', ')}] BELUM CAPAI TARGET SHIFT!`;
+            lbl.style.display = 'block';
+            return true;
+        } else {
+            lbl.style.display = 'none';
+            return false;
+        }
     }
 }
 
-    function simpanReal() {
+function simpanReal() {
         const k = getK(); const tgl = document.getElementById('tglInput').value;
         const ksr = document.getElementById('kasirAktif').value;
         const shf = document.getElementById('shfInput').value;
 
         if(!tgl || !ksr || ksr === "-- Pilih Kasir --") return alert("Pilih Tanggal & Kasir!");
+
+        // === TAMBAHAN BARU 1: WAJIB INPUT STD SEBELUM SIMPAN ===
+        const stdVal = parseFloat(document.getElementById('r_STD').value) || 0;
+        if(stdVal <= 0) {
+            return alert("🚨 QTY STD (Total Struk) WAJIB DIISI! Tidak boleh kosong atau nol.");
+        }
+        // ========================================================
 
         // === BUG FIX: WAJIB UPLOAD 2 FOTO SEBELUM SIMPAN ===
         const i1 = document.getElementById('pBuku');
@@ -1017,6 +1124,10 @@ function getLogic(tgl, it, yr, mn) {
         if(!hS[shfKey]) hS[shfKey] = {};
         
         items.forEach(it => { hS[shfKey][it] = parseFloat(document.getElementById(`r_${it}`).value) || 0; });
+        
+        // --- TAMBAHAN BARU 2: SIMPAN QTY STD KE DATABASE LOKAL ---
+        hS[shfKey]['STD'] = stdVal;
+        
         hS[shfKey+'_nama'] = ksr; 
         hS[shfKey+'_note'] = note;
         hS[shfKey+'_jam'] = waktuSekarang; 
@@ -1028,6 +1139,7 @@ function getLogic(tgl, it, yr, mn) {
         const payload = { 
             toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
             namaPersonil: ksr, note: note, 
+            std: stdVal, // --- TAMBAHAN BARU 3: KIRIM QTY STD KE CLOUD ---
             pwp: document.getElementById('r_PWP').value || 0, 
             psm: document.getElementById('r_PSM').value || 0, 
             serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
@@ -1719,15 +1831,15 @@ function bukaRapor() {
     modal.style.pointerEvents='auto';
     document.body.style.overflow = 'hidden';
     modal.innerHTML = `
-        <div class="modal-content" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
+        <div class="modal-content" id="ssRaporArea" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
-                <b style="font-size:18px;">📊 ANALISA KASIR (TARGET BULAT)</b>
-                <span onclick="tutupRapor()" style="font-size:30px; cursor:pointer;">&times;</span>
+                <b style="font-size:18px;">📊 ANALISA KASIR</b>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button onclick="kirimWAPopupCustom('ssRaporArea', 'RAPOR_ANALISA_KASIR')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+                    <span onclick="tutupRapor()" style="font-size:30px; cursor:pointer;">&times;</span>
+                </div>
             </div>
-            <div style="padding:15px;">${areaAsli.innerHTML}</div>
-            <div style="padding:15px; border-top:1px solid #ddd; text-align:center;">
-                <button onclick="tutupRapor()" style="width:100%; padding:12px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">TUTUP</button>
-            </div>
+            <div style="padding:15px; background:#e9ecef;">${areaAsli.innerHTML}</div>
         </div>`;
 }
 // ==========================================
@@ -1821,10 +1933,8 @@ function renderLaporanHarian() {
 }
 
 // ==========================================
-// FUNGSI POP UP CEK PENCAPAIAN HARIAN KASIR + AUTO SS & WA
+// FUNGSI POP UP CEK PENCAPAIAN HARIAN KASIR (DUAL TARGET)
 // ==========================================
-
-// Panggil library html2canvas secara otomatis agar bisa Screenshot layar
 if (typeof html2canvas === 'undefined') {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
@@ -1840,11 +1950,8 @@ function bukaFilterHarian(){
     const k = getK();
     const dM = new Date(k.yr, k.mn, 0).getDate();
     
-    // Bikin opsi tanggal dinamis (1 sampai akhir bulan)
     let tglOptions = "";
-    for(let i = 1; i <= dM; i++){
-        tglOptions += `<option value="${i}">Tanggal ${i}</option>`;
-    }
+    for(let i = 1; i <= dM; i++){ tglOptions += `<option value="${i}">Tanggal ${i}</option>`; }
 
     const html = `
     <div class="modal-rapor" id="filterHarianModal" style="display:block;">
@@ -1872,15 +1979,20 @@ function bukaFilterHarian(){
                 <select id="filterTglHarian" style="width:auto; flex:1;">
                     ${tglOptions}
                 </select>
+
+                <!-- FITUR BARU: PILIH MAU PAKAI MODE APA -->
+                <select id="filterModeHarian" style="width:100%; font-weight:bold; background:#fff3cd; color:#856404; border:1px solid #ffeeba;">
+                    <option value="qty">🎯 FILTER BY: TARGET KUOTA (PCS)</option>
+                    <option value="std">🧾 FILTER BY: SYARAT STD (%)</option>
+                </select>
                 
                 <button onclick="generateFilterHarian()" style="width:100%; background:#27ae60; color:white; padding:10px; margin:0; font-weight:bold;">TAMPILKAN DATA</button>
             </div>
             
             <div style="overflow-y: auto; flex:1; padding-right: 5px; background:#e9ecef; border-radius:10px;">
-                <!-- AREA YANG AKAN DI-SCREENSHOT -->
                 <div id="hasilFilterHarian" style="padding:10px; background:#e9ecef;">
                     <div style="text-align:center; padding:30px 10px; color:#7f8c8d; font-style:italic;">
-                        Pilih Item & Tanggal di atas,<br>lalu klik <b>TAMPILKAN DATA</b>
+                        Pilih Mode Filter, Item, & Tanggal di atas,<br>lalu klik <b>TAMPILKAN DATA</b>
                     </div>
                 </div>
             </div>
@@ -1889,7 +2001,6 @@ function bukaFilterHarian(){
     </div>`;
 
     document.body.insertAdjacentHTML('beforeend', html);
-
     const today = new Date().getDate();
     if(document.getElementById('filterTglHarian') && today <= dM) {
         document.getElementById('filterTglHarian').value = today;
@@ -1901,6 +2012,7 @@ function generateFilterHarian(){
     if(!k.tk) return;
     const item = document.getElementById('filterItemHarian').value;
     const tgl = parseInt(document.getElementById('filterTglHarian').value);
+    const mode = document.getElementById('filterModeHarian').value;
     
     const harianData = db[k.yr][k.mn][k.tk].harian || {};
     const tipeToko = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
@@ -1908,65 +2020,123 @@ function generateFilterHarian(){
     
     const kru = (document.getElementById('listKru').value || '').split(',').map(x => x.trim()).filter(Boolean);
     const log = getLogic(tgl, item, k.yr, k.mn);
-    const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[item]) || 0;
     
-    // Kalkulasi Data Harian vs Shift
-    const tShift = getTargetDinamis(k, tgl, item, tTotal, jmlShift, log);
-    const tHarian = tShift * jmlShift; // Total Target 1 Hari
+    const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[item]) || 0;
+    const pSyarat = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[`p_${item}`]) || 0;
     
     const h = harianData[tgl] || {};
+    
+    let shiftEntries = [];
+    Object.keys(h).forEach(key => {
+        if(key.endsWith('_nama')) {
+            const shiftKey = key.replace('_nama', ''); 
+            const parts = shiftKey.split('_');
+            const shfCode = parts[0]; // s3, s1, s2
+            const namaKasir = h[key].toUpperCase();
+            const dataRow = h[shiftKey] || {};
+            
+            shiftEntries.push({
+                shift: shfCode,
+                nama: namaKasir,
+                real: parseFloat(dataRow[item]) || 0,
+                std: parseFloat(dataRow['STD']) || 0
+            });
+        }
+    });
+
+    // --- 1. TOTAL STD HARIAN TOKO: AMBIL NILAI STD TERBESAR (CLOSING AKHIR) ---
+    let maxStdDay = 0;
+    shiftEntries.forEach(e => {
+        if(e.std > maxStdDay) maxStdDay = e.std;
+    });
+    let totalStdHarian = maxStdDay; 
+
+    // --- 2. AGREGASI PER KASIR (MASING-MASING KASIR MENDAPATKAN STD MEREKA) ---
+    let processedShiftData = {};
+    shiftEntries.forEach(entry => {
+        if(!processedShiftData[entry.nama]) {
+            processedShiftData[entry.nama] = { real: 0, std: 0, shifts: [] };
+        }
+        processedShiftData[entry.nama].real += entry.real;
+        
+        // Ambil nilai STD yang diinput kasir (jika lapor beberapa kali, ambil yang terbesar/terakhir)
+        if(entry.std > processedShiftData[entry.nama].std) {
+            processedShiftData[entry.nama].std = entry.std;
+        }
+        
+        if(!processedShiftData[entry.nama].shifts.includes(entry.shift.toUpperCase())) {
+            processedShiftData[entry.nama].shifts.push(entry.shift.toUpperCase());
+        }
+    });
+
     let hasilKasir = [];
     let realHarian = 0;
+    let totalTargetHarian = 0;
     
-    kru.forEach(nama => {
-        let real = 0;
-        let shiftKerja = []; 
+    const tHarianTokoFixed = getTargetDinamis(k, tgl, item, tTotal, 1, log); 
+    
+    kru.forEach(namaUpper => {
+        let dataKasir = processedShiftData[namaUpper] || { real: 0, std: 0, shifts: [] };
+        realHarian += dataKasir.real;
         
-        Object.keys(h).forEach(key => {
-            if(key.endsWith('_nama') && h[key].toUpperCase() === nama.toUpperCase()) {
-                const shiftKode = key.substring(0, 2); 
-                shiftKerja.push(shiftKode.toUpperCase());
-                
-                const dataKey = key.replace('_nama', '');
-                if(h[dataKey]) {
-                    real += parseFloat(h[dataKey][item]) || 0;
-                }
-            }
-        });
-        
-        realHarian += real; // Kumpulkan semua actual harian
+        let targetKasir = 0;
+        if(mode === 'qty') {
+            const tShift = getTargetDinamis(k, tgl, item, tTotal, jmlShift, log);
+            targetKasir = dataKasir.shifts.length > 0 ? (tShift * dataKasir.shifts.length) : 0;
+            totalTargetHarian = tHarianTokoFixed; 
+        } else {
+            // Target Syarat Kasir = STD Kasir * (% Syarat)
+            targetKasir = Math.ceil(dataKasir.std * (pSyarat / 100));
+        }
 
         hasilKasir.push({
-            nama: nama.toUpperCase(),
-            real: real,
-            shift: shiftKerja.length > 0 ? shiftKerja.join(', ') : 'LIBUR / BELUM LAPOR'
+            nama: namaUpper,
+            real: dataKasir.real,
+            std: dataKasir.std,
+            targetKasir: targetKasir,
+            shift: dataKasir.shifts.length > 0 ? dataKasir.shifts.join(', ') : 'LIBUR / BELUM LAPOR'
         });
     });
     
+    // Jika mode STD, Total Target Harian Toko dihitung dari Total STD Harian dikali % Syarat
+    if(mode === 'std') {
+        totalTargetHarian = Math.ceil(totalStdHarian * (pSyarat / 100));
+    }
+    
     hasilKasir.sort((a, b) => b.real - a.real);
 
-    let gapHarian = Math.max(0, tHarian - realHarian);
-    let pctHarian = tHarian > 0 ? (realHarian / tHarian) * 100 : 0;
+    let gapHarian = Math.max(0, totalTargetHarian - realHarian);
+    let pctHarian = totalTargetHarian > 0 ? (realHarian / totalTargetHarian) * 100 : (realHarian > 0 ? 100 : 0);
     let colorPctHarian = pctHarian >= 100 ? '#27ae60' : (pctHarian >= 75 ? '#f39c12' : '#e74c3c');
     
-    // --- PEMBUATAN TAMPILAN DASHBOARD MINI HARIAN (UNTUK SS) ---
+    let infoModeStr = mode === 'qty' ? "TGT KUOTA (Pcs)" : `TGT SYARAT (${pSyarat}%)`;
+    
+    // --- TENTUKAN TARGET / SHIFT DINAMIS BERDASARKAN MODE ---
+    let tShiftVal = 0;
+    if (mode === 'qty') {
+        tShiftVal = getTargetDinamis(k, tgl, item, tTotal, jmlShift, log);
+    } else {
+        tShiftVal = jmlShift > 0 ? Math.round(totalTargetHarian / jmlShift) : 0;
+    }
+
     let html = `
     <div style="background:white; padding:15px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); border-top: 5px solid #3498db;">
         <div style="text-align:center; margin-bottom:12px; border-bottom:2px dashed #eee; padding-bottom:8px;">
-            <div style="font-size:16px; font-weight:bold; color:#2c3e50;">📊 REKAP PENCAPAIAN HARIAN TOKO</div>
-            <div style="font-size:13px; color:#555; margin-top:3px;">📅 Tanggal <b>${tgl}</b> • Item <b>${item.replace('_', ' ')}</b></div>
+            <div style="font-size:16px; font-weight:bold; color:#2c3e50;">📊 REKAP HARIAN (${infoModeStr})</div>
+            <div style="font-size:13px; color:#555; margin-top:3px;">📅 Tgl <b>${tgl}</b> • Item <b>${item.replace('_', ' ')}</b></div>
         </div>
         
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px; text-align:center; margin-bottom:15px;">
-            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">🎯 Target Harian<br><b style="font-size:18px; color:#34495e;">${tHarian}</b> <small>Pcs</small></div>
-            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">🎯 Target Shift<br><b style="font-size:18px; color:#8e44ad;">${tShift}</b> <small>Pcs</small></div>
-            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">✅ Actual Harian<br><b style="font-size:18px; color:#27ae60;">${realHarian}</b> <small>Pcs</small></div>
-            <div style="background:#ffebee; padding:8px; border-radius:8px; border:1px solid #ffcdd2;">🔥 Gap Harian<br><b style="font-size:18px; color:#e74c3c;">${gapHarian}</b> <small>Pcs</small></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:13px; text-align:center; margin-bottom:15px;">
+            <div style="background:#fff3cd; padding:8px; border-radius:8px;">🧾 Total STD Harian<br><b style="font-size:16px; color:#856404;">${totalStdHarian}</b></div>
+            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">🎯 Target Harian<br><b style="font-size:16px; color:#34495e;">${totalTargetHarian}</b></div>
+            <div style="background:#e8f4f8; padding:8px; border-radius:8px;">⏱️ Target / Shift<br><b style="font-size:16px; color:#2980b9;">${tShiftVal} Pcs</b></div>
+            <div style="background:#e8f4f8; padding:8px; border-radius:8px;">✅ Actual Harian<br><b style="font-size:16px; color:#2980b9;">${realHarian}</b></div>
+            <div style="background:#ffebee; padding:8px; border-radius:8px; border:1px solid #ffcdd2; grid-column: span 2;">🔥 Gap Harian<br><b style="font-size:16px; color:#e74c3c;">${gapHarian}</b></div>
         </div>
 
         <div>
             <div style="font-size:13px; font-weight:bold; margin-bottom:5px; display:flex; justify-content:space-between;">
-                <span>📈 Pencapaian Toko Harian</span>
+                <span>📈 Pencapaian Harian</span>
                 <span style="color:${colorPctHarian};">${Math.round(pctHarian)}%</span>
             </div>
             <div style="height:12px; background:#ecf0f1; border-radius:10px; overflow:hidden;">
@@ -1974,44 +2144,42 @@ function generateFilterHarian(){
             </div>
         </div>
     </div>
-    <div style="font-size:14px; font-weight:bold; color:#2c3e50; margin-bottom:10px; padding-left:5px;">👥 RINCIAN KASIR (TARGET SHIFT: ${tShift} PCS)</div>
+    <div style="font-size:14px; font-weight:bold; color:#2c3e50; margin-bottom:10px; padding-left:5px;">👥 RINCIAN KASIR (MODE: ${infoModeStr})</div>
     `;
     
     let listKasirWA = "";
 
-    // --- PEMBUATAN LIST KASIR ---
     hasilKasir.forEach((x, i) => {
-        let actualTarget = tShift; 
-        const pct = actualTarget > 0 ? (x.real / actualTarget) * 100 : 0;
+        let actualTarget = x.targetKasir; 
+        const pct = actualTarget > 0 ? (x.real / actualTarget) * 100 : (x.real > 0 ? 100 : 0);
         const gap = Math.max(0, actualTarget - x.real);
         
         let statusHTML = "", gapColor = "", emoWA = "";
         
-        // Kembalikan Emoji Warna-Warni
         if(x.shift === 'LIBUR / BELUM LAPOR') {
-            statusHTML = "💤 BELUM LAPOR / LIBUR"; gapColor = "#95a5a6"; 
-            emoWA = "💤";
+            statusHTML = "💤 BELUM LAPOR / LIBUR"; gapColor = "#95a5a6"; emoWA = "💤";
+        } else if(mode === 'std' && x.std <= 0) {
+            statusHTML = "⚠️ STD NOL (TIDAK ADA DATA)"; gapColor = "#95a5a6"; emoWA = "⚠️";
         } else if(pct >= 100) {
-            statusHTML = "🔥 LUNAS!"; gapColor = "#27ae60"; 
-            emoWA = "✅";
+            statusHTML = "🔥 LUNAS!"; gapColor = "#27ae60"; emoWA = "✅";
         } else if(pct >= 75) {
-            statusHTML = "⚠️ DIKIT LAGI!"; gapColor = "#f39c12"; 
-            emoWA = "⚠️";
+            statusHTML = "⚠️ DIKIT LAGI!"; gapColor = "#f39c12"; emoWA = "⚠️";
         } else {
-            statusHTML = "🚨 FLOP!"; gapColor = "#e74c3c"; 
-            emoWA = "🚨";
+            statusHTML = "🚨 FLOP!"; gapColor = "#e74c3c"; emoWA = "🚨";
         }
         
         const medalHTML = i === 0 && x.real > 0 ? "🥇" : i === 1 && x.real > 0 ? "🥈" : i === 2 && x.real > 0 ? "🥉" : (i+1) + ".";
         const medalWA = i === 0 && x.real > 0 ? "🥇" : i === 1 && x.real > 0 ? "🥈" : i === 2 && x.real > 0 ? "🥉" : "👤";
         
-        // Teks WA yang menyala
-        listKasirWA += `${medalWA} *${x.nama}* (${x.shift})\n     ├ Target: ${actualTarget} | Real: *${x.real}*\n     └ Pencapaian: *${Math.round(pct)}%* ${emoWA} ${x.shift !== 'LIBUR / BELUM LAPOR' && x.real < actualTarget ? `(Minus: ${gap})` : ''}\n\n`;
+        let stdInfoHTML = mode === 'std' ? `<div style="font-size:11px; color:#856404; background:#fff3cd; padding:2px 6px; border-radius:4px; font-weight:bold;">STD: ${x.std}</div>` : "";
+        let stdInfoWA = mode === 'std' ? `     ├ STD Shift: ${x.std}\n` : "";
+        
+        listKasirWA += `${medalWA} *${x.nama}* (${x.shift})\n${stdInfoWA}     ├ Target: ${actualTarget} | Real: *${x.real}*\n     └ Pencapaian: *${Math.round(pct)}%* ${emoWA} ${x.shift !== 'LIBUR / BELUM LAPOR' && x.real < actualTarget ? `(Minus: ${gap})` : ''}\n\n`;
 
         html += `
         <div style="margin-bottom:10px; padding:12px; background:#fff; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.08); border-left: 6px solid ${gapColor};">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-weight:bold; font-size:14px;">${medalHTML} ${x.nama}</div>
+                <div style="font-weight:bold; font-size:14px; display:flex; gap:5px; align-items:center;">${medalHTML} ${x.nama} ${stdInfoHTML}</div>
                 <div style="font-size:10px; background:#eee; padding:3px 6px; border-radius:5px; font-weight:bold;">${x.shift}</div>
             </div>
             
@@ -2038,10 +2206,10 @@ function generateFilterHarian(){
     if(btnWA) {
         btnWA.style.display = 'inline-block';
         window.dataWAFilter = {
-            tk: k.tk, tgl: tgl, item: item.replace('_', ' '),
-            tHarian: tHarian, tShift: tShift, realHarian: realHarian, 
+            tk: k.tk, tgl: tgl, item: item.replace('_', ' '), modeStr: infoModeStr,
+            tHarian: totalTargetHarian, realHarian: realHarian, 
             gapHarian: gapHarian, pctHarian: Math.round(pctHarian),
-            listKasir: listKasirWA
+            listKasir: listKasirWA, totalStdHarian: totalStdHarian
         };
     }
 }
@@ -2056,33 +2224,25 @@ async function kirimWAFilterHarian() {
     if (typeof html2canvas !== 'undefined') {
         btn.innerText = "📸 Memotret...";
         const areaSS = document.getElementById('hasilFilterHarian');
-        
         try {
             const canvas = await html2canvas(areaSS, { scale: 2, backgroundColor: "#e9ecef" });
             const imgData = canvas.toDataURL("image/jpeg", 0.9);
-            
             const link = document.createElement('a');
             link.download = `REKAP_HARIAN_${data.item.replace(/\s/g,'_')}_TGL_${data.tgl}.jpg`;
-            link.href = imgData;
-            link.click();
-        } catch(e) {
-            console.error(e);
-            alert("Gagal ambil screenshot otomatis. Pesan WA tetap akan dikirim.");
-        }
-    } else {
-        alert("Library Screenshot belum termuat, langsung kirim ke WA.");
+            link.href = imgData; link.click();
+        } catch(e) { console.error(e); }
     }
 
     btn.innerText = "🚀 Mengirim...";
 
-    // Teks WA Full Warna-Warni
     const pesanWA = `*📊 REKAP HARIAN PPS [${data.tk}]*\n`
         + `📅 Tanggal: *${data.tgl}*\n`
         + `📦 Item: *${data.item}*\n`
+        + `🔍 Filter By: *${data.modeStr}*\n`
         + `------------------------------------\n`
         + `*🏢 PENCAPAIAN TOKO (1 HARI)*\n`
+        + `🧾 Total STD Harian: *${data.totalStdHarian}*\n`
         + `🎯 Target Harian: *${data.tHarian}*\n`
-        + `🎯 Target per Shift: *${data.tShift}*\n`
         + `✅ Actual Harian: *${data.realHarian}*\n`
         + `🔥 Gap Harian: *${data.gapHarian}*\n`
         + `📈 Pencapaian: *${data.pctHarian}%*\n`
@@ -2097,6 +2257,107 @@ async function kirimWAFilterHarian() {
         btn.innerText = prevText;
     }, 800);
 }
+
+// ==========================================
+    // FUNGSI UNIVERSAL KIRIM WA + AUTO SCREENSHOT (ANTI GEPENG 100%)
+    // ==========================================
+    async function kirimWAPopupCustom(elementId, namaLaporan) {
+        const areaSS = document.getElementById(elementId);
+        if(!areaSS) return alert("Data laporan belum dimuat!");
+        const btnTarget = event.target;
+        const prevText = btnTarget.innerText;
+        
+        const scrollableElements = areaSS.querySelectorAll('*');
+        const originalStyles = [];
+        
+        // Simpan style asli pembungkus utama
+        const areaOriginalMaxHeight = areaSS.style.maxHeight;
+        const areaOriginalOverflowY = areaSS.style.overflowY;
+        const areaOriginalPadding = areaSS.style.padding;
+
+        areaSS.style.maxHeight = 'none';
+        areaSS.style.overflowY = 'visible';
+        areaSS.style.padding = '15px';
+
+        scrollableElements.forEach(el => {
+            const style = window.getComputedStyle(el);
+            
+            if (style.overflowY === 'auto' || style.overflowY === 'scroll' || el.style.maxHeight !== '') {
+                originalStyles.push({ element: el, maxHeight: el.style.maxHeight, overflowY: el.style.overflowY });
+                el.style.maxHeight = 'none';
+                el.style.overflowY = 'visible';
+            }
+            
+            // --- TRIK TERBARU: Matikan "Native UI" HP/Laptop agar teks Select/Input tidak terpotong ---
+            if (el.tagName === 'SELECT' || el.tagName === 'INPUT') {
+                originalStyles.push({ 
+                    element: el, 
+                    height: el.style.height,
+                    appearance: el.style.appearance,
+                    webkitAppearance: el.style.webkitAppearance,
+                    padding: el.style.padding,
+                    flexShrink: el.style.flexShrink
+                });
+                
+                el.style.appearance = 'none'; // Mematikan desain 3D bawaan HP
+                el.style.webkitAppearance = 'none'; // Mematikan desain 3D bawaan Safari/Chrome
+                el.style.height = '42px'; // Paksa tinggi kotak lebih lega
+                el.style.padding = '10px'; // Kasih ruang napas untuk teks
+                el.style.flexShrink = '0'; // Tolak digepengkan
+            }
+        });
+
+        if (typeof html2canvas !== 'undefined') {
+            btnTarget.innerText = "📸 Memotret...";
+            // Jeda 0.5 detik agar browser siap memotret tanpa terpotong
+            await new Promise(resolve => setTimeout(resolve, 500)); 
+            
+            try {
+                const canvas = await html2canvas(areaSS, { 
+                    scale: 2.5, // Ukuran ideal: Tajam tapi tidak bikin HP lemot
+                    backgroundColor: "#e9ecef",
+                    useCORS: true,
+                    scrollY: -window.scrollY 
+                });
+                const imgData = canvas.toDataURL("image/jpeg", 0.9);
+                const link = document.createElement('a');
+                link.download = `${namaLaporan}_${Date.now()}.jpg`;
+                link.href = imgData; link.click();
+            } catch(e) { console.error(e); }
+        }
+
+        // --- Kembalikan semua tampilan seperti semula dalam hitungan milidetik ---
+        areaSS.style.maxHeight = areaOriginalMaxHeight;
+        areaSS.style.overflowY = areaOriginalOverflowY;
+        areaSS.style.padding = areaOriginalPadding;
+        
+        originalStyles.forEach(item => {
+            if(item.maxHeight !== undefined) item.element.style.maxHeight = item.maxHeight;
+            if(item.overflowY !== undefined) item.element.style.overflowY = item.overflowY;
+            if(item.height !== undefined) item.element.style.height = item.height;
+            if(item.appearance !== undefined) item.element.style.appearance = item.appearance;
+            if(item.webkitAppearance !== undefined) item.element.style.webkitAppearance = item.webkitAppearance;
+            if(item.padding !== undefined) item.element.style.padding = item.padding;
+            if(item.flexShrink !== undefined) item.element.style.flexShrink = item.flexShrink;
+        });
+
+        btnTarget.innerText = "🚀 Mengirim...";
+        
+        let kataSemangat = "🔥 *GACOR PARAH!* Buat yang udah capai target, pertahankan performa luar biasa ini! 🚀💰\n\n⚠️ *YANG MASIH KUSUT / BELUM CAPAI:* Ayo kejar terus targetnya, kawal sampai closing shift terakhir! Pasti bisa! 💪";
+        
+        const k = getK();
+        const pesanWA = `*📢 UPDATE LAPORAN [${k.tk || 'TOKO'}]*\n`
+            + `📋 Jenis: *${namaLaporan.replace(/_/g, ' ')}*\n`
+            + `------------------------------------\n`
+            + `${kataSemangat}\n`
+            + `------------------------------------\n`
+            + `*#omkopipait* ☕🔥`;
+
+        setTimeout(() => {
+            window.open(`https://wa.me/?text=${encodeURIComponent(pesanWA)}`, '_blank');
+            btnTarget.innerText = prevText;
+        }, 800);
+    }
 
 </script>
 </body>
