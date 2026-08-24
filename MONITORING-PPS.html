@@ -303,6 +303,17 @@
             <table id="tabelPPS"><thead id="headPPS"></thead><tbody id="bodyPPS"></tbody></table>
         </div>
     </div>
+        
+        <!-- TOMBOL FILTER BARU -->
+        <button onclick="bukaFilterHarian()" style="background:#e67e22; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; margin-bottom:5px; font-weight:bold; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            🔍 FILTER PROGRES HARIAN (BY ITEM & PERIODE)
+        </button>
+
+        <!-- Bungkus tabel dengan div scroll -->
+        <div class="table-scroll-container" id="scrollHarian">
+            <table id="tabelPPS"><thead id="headPPS"></thead><tbody id="bodyPPS"></tbody></table>
+        </div>
+    </div>
 
     <!-- DASHBOARD BARU: MONITORING LAPORAN SHIFT -->
     <div id="wrapperLaporanHarian" style="margin-top: 30px;">
@@ -1808,6 +1819,285 @@ function renderLaporanHarian() {
         body.innerHTML += `<tr>${rowHTML}</tr>`;
     }
 }
+
+// ==========================================
+// FUNGSI POP UP CEK PENCAPAIAN HARIAN KASIR + AUTO SS & WA
+// ==========================================
+
+// Panggil library html2canvas secara otomatis agar bisa Screenshot layar
+if (typeof html2canvas === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    document.head.appendChild(script);
+}
+
+function tutupFilterHarian(){
+    const modal = document.getElementById('filterHarianModal');
+    if(modal) modal.remove();
+}
+
+function bukaFilterHarian(){
+    const k = getK();
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    
+    // Bikin opsi tanggal dinamis (1 sampai akhir bulan)
+    let tglOptions = "";
+    for(let i = 1; i <= dM; i++){
+        tglOptions += `<option value="${i}">Tanggal ${i}</option>`;
+    }
+
+    const html = `
+    <div class="modal-rapor" id="filterHarianModal" style="display:block;">
+        <div class="modal-content" style="max-width: 95%; max-height:90vh; display:flex; flex-direction:column;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="margin:0; font-size:16px;">🔍 CEK PENCAPAIAN HARIAN</h3>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button id="btnWAFilter" onclick="kirimWAFilterHarian()" style="display:none; background:#25d366; color:white; border:2px solid #128c7e; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                        📲 KIRIM WA
+                    </button>
+                    <span class="btn-tutup" onclick="tutupFilterHarian()">×</span>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 10px; background:#f4f7f6; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <select id="filterItemHarian" style="width:auto; flex:1;">
+                    <option value="PWP">PWP</option>
+                    <option value="PSM">PSM</option>
+                    <option value="SERBA_GRATIS">SERBA GRATIS</option>
+                    <option value="SUGER">SUGER</option>
+                    <option value="CEBAN">CEBAN</option>
+                </select>
+                
+                <select id="filterTglHarian" style="width:auto; flex:1;">
+                    ${tglOptions}
+                </select>
+                
+                <button onclick="generateFilterHarian()" style="width:100%; background:#27ae60; color:white; padding:10px; margin:0; font-weight:bold;">TAMPILKAN DATA</button>
+            </div>
+            
+            <div style="overflow-y: auto; flex:1; padding-right: 5px; background:#e9ecef; border-radius:10px;">
+                <!-- AREA YANG AKAN DI-SCREENSHOT -->
+                <div id="hasilFilterHarian" style="padding:10px; background:#e9ecef;">
+                    <div style="text-align:center; padding:30px 10px; color:#7f8c8d; font-style:italic;">
+                        Pilih Item & Tanggal di atas,<br>lalu klik <b>TAMPILKAN DATA</b>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+
+    const today = new Date().getDate();
+    if(document.getElementById('filterTglHarian') && today <= dM) {
+        document.getElementById('filterTglHarian').value = today;
+    }
+}
+
+function generateFilterHarian(){
+    const k = getK();
+    if(!k.tk) return;
+    const item = document.getElementById('filterItemHarian').value;
+    const tgl = parseInt(document.getElementById('filterTglHarian').value);
+    
+    const harianData = db[k.yr][k.mn][k.tk].harian || {};
+    const tipeToko = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+    const jmlShift = (tipeToko === 3) ? 3 : 2;
+    
+    const kru = (document.getElementById('listKru').value || '').split(',').map(x => x.trim()).filter(Boolean);
+    const log = getLogic(tgl, item, k.yr, k.mn);
+    const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[item]) || 0;
+    
+    // Kalkulasi Data Harian vs Shift
+    const tShift = getTargetDinamis(k, tgl, item, tTotal, jmlShift, log);
+    const tHarian = tShift * jmlShift; // Total Target 1 Hari
+    
+    const h = harianData[tgl] || {};
+    let hasilKasir = [];
+    let realHarian = 0;
+    
+    kru.forEach(nama => {
+        let real = 0;
+        let shiftKerja = []; 
+        
+        Object.keys(h).forEach(key => {
+            if(key.endsWith('_nama') && h[key].toUpperCase() === nama.toUpperCase()) {
+                const shiftKode = key.substring(0, 2); 
+                shiftKerja.push(shiftKode.toUpperCase());
+                
+                const dataKey = key.replace('_nama', '');
+                if(h[dataKey]) {
+                    real += parseFloat(h[dataKey][item]) || 0;
+                }
+            }
+        });
+        
+        realHarian += real; // Kumpulkan semua actual harian
+
+        hasilKasir.push({
+            nama: nama.toUpperCase(),
+            real: real,
+            shift: shiftKerja.length > 0 ? shiftKerja.join(', ') : 'LIBUR / BELUM LAPOR'
+        });
+    });
+    
+    hasilKasir.sort((a, b) => b.real - a.real);
+
+    let gapHarian = Math.max(0, tHarian - realHarian);
+    let pctHarian = tHarian > 0 ? (realHarian / tHarian) * 100 : 0;
+    let colorPctHarian = pctHarian >= 100 ? '#27ae60' : (pctHarian >= 75 ? '#f39c12' : '#e74c3c');
+    
+    // --- PEMBUATAN TAMPILAN DASHBOARD MINI HARIAN (UNTUK SS) ---
+    let html = `
+    <div style="background:white; padding:15px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); border-top: 5px solid #3498db;">
+        <div style="text-align:center; margin-bottom:12px; border-bottom:2px dashed #eee; padding-bottom:8px;">
+            <div style="font-size:16px; font-weight:bold; color:#2c3e50;">📊 REKAP PENCAPAIAN HARIAN TOKO</div>
+            <div style="font-size:13px; color:#555; margin-top:3px;">📅 Tanggal <b>${tgl}</b> • Item <b>${item.replace('_', ' ')}</b></div>
+        </div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px; text-align:center; margin-bottom:15px;">
+            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">🎯 Target Harian<br><b style="font-size:18px; color:#34495e;">${tHarian}</b> <small>Pcs</small></div>
+            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">🎯 Target Shift<br><b style="font-size:18px; color:#8e44ad;">${tShift}</b> <small>Pcs</small></div>
+            <div style="background:#f8f9fa; padding:8px; border-radius:8px;">✅ Actual Harian<br><b style="font-size:18px; color:#27ae60;">${realHarian}</b> <small>Pcs</small></div>
+            <div style="background:#ffebee; padding:8px; border-radius:8px; border:1px solid #ffcdd2;">🔥 Gap Harian<br><b style="font-size:18px; color:#e74c3c;">${gapHarian}</b> <small>Pcs</small></div>
+        </div>
+
+        <div>
+            <div style="font-size:13px; font-weight:bold; margin-bottom:5px; display:flex; justify-content:space-between;">
+                <span>📈 Pencapaian Toko Harian</span>
+                <span style="color:${colorPctHarian};">${Math.round(pctHarian)}%</span>
+            </div>
+            <div style="height:12px; background:#ecf0f1; border-radius:10px; overflow:hidden;">
+                <div style="height:100%; width:${Math.min(100, pctHarian)}%; background:${colorPctHarian};"></div>
+            </div>
+        </div>
+    </div>
+    <div style="font-size:14px; font-weight:bold; color:#2c3e50; margin-bottom:10px; padding-left:5px;">👥 RINCIAN KASIR (TARGET SHIFT: ${tShift} PCS)</div>
+    `;
+    
+    let listKasirWA = "";
+
+    // --- PEMBUATAN LIST KASIR ---
+    hasilKasir.forEach((x, i) => {
+        let actualTarget = tShift; 
+        const pct = actualTarget > 0 ? (x.real / actualTarget) * 100 : 0;
+        const gap = Math.max(0, actualTarget - x.real);
+        
+        let statusHTML = "", gapColor = "", emoWA = "";
+        
+        // Kembalikan Emoji Warna-Warni
+        if(x.shift === 'LIBUR / BELUM LAPOR') {
+            statusHTML = "💤 BELUM LAPOR / LIBUR"; gapColor = "#95a5a6"; 
+            emoWA = "💤";
+        } else if(pct >= 100) {
+            statusHTML = "🔥 LUNAS!"; gapColor = "#27ae60"; 
+            emoWA = "✅";
+        } else if(pct >= 75) {
+            statusHTML = "⚠️ DIKIT LAGI!"; gapColor = "#f39c12"; 
+            emoWA = "⚠️";
+        } else {
+            statusHTML = "🚨 FLOP!"; gapColor = "#e74c3c"; 
+            emoWA = "🚨";
+        }
+        
+        const medalHTML = i === 0 && x.real > 0 ? "🥇" : i === 1 && x.real > 0 ? "🥈" : i === 2 && x.real > 0 ? "🥉" : (i+1) + ".";
+        const medalWA = i === 0 && x.real > 0 ? "🥇" : i === 1 && x.real > 0 ? "🥈" : i === 2 && x.real > 0 ? "🥉" : "👤";
+        
+        // Teks WA yang menyala
+        listKasirWA += `${medalWA} *${x.nama}* (${x.shift})\n     ├ Target: ${actualTarget} | Real: *${x.real}*\n     └ Pencapaian: *${Math.round(pct)}%* ${emoWA} ${x.shift !== 'LIBUR / BELUM LAPOR' && x.real < actualTarget ? `(Minus: ${gap})` : ''}\n\n`;
+
+        html += `
+        <div style="margin-bottom:10px; padding:12px; background:#fff; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.08); border-left: 6px solid ${gapColor};">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-weight:bold; font-size:14px;">${medalHTML} ${x.nama}</div>
+                <div style="font-size:10px; background:#eee; padding:3px 6px; border-radius:5px; font-weight:bold;">${x.shift}</div>
+            </div>
+            
+            <div style="margin-top:10px; font-size:13px; font-weight:bold;">
+                Real: <span style="color:${gapColor}; font-size:15px;">${x.real}</span> / ${actualTarget} 
+                <span style="float:right; color:${gapColor}; font-size:15px;">${Math.round(pct)}%</span>
+            </div>
+            
+            <div style="height:8px; background:#ecf0f1; border-radius:10px; overflow:hidden; margin-top:6px;">
+                <div style="height:100%; width:${Math.min(100, pct)}%; background:${gapColor};"></div>
+            </div>
+            
+            <div style="margin-top:6px; font-size:11px; color:${gapColor}; font-weight:bold; display:flex; justify-content:space-between;">
+                <span>${statusHTML}</span>
+                <span>${x.shift !== 'LIBUR / BELUM LAPOR' && x.real < actualTarget ? `Minus: ${gap} Pcs` : ''}</span>
+            </div>
+        </div>
+        `;
+    });
+    
+    document.getElementById('hasilFilterHarian').innerHTML = html;
+
+    const btnWA = document.getElementById('btnWAFilter');
+    if(btnWA) {
+        btnWA.style.display = 'inline-block';
+        window.dataWAFilter = {
+            tk: k.tk, tgl: tgl, item: item.replace('_', ' '),
+            tHarian: tHarian, tShift: tShift, realHarian: realHarian, 
+            gapHarian: gapHarian, pctHarian: Math.round(pctHarian),
+            listKasir: listKasirWA
+        };
+    }
+}
+
+async function kirimWAFilterHarian() {
+    const data = window.dataWAFilter;
+    if(!data) return alert("Silakan TAMPILKAN DATA terlebih dahulu!");
+    
+    const btn = document.getElementById('btnWAFilter');
+    const prevText = btn.innerText;
+    
+    if (typeof html2canvas !== 'undefined') {
+        btn.innerText = "📸 Memotret...";
+        const areaSS = document.getElementById('hasilFilterHarian');
+        
+        try {
+            const canvas = await html2canvas(areaSS, { scale: 2, backgroundColor: "#e9ecef" });
+            const imgData = canvas.toDataURL("image/jpeg", 0.9);
+            
+            const link = document.createElement('a');
+            link.download = `REKAP_HARIAN_${data.item.replace(/\s/g,'_')}_TGL_${data.tgl}.jpg`;
+            link.href = imgData;
+            link.click();
+        } catch(e) {
+            console.error(e);
+            alert("Gagal ambil screenshot otomatis. Pesan WA tetap akan dikirim.");
+        }
+    } else {
+        alert("Library Screenshot belum termuat, langsung kirim ke WA.");
+    }
+
+    btn.innerText = "🚀 Mengirim...";
+
+    // Teks WA Full Warna-Warni
+    const pesanWA = `*📊 REKAP HARIAN PPS [${data.tk}]*\n`
+        + `📅 Tanggal: *${data.tgl}*\n`
+        + `📦 Item: *${data.item}*\n`
+        + `------------------------------------\n`
+        + `*🏢 PENCAPAIAN TOKO (1 HARI)*\n`
+        + `🎯 Target Harian: *${data.tHarian}*\n`
+        + `🎯 Target per Shift: *${data.tShift}*\n`
+        + `✅ Actual Harian: *${data.realHarian}*\n`
+        + `🔥 Gap Harian: *${data.gapHarian}*\n`
+        + `📈 Pencapaian: *${data.pctHarian}%*\n`
+        + `------------------------------------\n`
+        + `*👥 RINCIAN KASIR:*\n\n`
+        + `${data.listKasir}`
+        + `------------------------------------\n`
+        + `*#omkopipait* ☕🔥`;
+
+    setTimeout(() => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(pesanWA)}`, '_blank');
+        btn.innerText = prevText;
+    }, 800);
+}
+
 </script>
 </body>
 </html>
