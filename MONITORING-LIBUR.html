@@ -129,6 +129,20 @@
             background: #e67e22; /* Warna oranye khas Omkopipait */
             border-radius: 8px;
         }
+
+        /* --- SCROLL TAMPILAN ADMIN --- */
+        .admin-table-wrapper {
+            max-height: 300px; /* Angka ini membatasi tingginya. Bisa diganti misal 250px atau 400px */
+            overflow-y: auto; /* Scroll atas-bawah otomatis muncul */
+            overflow-x: auto; /* Scroll kiri-kanan */
+            padding-right: 5px;
+            border-bottom: 2px solid #fadbd8;
+        }
+
+        /* Percantik warna scrollbar admin agar senada dengan kotak merahnya */
+        .admin-table-wrapper::-webkit-scrollbar { width: 6px; height: 6px; }
+        .admin-table-wrapper::-webkit-scrollbar-track { background: #fdf4f6; border-radius: 8px; }
+        .admin-table-wrapper::-webkit-scrollbar-thumb { background: #e74c3c; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -160,7 +174,7 @@
                     <input type="text" id="inputNamaKru" placeholder="Tulis Nama Personil Baru..." style="margin:0;">
                     <button style="background: #e74c3c; color: white; border: none; padding: 0 15px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer;" onclick="tambahPersonil()">DAFTAR</button>
                 </div>
-                <div style="overflow-x: auto;">
+                <div class="admin-table-wrapper">
                     <table class="admin-table">
                         <thead>
                             <tr>
@@ -236,7 +250,7 @@
 
 <script>
     // =========================================================================
-    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwbc0bbJuX1nrf6qcYQYvDjgIZYHr92aHNHtQSNxZqFARmacCAiF6Ca85jyOkeMVrnV/exec"; 
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbynjzwRlccCjEdbVAND-4j_5-DdlDwQPigD7TCr1y8NTf4hTdwGIYin-_9Z6G7V80vf/exec"; 
     // =========================================================================
 
     const urlParams = new URLSearchParams(window.location.search);
