@@ -422,7 +422,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbw9kkW_8pyWa9j9Wsdg7b0VD9Di0ZOg6HSi27T3JpHIHjJ7ufSD9rJT3ue9BWaCgnEwqA/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbz6ekr-qE5B8WZdyjde6L796YOD82l0SQaOB5iemPJbJmh8zUxw-7sBTKt44kdu4ue8pw/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -1681,136 +1681,160 @@ function pctGrowth(sekarang,lalu){
         } else { setInputState(true); }
     }
 
-    async function kirimWA() {
-    try {
-        const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
-        const shf = document.getElementById('shfInput').value; 
-        const ksr = document.getElementById('kasirAktif').value;
-        const shfKey = shf + "_" + ksr.replace(/\s+/g, '_');
-        const note = document.getElementById('noteWA').value.trim();
+async function kirimWA() {
+        try {
+            const k = getK(), tgl = parseInt(document.getElementById('tglInput').value); 
+            const shf = document.getElementById('shfInput').value; 
+            const ksr = document.getElementById('kasirAktif').value;
+            const shfKey = shf + "_" + ksr.replace(/\s+/g, '_');
+            const note = document.getElementById('noteWA').value.trim();
 
-        if(!tgl) return alert("Pilih Tanggal!");
-        const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
-        if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
+            if(!tgl) return alert("Pilih Tanggal!");
+            const i1 = document.getElementById('pBuku'), i2 = document.getElementById('pSIS');
+            if(!i1.getAttribute('data-loaded') || !i2.getAttribute('data-loaded')) return alert("Upload Foto Dulu!");
 
-        const p = tgl <= 15 ? 1 : 2;
-        const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
-        let tTokoBulat = {};
-        const itm = ['PWP','PSM','SERBA_GRATIS','SUGER','CEBAN'];
-        const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+            const p = tgl <= 15 ? 1 : 2;
+            const tipe = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+            let tTokoBulat = {};
+            const itm = ['PWP','PSM','SERBA_GRATIS','SUGER','CEBAN'];
+            const harianSkrg = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
 
-        let pDetail = "📊 *HASIL SHIFT INI:*\n";
-        let adaBebanShift = false;
+            let pDetail = "📊 *HASIL SHIFT INI:*\n";
+            let adaBebanShift = false;
 
-        itm.forEach(it => {
-            tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
-            if(it === 'PSM') {
-                const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
-                tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.PSM) || 0;
-            }
+            // --- 1. AMBIL QTY STD YANG DIINPUT KASIR (ANTI 0) ---
+            const stdVal = parseFloat(document.getElementById('r_STD').value) || 0;
+            pDetail += `🧾 QTY STD (Struk): *${stdVal}*\n\n`;
 
-            const log = getLogic(tgl, it, k.yr, k.mn);
-            const tS = getTargetDinamis(k, tgl, it, tTokoBulat[it], tipe, log);
-
-            const rS = parseFloat(harianSkrg[shfKey]?.[it]) || 0;
-            const pct = tS > 0 ? (rS/tS)*100 : 0;
-
-            if(rS < tS) adaBebanShift = true;
-
-            pDetail += `🔹 *${it.replace('_',' ')}*\nReal: ${rS} / Tgt Shift: ${tS}\n${getTextBar(pct)} (${Math.round(pct)}%)\n\n${rS>=tS ? '✅ *LUNAS*' : '🚨 *BEBAN:* '+(tS-rS)+' Pcs'}\n\n`;
-        });
-
-        if(adaBebanShift) {
-            if(!note) return alert("🚨 TARGET SHIFT TIDAK CAPAI!\nWajib isi kendala/alasan.");
-            if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
-            let alasanBaru = note.toLowerCase().replace(/\s+/g, ' ');
-            if(db[k.yr][k.mn][k.tk].reasons.includes(alasanBaru)) {
-                return alert("🚨 ALASAN DITOLAK!\nAlasan '" + note + "' sudah pernah digunakan bulan ini.");
-            }
-            db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
-        }
-
-        // --- TAMBAHAN FIX BUG ALASAN KE CLOUD ---
-        // 1. Simpan alasan (note) ke database lokal agar tidak hilang
-        if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
-        if(!db[k.yr][k.mn][k.tk].harian[tgl][shfKey]) db[k.yr][k.mn][k.tk].harian[tgl][shfKey] = {};
-        db[k.yr][k.mn][k.tk].harian[tgl][shfKey + '_note'] = note;
-        saveDisk();
-
-        // 2. Tembak/Push langsung ke cloud berbarengan saat klik Kirim WA
-        const waktuSekarang = db[k.yr][k.mn][k.tk].harian[tgl][shfKey + '_jam'] || new Date().getTime();
-        const payloadWA = { 
-            toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
-            namaPersonil: ksr, note: note, 
-            pwp: document.getElementById('r_PWP').value || 0, 
-            psm: document.getElementById('r_PSM').value || 0, 
-            serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
-            suger: document.getElementById('r_SUGER').value || 0, 
-            ceban: document.getElementById('r_CEBAN').value || 0, 
-            jam: waktuSekarang, 
-            tipeData: "PPS_HARIAN_SAVE_V2" 
-        };
-        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadWA) })
-            .catch(() => console.log("Gagal push alasan ke cloud"));
-        // ----------------------------------------
-
-        let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
-        const dM = new Date(k.yr, k.mn, 0).getDate();
-        for(let i=1; i<=dM; i++){
-            const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
-            Object.keys(dh).forEach(key => {
-                if(key.includes('_nama')){
-                    const namaK = dh[key].trim().toUpperCase();
-                    const kUtama = key.replace('_nama', '');
-                    if(!rekapIndiv[namaK]) rekapIndiv[namaK] = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
-                    let rPWP = parseFloat(dh[kUtama]?.PWP || 0), rPSM = parseFloat(dh[kUtama]?.PSM || 0), rSERBA = parseFloat(dh[kUtama]?.SERBA_GRATIS || 0), rSUGER = parseFloat(dh[kUtama]?.SUGER || 0), rCEBAN = parseFloat(dh[kUtama]?.CEBAN || 0);
-                    rekapIndiv[namaK].PWP += rPWP; rekapIndiv[namaK].PSM += rPSM; rekapIndiv[namaK].SERBA += rSERBA; rekapIndiv[namaK].SUGER += rSUGER; rekapIndiv[namaK].CEBAN += rCEBAN;
-                    if((p === 1 && i <= 15) || (p === 2 && i > 15)){
-                        akumulasiToko.PWP += rPWP; akumulasiToko.PSM += rPSM; akumulasiToko.SERBA += rSERBA; akumulasiToko.SUGER += rSUGER; akumulasiToko.CEBAN += rCEBAN;
-                    }
+            itm.forEach(it => {
+                tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
+                if(it === 'PSM') {
+                    const logPSM = getLogic(tgl,'PSM',k.yr,k.mn);
+                    tTokoBulat[it] = parseFloat(db[k.yr][k.mn][k.tk].target[logPSM.wk]?.PSM) || 0;
                 }
+
+                const log = getLogic(tgl, it, k.yr, k.mn);
+                const tS = getTargetDinamis(k, tgl, it, tTokoBulat[it], tipe, log);
+
+                // --- 2. HITUNG TARGET SYARAT BERDASARKAN STD ---
+                const pSyarat = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[`p_${it}`]) || 0;
+                const tSyaratPcs = Math.ceil(stdVal * (pSyarat / 100));
+
+                const rS = parseFloat(document.getElementById(`r_${it}`).value) || 0;
+                const pct = tS > 0 ? (rS/tS)*100 : 0;
+
+                if(rS < tS) adaBebanShift = true;
+
+                // --- 3. FORMAT TEKS WA BARU (MENAMPILKAN KUOTA & SYARAT) ---
+                pDetail += `🔹 *${it.replace('_',' ')}*\n`;
+                pDetail += `🎯 Tgt Kuota: *${tS}* | Syarat: *${tSyaratPcs}* (${pSyarat}%)\n`;
+                pDetail += `✅ Realisasi: *${rS}*\n`;
+                pDetail += `${getTextBar(pct)} (${Math.round(pct)}%)\n`;
+                pDetail += `${rS>=tS ? '✅ *LUNAS!*' : '🚨 *MINUS:* '+(tS-rS)+' Pcs'}\n\n`;
             });
-        }
 
-        let dashToko = "🏪 *DASHBOARD TOKO (AKUMULASI):*\n";
-        ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
-            let kR = it === 'SERBA' ? 'SERBA' : it;
-            let kT = it === 'SERBA' ? 'SERBA_GRATIS' : it;
-            let pctT = tTokoBulat[kT] > 0 ? (akumulasiToko[kR]/tTokoBulat[kT])*100 : 0;
-            let emo = pctT < 50 ? "🔴" : (pctT < 100 ? "🟡" : "🟢");
-            dashToko += `${emo} ${it}: ${getTextBar(pctT)} ${akumulasiToko[kR]}/${tTokoBulat[kT]} (${Math.round(pctT)}%)\n`;
-        });
+            if(adaBebanShift) {
+                if(!note) return alert("🚨 TARGET SHIFT TIDAK CAPAI!\nWajib isi kendala/alasan.");
+                if(!db[k.yr][k.mn][k.tk].reasons) db[k.yr][k.mn][k.tk].reasons = [];
+                let alasanBaru = note.toLowerCase().replace(/\s+/g, ' ');
+                if(db[k.yr][k.mn][k.tk].reasons.includes(alasanBaru)) {
+                    return alert("🚨 ALASAN DITOLAK!\nAlasan '" + note + "' sudah pernah digunakan bulan ini.");
+                }
+                db[k.yr][k.mn][k.tk].reasons.push(alasanBaru);
+            }
 
-        let personilWA = "🏆 *KONTRIBUSI PERSONIL (PERIODE):*\n";
-        for (let n in rekapIndiv) {
-            personilWA += `👤 *${n}*\n`;
+            // Simpan alasan (note) ke database lokal
+            if(!db[k.yr][k.mn][k.tk].harian[tgl]) db[k.yr][k.mn][k.tk].harian[tgl] = {};
+            if(!db[k.yr][k.mn][k.tk].harian[tgl][shfKey]) db[k.yr][k.mn][k.tk].harian[tgl][shfKey] = {};
+            db[k.yr][k.mn][k.tk].harian[tgl][shfKey + '_note'] = note;
+            saveDisk();
+
+            // --- 4. TEMBAK KE CLOUD (DENGAN KABEL PENYELAMAT STD) ---
+            const waktuSekarang = db[k.yr][k.mn][k.tk].harian[tgl][shfKey + '_jam'] || new Date().getTime();
+            const payloadWA = { 
+                toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
+                namaPersonil: ksr, note: note, 
+                std: stdVal, // <--- ANTI 0 DI CLOUD! 🔥
+                pwp: document.getElementById('r_PWP').value || 0, 
+                psm: document.getElementById('r_PSM').value || 0, 
+                serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
+                suger: document.getElementById('r_SUGER').value || 0, 
+                ceban: document.getElementById('r_CEBAN').value || 0, 
+                jam: waktuSekarang, 
+                tipeData: "PPS_HARIAN_SAVE_V2" 
+            };
+            fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payloadWA) })
+                .catch(() => console.log("Gagal push ke cloud"));
+
+            let rekapIndiv = {}, akumulasiToko = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
+            const dM = new Date(k.yr, k.mn, 0).getDate();
+            for(let i=1; i<=dM; i++){
+                const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
+                Object.keys(dh).forEach(key => {
+                    if(key.includes('_nama')){
+                        const namaK = dh[key].trim().toUpperCase();
+                        const kUtama = key.replace('_nama', '');
+                        if(!rekapIndiv[namaK]) rekapIndiv[namaK] = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
+                        let rPWP = parseFloat(dh[kUtama]?.PWP || 0), rPSM = parseFloat(dh[kUtama]?.PSM || 0), rSERBA = parseFloat(dh[kUtama]?.SERBA_GRATIS || 0), rSUGER = parseFloat(dh[kUtama]?.SUGER || 0), rCEBAN = parseFloat(dh[kUtama]?.CEBAN || 0);
+                        rekapIndiv[namaK].PWP += rPWP; rekapIndiv[namaK].PSM += rPSM; rekapIndiv[namaK].SERBA += rSERBA; rekapIndiv[namaK].SUGER += rSUGER; rekapIndiv[namaK].CEBAN += rCEBAN;
+                        if((p === 1 && i <= 15) || (p === 2 && i > 15)){
+                            akumulasiToko.PWP += rPWP; akumulasiToko.PSM += rPSM; akumulasiToko.SERBA += rSERBA; akumulasiToko.SUGER += rSUGER; akumulasiToko.CEBAN += rCEBAN;
+                        }
+                    }
+                });
+            }
+
+            let dashToko = "🏪 *DASHBOARD TOKO (AKUMULASI):*\n";
             ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
-                let rI = rekapIndiv[n][it] || 0;
-                let tI = tTokoBulat[it === 'SERBA' ? 'SERBA_GRATIS' : it] || 0;
-                let pctI = tI > 0 ? (rI/tI)*100 : 0;
-                let emo = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
-                personilWA += `  ${emo} ${it}: ${getTextBar(pctI)} ${rI}/${tI}\n`;
+                let kR = it === 'SERBA' ? 'SERBA' : it;
+                let kT = it === 'SERBA' ? 'SERBA_GRATIS' : it;
+                let pctT = tTokoBulat[kT] > 0 ? (akumulasiToko[kR]/tTokoBulat[kT])*100 : 0;
+                let emo = pctT < 50 ? "🔴" : (pctT < 100 ? "🟡" : "🟢");
+                dashToko += `${emo} ${it}: ${getTextBar(pctT)} ${akumulasiToko[kR]}/${tTokoBulat[kT]} (${Math.round(pctT)}%)\n`;
             });
-            personilWA += `\n`;
-        }
 
-        const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA/ALASAN:* ${note || '-'}\n\n${dashToko}\n${personilWA}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
+            let personilWA = "🏆 *KONTRIBUSI PERSONIL (PERIODE):*\n";
+            for (let n in rekapIndiv) {
+                personilWA += `👤 *${n}*\n`;
+                ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
+                    let rI = rekapIndiv[n][it] || 0;
+                    let tI = tTokoBulat[it === 'SERBA' ? 'SERBA_GRATIS' : it] || 0;
+                    let pctI = tI > 0 ? (rI/tI)*100 : 0;
+                    let emo = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
+                    personilWA += `  ${emo} ${it}: ${getTextBar(pctI)} ${rI}/${tI}\n`;
+                });
+                personilWA += `\n`;
+            }
 
-        const cnv = document.getElementById('canvasJoin');
-        if (cnv) {
-            const ctx = cnv.getContext('2d');
-            cnv.width=1200; cnv.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
-            ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600);
-            const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}.jpg`; link.href = cnv.toDataURL("image/jpeg", 0.8);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
+            const btn = document.getElementById('btnWA');
+            const prevText = btn.innerText;
+            btn.innerText = "📸 Memproses WA...";
 
-        alert("SINKRON BERHASIL! ✅🔥");
-        setTimeout(() => { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank'); }, 1000);
+            // --- 5. KATA-KATA MOTIVASI TAJAM ---
+            let kataSemangat = "";
+            if(adaBebanShift) {
+                kataSemangat = "⚠️ *STATUS: KUSUT!* 🐌\nMasih ada item yang belum capai target shift! Jangan santai dulu, kejar minusnya di sisa waktu atau serah terima dengan jelas ke shift berikutnya. Buktikan kalian bukan beban toko! 💪🔥";
+            } else {
+                kataSemangat = "🔥 *STATUS: GACOR PARAH!* 🚀\nLuar biasa! Semua target shift ini lunas dibabat habis! Pertahankan ritme sadis ini, jangan kasih kendor sampai closing! Kalian kebanggaan toko! 🏆💰";
+            }
 
-    } catch (err) { alert("🚨 ERROR: " + err.message); }
-}
+            const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA/ALASAN:* ${note || '-'}\n------------------------------------\n${kataSemangat}\n------------------------------------\n${dashToko}\n${personilWA}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
 
+            const cnv = document.getElementById('canvasJoin');
+            if (cnv) {
+                const ctx = cnv.getContext('2d');
+                cnv.width=1200; cnv.height=600; ctx.fillStyle="white"; ctx.fillRect(0,0,1200,600);
+                ctx.drawImage(i1, 0, 0, 600, 600); ctx.drawImage(i2, 600, 0, 600, 600);
+                const link = document.createElement('a'); link.download = `LAPORAN_${k.tk}_TGL${tgl}.jpg`; link.href = cnv.toDataURL("image/jpeg", 0.8);
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            }
+
+            btn.innerText = prevText;
+            alert("SINKRON BERHASIL! ✅🔥");
+            setTimeout(() => { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank'); }, 1000);
+
+        } catch (err) { alert("🚨 ERROR: " + err.message); }
+    }
 
 function tutupRapor() {
     const modal = document.getElementById('modalRapor');
