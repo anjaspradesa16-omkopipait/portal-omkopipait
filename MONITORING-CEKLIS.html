@@ -219,7 +219,9 @@
                     <!-- Dirender via JS -->
                 </div>
 
-                <button class="btn-wa" onclick="kirimLaporan()">🚀 KIRIM KE CLOUD & WA</button>
+
+                <button id="btnCloud" class="btn-save" onclick="prosesCloud()">☁️ 1. SIMPAN CLOUD & DOWNLOAD FOTO</button>
+                <button id="btnWA" class="btn-wa" onclick="prosesWA()" style="display: none; background: #25d366; border: 2px solid #128c7e;">💬 2. KIRIM LAPORAN KE WHATSAPP</button>
             </div>
 
             <!-- ================= ADMIN & CREW: PROGRESS PERSONIL ================= -->
@@ -279,7 +281,7 @@
     <!-- LOGIC JAVASCRIPT -->
     <script>
         // 🔴🔴🔴 PASTE LINK URL GOOGLE APPS SCRIPT ANDA DI SINI 🔴🔴🔴
-        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8TOc-kPAB9tLHcV7u9CwqzkS3eCpZRl6ZFSxENj3KuyWqsOeWTnn0I2fkSzjHfkwU/exec";
+        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwO42hEoOB7N0Fzg3SBh9JZBtKq7ANvoEdI5JLo4O4dRLhRY2Sc5NRNXXBB9tJNpZ7q/exec";
         
         let globalUser = null;
         let setupMaster = { tipe: "Toko 24 Jam", personil: [], jobdesk: [] };
@@ -293,16 +295,21 @@
         function showLoad() { document.getElementById('loader').style.display = 'flex'; }
         function hideLoad() { document.getElementById('loader').style.display = 'none'; }
 
-        async function fetchToCloud(payload) {
-            try {
-                const response = await fetch(APP_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-                const result = await response.json();
-                if(result.status === "error") throw new Error(result.message);
-                return result;
-            } catch (error) {
-                alert("Error dari Cloud: " + error.message); hideLoad(); throw error;
-            }
-        }
+    async function fetchToCloud(payload) {
+    try {
+        const response = await fetch(APP_SCRIPT_URL, { 
+            method: "POST", 
+            // PERBAIKAN: Header ini mencegah Google menolak request dari browser HP
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload) 
+        });
+        const result = await response.json();
+        if(result.status === "error") throw new Error(result.message);
+        return result;
+    } catch (error) {
+        alert("Error dari Cloud: " + error.message); hideLoad(); throw error;
+    }
+}
 
         // ================= JAM REAL-TIME =================
         function jalankanJam() {
@@ -618,11 +625,15 @@ async function tarikSetupCloud() {
             });
         }
 
-// ================= KIRIM LAPORAN =================
-async function kirimLaporan() {
+// ================= VARIABEL GLOBAL UNTUK WA =================
+let teksWASiapKirim = ""; 
+
+// ================= FUNGSI 1: CLOUD & FOTO =================
+async function prosesCloud() {
     if(isSubmitting) return;
 
-    const btnKirim = document.querySelector('.btn-wa');
+    const btnCloud = document.getElementById('btnCloud');
+    const btnWA = document.getElementById('btnWA');
     const nama = globalUser.nama; 
     const shift = document.getElementById('shfInput').value;
     const arrJob = setupMaster.jobdesk;
@@ -645,9 +656,9 @@ async function kirimLaporan() {
     if(!semuaFoto) return alert("PERINGATAN: Bukti Foto wajib diupload sepenuhnya! Tidak boleh ada foto yang kosong.");
 
     isSubmitting = true;
-    btnKirim.disabled = true;
-    btnKirim.style.opacity = "0.5";
-    btnKirim.innerText = "⏳ MENGIRIM... (MOHON TUNGGU)";
+    btnCloud.disabled = true;
+    btnCloud.style.opacity = "0.5";
+    btnCloud.innerText = "⏳ MENYIMPAN... (MOHON TUNGGU)";
 
     showLoad();
     
@@ -671,15 +682,6 @@ async function kirimLaporan() {
 
         hideLoad();
         
-        // Reset Form
-        document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.foto-wajib').forEach(fl => fl.value = "");
-
-        isSubmitting = false;
-        btnKirim.disabled = false;
-        btnKirim.style.opacity = "1";
-        btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
-
         // Persiapkan teks WhatsApp
         let waText = `✨ *LAPORAN CEKLIS AWAL SHIFT* ✨\n`;
         waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -689,36 +691,54 @@ async function kirimLaporan() {
         waText += `🧑‍🚀 *Personil:* ${nama}\n`;
         waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
         waText += `*📋 STATUS TUGAS:* \n`;
-        
         arrJob.forEach(job => { waText += ` ✅ _${job}_\n`; });
-        
         waText += `━━━━━━━━━━━━━━━━━━━━━\n`;
         waText += `💡 _(Laporan ini sah dan disertai dengan lampiran foto grid)_ 📸`;
 
-        // URL menggunakan wa.me (lebih optimal untuk mobile & desktop)
-        const urlWA = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+        teksWASiapKirim = `https://wa.me/?text=${encodeURIComponent(waText)}`;
 
-        // CARA BARU: Menggunakan elemen <a> agar tidak diblokir browser
-        const linkWA = document.createElement('a');
-        linkWA.href = urlWA;
-        linkWA.target = '_blank';
-        document.body.appendChild(linkWA);
-        linkWA.click();
-        document.body.removeChild(linkWA);
+        // Reset Form
+        document.querySelectorAll('.chk-wajib').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.foto-wajib').forEach(fl => fl.value = "");
+
+        isSubmitting = false;
+        
+        // Sembunyikan tombol Cloud, Munculkan tombol WA
+        btnCloud.style.display = "none";
+        btnWA.style.display = "block";
+        
+        alert("✅ SUKSES! Data masuk Cloud & Foto ter-download.\n\nSilakan klik tombol hijau 'KIRIM LAPORAN KE WHATSAPP' untuk tahap terakhir.");
 
     } catch (e) {
-        console.error(e); // Tambahkan log untuk memudahkan pengecekan jika ada error di cloud
-        alert("Gagal koneksi, coba lagi!");
+        console.error(e); 
+        alert("Gagal koneksi Cloud, coba lagi!");
         hideLoad();
         
         isSubmitting = false;
-        btnKirim.disabled = false;
-        btnKirim.style.opacity = "1";
-        btnKirim.innerText = "🚀 KIRIM KE CLOUD & WA";
+        btnCloud.disabled = false;
+        btnCloud.style.opacity = "1";
+        btnCloud.innerText = "☁️ 1. SIMPAN CLOUD & DOWNLOAD FOTO";
     }
 }
 
-        window.onload = init;
+// ================= FUNGSI 2: KIRIM KE WHATSAPP =================
+function prosesWA() {
+    const btnCloud = document.getElementById('btnCloud');
+    const btnWA = document.getElementById('btnWA');
+    
+    // Buka tab WhatsApp
+    window.open(teksWASiapKirim, '_blank');
+
+    // Reset tombol untuk shift berikutnya
+    btnWA.style.display = "none";
+    btnCloud.style.display = "block";
+    btnCloud.disabled = false;
+    btnCloud.style.opacity = "1";
+    btnCloud.innerText = "☁️ 1. SIMPAN CLOUD & DOWNLOAD FOTO";
+}
+
+// 👉 INI DIA YANG HILANG (Tambahkan baris ini) 👈
+window.onload = init;
 
 // ================= FUNGSI BUKA / TUTUP POP-UP =================
 function bukaPopupRapor() {
