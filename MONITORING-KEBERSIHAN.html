@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MONITORING KEBERSIHAN & RH TOKO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
           --primary-color: #00b4d8;
@@ -47,13 +48,6 @@
         .tabel-matriks td { padding: 8px 4px; font-size: 11px; border: 1px solid #e1e8ed; text-align: center; font-weight: bold; }
         .tabel-matriks .crew-name-col { text-align: left; background-color: #f8f9fa; position: sticky; left: 0; z-index: 5; min-width: 110px; font-size: 11px; box-shadow: 2px 0 4px rgba(0,0,0,0.05); padding-left: 6px; }
 
-        .horror-rank-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 12px; }
-        .horror-rank-item.rajin { background-color: #e8f8f5; border-left: 4px solid #2ecc71; color: #111; }
-        .horror-rank-item.males { background-color: #fdf2f2; border-left: 4px solid #e74c3c; color: #7f1d1d; font-style: italic; }
-        .horror-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; color: white; }
-        .horror-badge.pujian { background-color: #2ecc71; }
-        .horror-badge.sindiran { background-color: #e74c3c; animation: blinker 1s linear infinite; }
-
         .admin-action-box { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #fff5f5; border-radius: 6px; margin-bottom: 12px; border: 1px dashed #e74c3c; }
         .admin-action-box input { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
         .rak-badge { display: inline-flex; align-items: center; gap: 4px; background: #e2e8f0; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin: 2px; font-weight: bold; }
@@ -82,13 +76,6 @@
         .lock-banner { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; border: 1px solid #ffeeba; font-size: 11px; }
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; font-weight: bold; color: var(--secondary-color); font-size: 14px; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 10px; }
-        .modal-content { background: white; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid #27ae60; }
-        .modal-header { background: #27ae60; color: white; padding: 12px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 15px; max-height: 400px; overflow-y: auto; }
-        .progress-bar-container { background: #eee; border-radius: 8px; height: 12px; width: 100%; margin: 6px 0 12px 0; overflow: hidden; }
-        .progress-bar-fill { background: #27ae60; height: 100%; width: 0%; }
-        
         .matriks-cell-aktif { background-color: #2ecc71 !important; color: white !important; }
         canvas { display: none; }
     </style>
@@ -114,6 +101,7 @@
     </div>
 
     <div class="container">
+        <!-- Notifikasi RH -->
         <div id="rhNotificationBox" class="section-card" style="display:none;">
             <div class="section-header" style="background:#c0392b;">
                 <span><i class="fa-solid fa-triangle-exclamation"></i> MONITORING RH AKTIF TOKO</span>
@@ -126,6 +114,7 @@
           <span>SISTEM TERKUNCI: Laporan real hari ini sudah tersimpan aman.</span>
         </div>
 
+        <!-- Menu Kontrol Admin -->
         <div class="section-card" id="adminSectionCard" style="display: none;">
             <div class="section-header bg-rekap">
                 <span><i class="fa-solid fa-user-gear"></i> KONTROL PERSONIL & REVISI RAK</span>
@@ -152,12 +141,12 @@
             </div>
         </div>
 
+        <!-- ============================================== -->
+        <!-- MENU 1: CEKLIS HARIAN CREW                     -->
+        <!-- ============================================== -->
         <div class="section-card">
             <div class="section-header bg-checklist">
                 <span><i class="fa-solid fa-clipboard-list"></i> CEKLIS HARIAN CREW</span>
-                <button class="btn btn-success" style="padding: 4px 8px; font-size: 10px;" onclick="openProgressPopup()">
-                    <i class="fa-solid fa-chart-simple"></i> LIVE PROGRESS
-                </button>
             </div>
             <div class="section-body">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 12px; background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 11px; border:1px solid #eee;">
@@ -203,19 +192,44 @@
                         <i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN & KUNCI DATA KE CLOUD
                     </button>
                     <button class="btn btn-disabled" id="btnKirimWA" style="padding: 12px; font-size: 13px; justify-content: center; background-color: #27ae60 !important; color: white !important;" onclick="generateCollageAndWA()" disabled>
-                        <i class="fa-brands fa-whatsapp"></i> KIRIM & BUKA WA OTOMATIS
+                        <i class="fa-brands fa-whatsapp"></i> KIRIM BUKTI (FOTO KELAR JALAN RAK)
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- ============================================== -->
+        <!-- MENU 2: KLASEMEN & LIVE PROGRESS TOKO          -->
+        <!-- ============================================== -->
         <div class="section-card">
-            <div class="section-header bg-horror">
-                <span><i class="fa-solid fa-skull-crossbones"></i> PAPAN KEDISIPLINAN PERSONIL HARI INI</span>
+            <div class="section-header" style="background: linear-gradient(135deg, #2c3e50, #e74c3c); display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fa-solid fa-ranking-star"></i> KLASEMEN & LIVE PROGRESS TOKO</span>
             </div>
-            <div class="section-body" style="padding:0;" id="mainHorrorLeaderboard"></div>
+            <div class="section-body" style="background: #f8f9fa;">
+                <div id="captureAreaProgress" style="padding: 15px; background: white; border-radius: 8px; border: 2px solid #e1e8ed; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;">
+                        <span>📈 PROGRESS TOTAL TOKO</span>
+                        <span id="mainTotalStoreProgressText">0%</span>
+                    </div>
+                    <div class="progress-bar-container" style="height: 20px; margin-bottom: 20px; background: #eee; border-radius: 10px; overflow: hidden; border: 1px solid #ccc;">
+                        <div class="progress-bar-fill" id="mainTotalStoreProgressFill" style="background: linear-gradient(90deg, #f39c12, #27ae60); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                    
+                    <h5 style="font-size: 13px; border-bottom: 2px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; color:#333;">
+                        <i class="fa-solid fa-users-viewfinder"></i> RINCIAN PERGERAKAN PERSONIL:
+                    </h5>
+                    <div id="mainCrewListContainer"></div>
+                </div>
+                
+                <button class="btn btn-success" style="width: 100%; padding: 15px; font-size: 14px; font-weight: 900; justify-content: center; background-color: #27ae60; box-shadow: 0 4px 6px rgba(39, 174, 96, 0.3);" onclick="kirimWALiveProgress()">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i> SCREENSHOT & KIRIM WA (KLASEMEN)
+                </button>
+            </div>
         </div>
 
+        <!-- ============================================== -->
+        <!-- MENU 3: DASHBOARD MATRIKS HARIAN               -->
+        <!-- ============================================== -->
         <div class="section-card">
             <div class="section-header bg-matriks">
                 <span><i class="fa-solid fa-calendar-days"></i> DASHBOARD MATRIKS HARIAN (<span id="matriksMonthLabel">-</span>)</span>
@@ -231,29 +245,10 @@
         </div>
     </div>
 
-    <div id="progressModal" class="modal">
-        <div class="modal-content" style="border: 3px solid #7f1d1d;">
-            <div class="modal-header" style="background: #7f1d1d;">
-                <span><i class="fa-solid fa-eye"></i> PENGINTAIAN PROGRESS ONLINE</span>
-                <button style="background:none; border:none; color:white; font-size:18px; cursor:pointer;" onclick="closeProgressPopup()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: #555;">
-                    <span>PROGRESS TOTAL TOKO</span>
-                    <span id="modalTotalStoreProgressText">0%</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="modalTotalStoreProgressFill" style="background:#7f1d1d;"></div>
-                </div>
-                <h5 style="font-size: 11px; border-bottom: 2px solid #eee; padding-bottom: 4px; margin-bottom: 8px; color:#333;"><i class="fa-solid fa-ranking-star"></i> DAFTARKAN STATUS DOSA/AMAL PERSONIL:</h5>
-                <div id="modalCrewListContainer"></div>
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT JAVASCRIPT UTAMA -->
     <script>
         // MASUKKAN URL APP SCRIPT BARU ANDA DI SINI!
-        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbzadxs9I22GoieYQMe4odGRP2ZsxhWlJRmqFPlpRHLp7SVjaPkVaLGSYuyYBiK1TAt7-Q/exec"; 
+        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbzfPmClCUWijmzHR92SwWBdwLHTVPDNyjZzyCxjNNL-J3lYED8tr6MMlsHW4s1S4nB5tg/exec"; 
 
         const urlParams = new URLSearchParams(window.location.search);
         const loginData = JSON.parse(sessionStorage.getItem("userArea")) || {};
@@ -329,7 +324,7 @@
                     renderAdminManagementTable();
                     renderCrewFormLayout();
                     renderMatriksBulananLayout();
-                    renderHorrorLeaderboard();
+                    renderLiveProgressDashboard(); // Memanggil menu klasemen
                     renderRHNotification(res.rhAktif || []);
                 }
                 showLoading(false);
@@ -337,42 +332,6 @@
             .catch(err => {
                 alert("Koneksi Cloud Spreadsheet Bermasalah.");
                 showLoading(false);
-            });
-        }
-
-        function dapatkanKataHororSindiran() {
-            const kataKata = ["BEBAN TOKO! Sengaja nunda jatah kerjaan biar numpuk ya?", "MATA DI BUTAKAN HATI DI MATIKAN! Rak berdebu dibiarin aja!", "MENGERIKAN! Nama Anda dicatat Malaikat pencari item Expired!", "GAJI MAU UTUH, KERJAAN MAU LUPUT? Buruan isi laporan woi!", "MANUSIA PURBA! Belum laporan sama sekali hari ini, awas disidak!", "SANG JUARA TIDUR! Kerjaan ditinggal, HP dimainin terus!", "BURONAN INVESTIGASI! Dicari Kepala Toko karena belum sentuh rak!"];
-            return kataKata[Math.floor(Math.random() * kataKata.length)];
-        }
-
-        function dapatkanKataPujian() {
-            const pujian = ["AMALAN BERSIH! Idaman Kepala Toko, bonus menanti!", "PAHLAWAN DISPLAY! Rak kinclong anti-expired, mantap!", "CREW ELITE! Disiplin tinggi, kerja tuntas anti tunda!"];
-            return pujian[Math.floor(Math.random() * pujian.length)];
-        }
-
-        function renderHorrorLeaderboard() {
-            const mainBox = document.getElementById('mainHorrorLeaderboard');
-            mainBox.innerHTML = "";
-            if(cloudPlottingData.length === 0) { mainBox.innerHTML = `<div style="padding:15px;color:#aaa;text-align:center;">Data kosong.</div>`; return; }
-
-            let ranking = [...cloudPlottingData].sort((a,b) => (b.savedRaks?.length || 0) - (a.savedRaks?.length || 0));
-
-            ranking.forEach((crew,index)=>{
-                const totalRak = crew.raks ? crew.raks.length : 0;
-                const rakJalan = crew.savedRaks ? crew.savedRaks.length : 0;
-                const sisaRak = Math.max(0,totalRak-rakJalan);
-                const progress = totalRak > 0 ? Math.round((rakJalan/totalRak)*100) : 0;
-                let medal = index===0 ? "🥇" : index===1 ? "🥈" : index===2 ? "🥉" : "🏅";
-                let div = document.createElement('div');
-
-                if(progress >= 100){
-                    div.className = "horror-rank-item rajin";
-                    div.innerHTML = `<span>${medal} <b>${crew.name}</b><br><small>Jatah: ${totalRak} Rak | Jalan: ${rakJalan} Rak | Sisa: ${sisaRak} Rak | Progress: ${progress}%</small><br><small style="color:#27ae60;">${dapatkanKataPujian()}</small></span><span class="horror-badge pujian">SELESAI</span>`;
-                } else {
-                    div.className = "horror-rank-item males";
-                    div.innerHTML = `<span>${medal} <b>${crew.name}</b><br><small>Jatah: ${totalRak} Rak | Jalan: ${rakJalan} Rak | Sisa: ${sisaRak} Rak | Progress: ${progress}%</small><br><small style="color:#e74c3c;">🚨 ${dapatkanKataHororSindiran()}</small></span><span class="horror-badge sindiran">${progress}%</span>`;
-                }
-                mainBox.appendChild(div);
             });
         }
 
@@ -393,27 +352,6 @@
                     <td style="padding:6px; border:1px solid #ddd;"><button class="btn btn-danger" style="padding:2px 4px; font-size:10px;" onclick="deleteCrewCloud('${crew.name}')">❌</button></td>
                 </tr>`;
             });
-        }
-
-        function renderRHNotification(dataRH) {
-            const box = document.getElementById("rhNotificationBox");
-            const content = document.getElementById("rhNotificationContent");
-            if (!dataRH || dataRH.length === 0) { box.style.display = "none"; return; }
-            box.style.display = "block";
-            let html = "";
-            dataRH.forEach(item => {
-                let warna = item.status === "RH_AKTIF" ? "#e74c3c" : "#f39c12";
-                let judul = item.status === "RH_AKTIF" ? "🚨 WAJIB TARIK / RETUR" : "🟡 FOKUS JUAL";
-                html += `<div style="border-left:6px solid ${warna}; background:#fff; margin-bottom:10px; padding:10px; border-radius:6px;">
-                    <div style="font-weight:bold; color:${warna}; margin-bottom:5px;">${judul}</div>
-                    <div>📦 Barang : <b>${item.barang}</b></div>
-                    <div>🗂 Rak : <b>${item.rak}</b></div>
-                    <div>📅 Exp : <b>${item.exp}</b></div>
-                    <div>⏳ RH : <b>${item.rh} Hari</b></div>
-                    <div style="margin-top:8px;"><button onclick="selesaikanRH('${item.idRH}')" style="background:#27ae60; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">✅ SUDAH DITARIK</button></div>
-                </div>`;
-            });
-            content.innerHTML = html;
         }
 
         function addNewCrewCloud() {
@@ -437,7 +375,36 @@
             fetch(CLOUD_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteRak", storeCode: userToko, crewName: crewName, rak: rakNum }) }).then(res => res.json()).then(res => { alert(res.message); syncWithCloud(); });
         }
 
-function renderCrewFormLayout() {
+        function renderRHNotification(dataRH) {
+            const box = document.getElementById("rhNotificationBox");
+            const content = document.getElementById("rhNotificationContent");
+            if (!dataRH || dataRH.length === 0) { box.style.display = "none"; return; }
+            box.style.display = "block";
+            let html = "";
+            dataRH.forEach(item => {
+                let warna = item.status === "RH_AKTIF" ? "#e74c3c" : "#f39c12";
+                let judul = item.status === "RH_AKTIF" ? "🚨 WAJIB TARIK / RETUR" : "🟡 FOKUS JUAL";
+                html += `<div style="border-left:6px solid ${warna}; background:#fff; margin-bottom:10px; padding:10px; border-radius:6px;">
+                    <div style="font-weight:bold; color:${warna}; margin-bottom:5px;">${judul}</div>
+                    <div>📦 Barang : <b>${item.barang}</b></div>
+                    <div>🗂 Rak : <b>${item.rak}</b></div>
+                    <div>📅 Exp : <b>${item.exp}</b></div>
+                    <div>⏳ RH : <b>${item.rh} Hari</b></div>
+                    <div style="margin-top:8px;"><button onclick="selesaikanRH('${item.idRH}')" style="background:#27ae60; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">✅ SUDAH DITARIK</button></div>
+                </div>`;
+            });
+            content.innerHTML = html;
+        }
+
+        function selesaikanRH(idRH) {
+            if (!confirm("Barang sudah ditarik dari rak?")) return;
+            showLoading(true);
+            fetch(CLOUD_API_URL, { method:"POST", body:JSON.stringify({ action:"selesaiRH", idRH:idRH }) })
+            .then(res=>res.json()).then(res=>{ alert(res.message); syncWithCloud(); })
+            .catch(()=>{ alert("Gagal update RH."); showLoading(false); });
+        }
+
+        function renderCrewFormLayout() {
             const grid = document.getElementById('checklistGridContainer');
             grid.innerHTML = "";
             let expBox = document.getElementById('expContainer');
@@ -456,13 +423,10 @@ function renderCrewFormLayout() {
             document.getElementById('activeCrewName').innerText = activeCrew.name;
             document.getElementById('activeCrewTarget').innerText = (activeCrew.raks ? activeCrew.raks.length : 0) + " Rak";
             
-            // HAPUS KUNCI TOTAL: Personil sekarang bebas lapor berkali-kali!
             if(activeCrew.raks && activeCrew.raks.length > 0) {
                 activeCrew.raks.forEach(rak => {
                     const sudahDiceklis = activeCrew.savedRaks && activeCrew.savedRaks.includes(rak);
                     let div = document.createElement('div'); div.className = "checklist-item";
-                    
-                    // Rak yang sudah disave akan terkunci tercentang, tidak bisa dicabut. Tinggal klik rak yang baru.
                     div.innerHTML = `<input type="checkbox" id="chk_${rak}" ${sudahDiceklis ? 'checked disabled' : ''}><label for="chk_${rak}">${rak}</label>`;
                     grid.appendChild(div);
                 });
@@ -470,11 +434,9 @@ function renderCrewFormLayout() {
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#aaa; font-style:italic;">Belum ada jatah rak.</div>`;
             }
 
-            // Sembunyikan Banner "Sistem Terkunci" selamanya
             const lockBanner = document.getElementById('lockNotification');
             if(lockBanner) lockBanner.style.display = "none";
             
-            // Jaga tombol simpan agar selalu hidup
             const simpanBtn = document.getElementById('btnSimpanChecklist');
             simpanBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN DATA KE CLOUD';
             simpanBtn.className = "btn btn-primary"; 
@@ -484,7 +446,6 @@ function renderCrewFormLayout() {
             if(tambahBtn) tambahBtn.style.display = "inline-flex";
             
             const waBtn = document.getElementById('btnKirimWA');
-            // Aktifkan tombol Kirim WA kapan pun personil sudah punya laporan masuk
             if (activeCrew.isDone) {
                 waBtn.className = "btn btn-success"; waBtn.disabled = false;
             } else {
@@ -497,27 +458,6 @@ function renderCrewFormLayout() {
             
             const btnResetRak = document.querySelector('button[onclick="resetFotoRak()"]');
             if(btnResetRak) btnResetRak.style.display = "inline-block";
-        }
-
-        function hitungOtomatisNotifRH(inputDateElem, selectOptionElem, alertContainerId) {
-            const tglVal = inputDateElem.value; const targetRH = parseInt(selectOptionElem.value);
-            const alertBox = document.getElementById(alertContainerId);
-            if(!tglVal || isNaN(targetRH)) { alertBox.style.display = "none"; return; }
-            const selisihWaktu = (new Date(new Date(tglVal).getTime() + (targetRH * 24 * 60 * 60 * 1000))).getTime() - new Date().getTime();
-            const sisaHari = Math.ceil(selisihWaktu / (24 * 60 * 60 * 1000));
-            if(sisaHari <= 7) { alertBox.style.display = "block"; alertBox.innerText = `⚠️ TARIK KE DISPLAY KHUSUS (Sisa ${sisaHari} Hari Lagi)`; } 
-            else { alertBox.style.display = "none"; }
-        }
-
-        function handleFileStatus(inputId, statusId, minCount) {
-            const input = document.getElementById(inputId); const status = document.getElementById(statusId);
-            if (!input || !input.files) return;
-            const fileCount = input.files.length;
-            if (fileCount >= minCount) { status.innerText = `✔ ${fileCount} Foto Ready`; status.style.color = "#2ec4b6"; } 
-            else {
-                if (fileCount === 0) { status.innerText = `Belum ada file dipilih!`; status.style.color = "#e63946"; } 
-                else { status.innerText = `⚠️ Baru ${fileCount} foto, kurang ${minCount - fileCount} lagi!`; status.style.color = "#ff9f1c"; }
-            }
         }
 
         function addExpRow() {
@@ -545,6 +485,16 @@ function renderCrewFormLayout() {
             selRH.addEventListener('change', () => hitungOtomatisNotifRH(inpDate, selRH, `alert_${rowId}`));
         }
 
+        function hitungOtomatisNotifRH(inputDateElem, selectOptionElem, alertContainerId) {
+            const tglVal = inputDateElem.value; const targetRH = parseInt(selectOptionElem.value);
+            const alertBox = document.getElementById(alertContainerId);
+            if(!tglVal || isNaN(targetRH)) { alertBox.style.display = "none"; return; }
+            const selisihWaktu = (new Date(new Date(tglVal).getTime() + (targetRH * 24 * 60 * 60 * 1000))).getTime() - new Date().getTime();
+            const sisaHari = Math.ceil(selisihWaktu / (24 * 60 * 60 * 1000));
+            if(sisaHari <= 7) { alertBox.style.display = "block"; alertBox.innerText = `⚠️ TARIK KE DISPLAY KHUSUS (Sisa ${sisaHari} Hari Lagi)`; } 
+            else { alertBox.style.display = "none"; }
+        }
+
         function renderMatriksBulananLayout() {
             const tbody = document.getElementById('matriksTableBody'); tbody.innerHTML = "";
             if(cloudPlottingData.length === 0) return;
@@ -558,10 +508,8 @@ function renderCrewFormLayout() {
                 
                 for(let tgl=1; tgl<=31; tgl++) {
                     let td = document.createElement('td'); td.innerText = "-";
-                    
                     if(crew.history){
                         Object.keys(crew.history).forEach(tanggalLapor => {
-                            // PERBAIKAN: Pisahkan tanggal untuk mencocokkan bulan dan tahun di filter!
                             let parts = tanggalLapor.split("-");
                             let tglLapor = parseInt(parts[0]) || 0;
                             let blnLapor = parts[1];
@@ -581,40 +529,58 @@ function renderCrewFormLayout() {
             });
         }
 
-        function openProgressPopup() {
-            document.getElementById('progressModal').style.display = "flex";
-            const container = document.getElementById('modalCrewListContainer'); container.innerHTML = "";
-            let totalRakToko = 0, totalRakJalan = 0;
+        // --- MANAJEMEN FOTO ---
+        let listFotoRakDicicil = [];
 
-            cloudPlottingData.forEach(crew => {
-                const totalRak = crew.raks ? crew.raks.length : 0;
-                const rakJalan = crew.savedRaks ? crew.savedRaks.length : 0;
-                const sisaRak = Math.max(0, totalRak - rakJalan);
-                const progress = totalRak > 0 ? Math.round((rakJalan / totalRak) * 100) : 0;
-                totalRakToko += totalRak; totalRakJalan += rakJalan;
+        function handleFileStatus(inputId, statusId, minCount) {
+            const input = document.getElementById(inputId); const status = document.getElementById(statusId);
+            if (!input || !input.files) return;
+            const fileCount = input.files.length;
+            if (fileCount >= minCount) { status.innerText = `✔ ${fileCount} Foto Ready`; status.style.color = "#2ec4b6"; } 
+            else {
+                if (fileCount === 0) { status.innerText = `Belum ada file dipilih!`; status.style.color = "#e63946"; } 
+                else { status.innerText = `⚠️ Baru ${fileCount} foto, kurang ${minCount - fileCount} lagi!`; status.style.color = "#ff9f1c"; }
+            }
+        }
 
-                let daftarRak = rakJalan > 0 ? crew.savedRaks.join(", ") : "-";
-                container.innerHTML += `<div style="padding:10px 0; border-bottom:1px dashed #ddd; font-size:11px;">
-                    <div style="font-weight:bold; margin-bottom:4px;">👤 ${crew.name}</div>
-                    <div>🎯 Target Rak : ${totalRak} | ✅ Jalan : ${rakJalan} | ⏳ Sisa : ${sisaRak}</div>
-                    <div>📊 Progress : ${progress}%</div><div style="margin-top:4px; color:#666;">Rak Selesai : <b>${daftarRak}</b></div>
-                </div>`;
+        function readImageAsBase64(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
             });
-            const persenToko = totalRakToko > 0 ? Math.round((totalRakJalan / totalRakToko) * 100) : 0;
-            document.getElementById('modalTotalStoreProgressFill').style.width = persenToko + "%";
-            document.getElementById('modalTotalStoreProgressText').innerText = `${persenToko}% (${totalRakJalan}/${totalRakToko} Rak)`;
         }
 
-        function selesaikanRH(idRH) {
-            if (!confirm("Barang sudah ditarik dari rak?")) return;
-            showLoading(true);
-            fetch(CLOUD_API_URL, { method:"POST", body:JSON.stringify({ action:"selesaiRH", idRH:idRH }) })
-            .then(res=>res.json()).then(res=>{ alert(res.message); syncWithCloud(); })
-            .catch(()=>{ alert("Gagal update RH."); showLoading(false); });
-        }
-        function closeProgressPopup() { document.getElementById('progressModal').style.display = "none"; }
+        async function cicilFotoRak() {
+            const input = document.getElementById('uploadRak');
+            const status = document.getElementById('statusRak');
+            if (!input.files || input.files.length === 0) return;
 
-function saveChecklistToCloud() {
+            for (let i = 0; i < input.files.length; i++) {
+                if (listFotoRakDicicil.length < 5) {
+                    const base64Data = await readImageAsBase64(input.files[i]);
+                    listFotoRakDicicil.push(base64Data);
+                }
+            }
+            const totalSekarang = listFotoRakDicicil.length;
+            if (totalSekarang >= 5) {
+                status.innerHTML = `<i class="fa-solid fa-circle-check"></i> ✔ ${totalSekarang} Foto Rak Ready!`; status.style.color = "#2ec4b6";
+            } else {
+                status.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ⚠️ Baru ${totalSekarang} foto, kurang ${5 - totalSekarang} lagi!`; status.style.color = "#ff9f1c";
+            }
+            input.value = ""; 
+        }
+
+        function resetFotoRak() {
+            listFotoRakDicicil = []; 
+            const input = document.getElementById('uploadRak');
+            const status = document.getElementById('statusRak');
+            if(input) input.value = ""; 
+            if(status) { status.innerHTML = "Belum ada file dipilih (Minimal harus 5 foto!)"; status.style.color = "#e63946"; }
+            alert("Antrean foto rak berhasil dikosongkan!");
+        }
+
+        function saveChecklistToCloud() {
             const btnSimpan = document.getElementById('btnSimpanChecklist');
             const totalFotoRak = listFotoRakDicicil.length;
             const totalFotoDisplay = document.getElementById('uploadDisplay').files.length;
@@ -638,13 +604,11 @@ function saveChecklistToCloud() {
             const target = document.getElementById('activeCrewTarget').innerText;
 
             let checkedRaks = [];
-            // Ambil SEMUA rak yang tercentang (baik yang lama maupun yang baru dicentang)
             document.querySelectorAll('#checklistGridContainer input[type="checkbox"]:checked').forEach(chk => { checkedRaks.push(chk.id.replace('chk_', '')); });
 
             let items = [];
             let rowsToMark = [];
             
-            // ANTI-DOBEL: Hanya memproses barang EXP yang belum pernah disave
             document.querySelectorAll('#expContainer .item-row').forEach(row => {
                 if (row.getAttribute('data-saved') !== 'true') {
                     let fields = row.querySelectorAll('input, select');
@@ -668,8 +632,6 @@ function saveChecklistToCloud() {
                         cloudPlottingData[indexCrew].savedRaks = checkedRaks;
                     }
                 }
-                
-                // Bekukan kotak EXP yang baru disave agar tidak terkirim 2x saat klik simpan lagi
                 rowsToMark.forEach(obj => {
                     obj.row.setAttribute('data-saved', 'true');
                     obj.fields.forEach(f => f.disabled = true);
@@ -679,10 +641,9 @@ function saveChecklistToCloud() {
 
                 renderCrewFormLayout(); 
                 renderMatriksBulananLayout(); 
-                renderHorrorLeaderboard(); 
+                renderLiveProgressDashboard(); 
                 renderAdminManagementTable();
                 
-                // Hidupkan kembali tombolnya!
                 btnSimpan.disabled = false;
                 btnSimpan.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SIMPAN DATA KE CLOUD';
                 showLoading(false);
@@ -695,56 +656,12 @@ function saveChecklistToCloud() {
             });
         }
 
-        // PERBAIKAN PENYIMPANAN FOTO DI MEMORI (Agar tidak hilang saat input dibersihkan)
-        let listFotoRakDicicil = [];
-
-        function readImageAsBase64(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function cicilFotoRak() {
-            const input = document.getElementById('uploadRak');
-            const status = document.getElementById('statusRak');
-            if (!input.files || input.files.length === 0) return;
-
-            for (let i = 0; i < input.files.length; i++) {
-                if (listFotoRakDicicil.length < 5) {
-                    // Konversi langsung jadi data base64 (Aman dari pembersihan memori file Android)
-                    const base64Data = await readImageAsBase64(input.files[i]);
-                    listFotoRakDicicil.push(base64Data);
-                }
-            }
-
-            const totalSekarang = listFotoRakDicicil.length;
-            if (totalSekarang >= 5) {
-                status.innerHTML = `<i class="fa-solid fa-circle-check"></i> ✔ ${totalSekarang} Foto Rak Ready!`; status.style.color = "#2ec4b6";
-            } else {
-                status.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ⚠️ Baru ${totalSekarang} foto, kurang ${5 - totalSekarang} lagi!`; status.style.color = "#ff9f1c";
-            }
-            input.value = ""; // Sekarang aman dikosongkan karena fotonya sudah jadi teks base64 di array
-        }
-
-        function resetFotoRak() {
-            listFotoRakDicicil = []; 
-            const input = document.getElementById('uploadRak');
-            const status = document.getElementById('statusRak');
-            if(input) input.value = ""; 
-            if(status) { status.innerHTML = "Belum ada file dipilih (Minimal harus 5 foto!)"; status.style.color = "#e63946"; }
-            alert("Antrean foto rak berhasil dikosongkan!");
-        }
-
         async function loadImage(source) {
             return new Promise((resolve) => {
                 const img = new Image(); img.onload = () => resolve(img); 
                 if (typeof source === 'string') {
-                    // Ini kalau source-nya adalah teks base64 (dari foto rak yang dicicil)
                     img.src = source;
                 } else {
-                    // Ini kalau source-nya adalah File asli (dari input biasa)
                     const reader = new FileReader(); 
                     reader.onload = (e) => { img.src = e.target.result; }; 
                     reader.readAsDataURL(source);
@@ -755,14 +672,14 @@ function saveChecklistToCloud() {
         async function generateCollageAndWA() {
             showLoading(true);
             const canvas = document.getElementById('collageCanvas'); const ctx = canvas.getContext('2d');
-            const filesRak = listFotoRakDicicil; // Memanggil dari array base64
+            const filesRak = listFotoRakDicicil; 
             const fileDisplay = document.getElementById('uploadDisplay').files[0];
             const fileBuku = document.getElementById('uploadBuku').files[0];
 
             if (!fileDisplay || !fileBuku || filesRak.length < 5) { alert("Gagal memproses gambar kolase. Pastikan file dokumentasi lengkap!"); showLoading(false); return; }
 
             const imgDisplay = await loadImage(fileDisplay); const imgBuku = await loadImage(fileBuku);
-            let imgsRak = []; for(let i=0; i<5; i++) { imgsRak.push(await loadImage(filesRak[i])); } // Aman memuat dari base64
+            let imgsRak = []; for(let i=0; i<5; i++) { imgsRak.push(await loadImage(filesRak[i])); } 
 
             canvas.width = 1200; canvas.height = 1600;
             ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0, canvas.width, canvas.height);
@@ -796,10 +713,23 @@ function saveChecklistToCloud() {
             let totalTarget = 0, totalJalan = 0; let ranking = [];
 
             cloudPlottingData.forEach(c => {
-                const target = c.raks ? c.raks.length : 0;
-                const jalan = c.savedRaks ? c.savedRaks.length : 0;
-                totalTarget += target; totalJalan += jalan;
-                ranking.push({ nama:c.name, target:target, jalan:jalan, sisa:Math.max(0, target-jalan) });
+                const targetRaks = c.raks || [];
+                const savedRaks = c.savedRaks || [];
+                const target = targetRaks.length;
+                const jalan = savedRaks.length;
+                const sisaRaks = targetRaks.filter(rak => !savedRaks.includes(rak));
+
+                totalTarget += target; 
+                totalJalan += jalan;
+                
+                ranking.push({ 
+                    nama: c.name, 
+                    target: target, 
+                    jalan: jalan, 
+                    sisa: Math.max(0, target-jalan),
+                    detailJalan: savedRaks.length > 0 ? savedRaks.join(", ") : "-",
+                    detailSisa: sisaRaks.length > 0 ? sisaRaks.join(", ") : "-"
+                });
             });
             ranking.sort((a,b)=> b.jalan-a.jalan);
 
@@ -808,12 +738,12 @@ function saveChecklistToCloud() {
             const rhAktif = rhAktifGlobal.filter(x=>x.status==="RH_AKTIF").length;
             const fokusJual = rhAktifGlobal.filter(x=>x.status==="FOKUS_JUAL").length;
 
-            let message = `🏪 *MONITORING KEBERSIHAN TOKO*\n\n🏬 TOKO : ${userToko}\n📅 TANGGAL : ${tanggal}\n👤 PIC : ${crew}\n\n═══════════════\n📊 *PROGRESS TOKO*\n═══════════════\n🎯 Target Rak : ${totalTarget}\n✅ Selesai : ${totalJalan}\n⏳ Sisa : ${totalSisa}\n📈 Progress : ${progress}%\n\n═══════════════\n🏆 *RANKING PERSONIL*\n═══════════════\n`;
+            let message = `🏪 *BUKTI CEKLIS HARIAN TOKO*\n\n🏬 TOKO : ${userToko}\n📅 TANGGAL : ${tanggal}\n👤 PIC Lapor : ${crew}\n\n═══════════════\n📊 *PROGRESS TOKO*\n═══════════════\n🎯 Target Rak : ${totalTarget}\n✅ Selesai : ${totalJalan}\n⏳ Sisa : ${totalSisa}\n📈 Progress : ${progress}%\n\n═══════════════\n🏆 *RANKING PERSONIL & REKAP RAK*\n═══════════════\n`;
             
             ranking.forEach((r,index)=>{
                 const medal = index===0 ? "🥇" : index===1 ? "🥈" : index===2 ? "🥉" : "🏅";
                 let persen = r.target > 0 ? Math.round((r.jalan / r.target) * 100) : 0;
-                message += `${medal} ${r.nama}\nTarget:${r.target} | Jalan:${r.jalan} | Sisa:${r.sisa}\nProgress:${persen}%\n\n`;
+                message += `${medal} *${r.nama}*\nTarget:${r.target} | Jalan:${r.jalan} | Sisa:${r.sisa}\nProgress: ${persen}%\n✅ Dikerjakan: ${r.detailJalan}\n⏳ GAP/Belum: ${r.detailSisa}\n\n`;
             });
 
             message += `═══════════════\n🚨 *MONITORING RH*\n═══════════════\n🔴 RH Aktif : ${rhAktif} Item\n🟡 Fokus Jual : ${fokusJual} Item\n\n═══════════════\n📦 *TEMUAN PIC HARI INI*\n═══════════════\n`;
@@ -828,8 +758,147 @@ function saveChecklistToCloud() {
             });
             if(!adaItem) message += "Tidak ada temuan RH/EXP hari ini.\n\n";
 
-            message += "═══════════════\n⚠️ *STATUS TOKO*\n═══════════════\nRak yang belum dibersihkan masih menunggu eksekusi.\nDisplay tidak akan bersih dengan sendirinya.\nBarang mendekati expired tidak akan habis tanpa aksi.\nTetap gas sampai progress 100%.\n";
+            message += "═══════════════\n⚠️ *STATUS TOKO*\n═══════════════\nLampiran foto hasil ceklis PIC terkait terlampir bersama pesan ini.\n";
             window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(message), "_blank");
+        }
+
+        // ==============================================================
+        // FITUR KLASEMEN (PENGGANTI POP UP KEDISIPLINAN)
+        // ==============================================================
+        function renderLiveProgressDashboard() {
+            const container = document.getElementById('mainCrewListContainer');
+            if (!container) return; 
+            container.innerHTML = "";
+            
+            if(cloudPlottingData.length === 0) { container.innerHTML = `<div style="text-align:center; padding:15px; color:#aaa;">Data crew belum ada.</div>`; return; }
+
+            let totalRakToko = 0, totalRakJalan = 0;
+
+            let ranking = [...cloudPlottingData].sort((a,b) => (b.savedRaks?.length || 0) - (a.savedRaks?.length || 0));
+
+            ranking.forEach((crew, index) => {
+                const totalRak = crew.raks ? crew.raks.length : 0;
+                const rakJalan = crew.savedRaks ? crew.savedRaks.length : 0;
+                const sisaRak = Math.max(0, totalRak - rakJalan);
+                const progress = totalRak > 0 ? Math.round((rakJalan / totalRak) * 100) : 0;
+                
+                totalRakToko += totalRak; 
+                totalRakJalan += rakJalan;
+
+                const targetRaks = crew.raks || [];
+                const savedRaks = crew.savedRaks || [];
+                const sisaRaksList = targetRaks.filter(rak => !savedRaks.includes(rak));
+
+                let daftarRakSelesai = savedRaks.length > 0 ? savedRaks.join(", ") : "-";
+                let daftarRakBelum = sisaRaksList.length > 0 ? sisaRaksList.join(", ") : "-";
+
+                let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🏅";
+                let statusBg = progress >= 100 ? "#e8f8f5" : (progress > 0 ? "#fef9e7" : "#fdf2f2");
+                let statusBorder = progress >= 100 ? "#2ecc71" : (progress > 0 ? "#f1c40f" : "#e74c3c");
+                let statusText = progress >= 100 ? "TUNTAS" : (progress > 0 ? "ON PROGRESS" : "BELUM GERAK");
+
+                container.innerHTML += `
+                <div style="background: ${statusBg}; border-left: 5px solid ${statusBorder}; padding: 12px; margin-bottom: 12px; border-radius: 6px; border-right: 1px solid #eee; border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ccc; padding-bottom: 6px; margin-bottom: 6px;">
+                        <strong style="font-size: 14px; color: #111;">${medal} ${crew.name}</strong>
+                        <span style="font-size: 10px; font-weight: 900; background: ${statusBorder}; color: ${progress >= 100 || progress === 0 ? 'white' : 'black'}; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px;">${statusText}</span>
+                    </div>
+                    <div style="font-size: 12px; color: #444; line-height: 1.6;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom:6px; background: rgba(255,255,255,0.5); padding: 4px; border-radius: 4px;">
+                            <span>🎯 Target: <b>${totalRak}</b></span>
+                            <span style="color:#27ae60;">✅ Selesai: <b>${rakJalan}</b></span>
+                            <span style="color:#e74c3c;">⏳ Sisa: <b>${sisaRak}</b></span>
+                            <span>📊 <b>${progress}%</b></span>
+                        </div>
+                        <div><span style="color:#27ae60; font-weight:bold;">✅ Rak Dikerjakan:</span> <b>${daftarRakSelesai}</b></div>
+                        <div><span style="color:#e74c3c; font-weight:bold;">⏳ GAP (Belum):</span> <b>${daftarRakBelum}</b></div>
+                    </div>
+                </div>`;
+            });
+
+            const persenToko = totalRakToko > 0 ? Math.round((totalRakJalan / totalRakToko) * 100) : 0;
+            document.getElementById('mainTotalStoreProgressFill').style.width = persenToko + "%";
+            document.getElementById('mainTotalStoreProgressText').innerText = `${persenToko}% (${totalRakJalan}/${totalRakToko} Rak)`;
+        }
+
+        function kirimWALiveProgress() {
+            const tanggal = `${document.getElementById('daySelector').value} ${document.getElementById('monthSelector').value} ${document.getElementById('yearSelector').value}`;
+            let textWA = `🏪 *KLASEMEN KEDISIPLINAN TOKO*\n🏬 TOKO: ${userToko}\n📅 TGL: ${tanggal}\n\n`;
+            
+            const persenTokoText = document.getElementById('mainTotalStoreProgressText').innerText;
+            textWA += `📊 *PROGRESS TOTAL TOKO:* ${persenTokoText}\n\n════════════════\n🏆 *RINCIAN KINERJA PERSONIL* 🏆\n════════════════\n\n`;
+
+            let ranking = [...cloudPlottingData].sort((a,b) => (b.savedRaks?.length || 0) - (a.savedRaks?.length || 0));
+            
+            ranking.forEach((crew, index) => {
+                const totalRak = crew.raks ? crew.raks.length : 0;
+                const rakJalan = crew.savedRaks ? crew.savedRaks.length : 0;
+                const sisaRak = Math.max(0, totalRak - rakJalan);
+                const progress = totalRak > 0 ? Math.round((rakJalan / totalRak) * 100) : 0;
+                
+                const targetRaks = crew.raks || [];
+                const savedRaks = crew.savedRaks || [];
+                const sisaRaksList = targetRaks.filter(rak => !savedRaks.includes(rak));
+
+                let daftarRakSelesai = savedRaks.length > 0 ? savedRaks.join(", ") : "-";
+                let daftarRakBelum = sisaRaksList.length > 0 ? sisaRaksList.join(", ") : "-";
+
+                let medal = index===0 ? "🥇" : index===1 ? "🥈" : index===2 ? "🥉" : "🏅";
+                
+                let note = "";
+                if (progress >= 100) {
+                    note = "🔥 *GACOR!* Luar biasa, teladan toko! Terima kasih banyak atas dedikasi dan kerja kerasnya merawat toko hari ini. Pertahankan performa emas ini!";
+                } else if (progress >= 50) {
+                    note = "🏃 *ON PROGRESS!* Mantap, sudah lewat separuh jalan. Tarikan gasnya ditambah sedikit lagi ya biar tuntas 100%, pantang pulang sebelum rak kinclong!";
+                } else if (progress > 0) {
+                    note = "⚠️ *TERSEOK-SEOK!* Halo kak, progressnya masih sangat minim nih. Pekerjaan ditatap doang nggak akan selesai, yuk tangannya mulai digerakkan biar nggak jadi beban shift selanjutnya.";
+                } else {
+                    note = "🚨 *KUSUT PARAH!* Maaf sebelumnya, ini kok belum ada pergerakan sama sekali ya? Toko kita butuh aksi nyata, bukan cuma kehadiran fisik. Tolong hargai teman-teman lain yang sudah capek. Segera laksanakan!";
+                }
+
+                textWA += `${medal} *${crew.name}* (${progress}%)\n`;
+                textWA += `🎯 Target: ${totalRak} | ✅ Jalan: ${rakJalan} | ⏳ Sisa: ${sisaRak}\n`;
+                textWA += `✅ Dikerjakan: ${daftarRakSelesai}\n`;
+                textWA += `⏳ GAP/Belum: ${daftarRakBelum}\n`;
+                textWA += `💬 _${note}_\n\n`;
+            });
+
+            textWA += `════════════════\n_📸 Screenshot klasemen terlampir bersama pesan ini._\n\nTerima kasih atas kerja samanya. 🙏`;
+
+            const btnOriginalText = '<i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i> SCREENSHOT & KIRIM WA (KLASEMEN)';
+            const btnLoadText = '<i class="fa-solid fa-camera fa-fade" style="font-size: 20px;"></i> MEMPROSES GAMBAR...';
+            const waButton = document.querySelector('button[onclick="kirimWALiveProgress()"]');
+            
+            if(typeof html2canvas !== 'undefined') {
+                const captureArea = document.getElementById('captureAreaProgress');
+                waButton.innerHTML = btnLoadText;
+                waButton.disabled = true;
+
+                html2canvas(captureArea, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+                    const link = document.createElement('a');
+                    link.download = `KLASEMEN_${userToko}_${tanggal.replace(/ /g, '_')}.jpg`;
+                    link.href = dataURL;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    waButton.innerHTML = btnOriginalText;
+                    waButton.disabled = false;
+
+                    setTimeout(() => {
+                        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(textWA), "_blank");
+                    }, 800); 
+                }).catch(err => {
+                    alert("Gagal memproses gambar. Membuka WA dengan teks saja.");
+                    waButton.innerHTML = btnOriginalText;
+                    waButton.disabled = false;
+                    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(textWA), "_blank");
+                });
+            } else {
+                alert("Sistem gambar belum siap (Loading), tunggu sebentar atau reload halaman. Mengirim teks WA saja.");
+                window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(textWA), "_blank");
+            }
         }
     </script>
 </body>
