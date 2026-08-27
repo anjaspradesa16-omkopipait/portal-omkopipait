@@ -181,6 +181,23 @@
     background: #c0392b;
 }
     </style>
+
+<style>
+        /* --- PENYESUAIAN POP-UP TABEL SS UNTUK HP --- */
+        @media only screen and (max-width:768px){
+            #modalHarian .modal-content, #modalLaporan .modal-content {
+                padding: 10px !important;
+                width: 98% !important;
+                margin: 5% auto !important;
+            }
+            #cloneHarian table, #cloneLaporan table {
+                font-size: 8.5px !important; /* Dikecilkan biar muat 1 layar */
+            }
+            #cloneHarian th, #cloneHarian td, #cloneLaporan th, #cloneLaporan td {
+                padding: 3px !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -192,9 +209,15 @@
 </div>
 
 <div class="container">
-    <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">DASHBOARD MONITORING PPS v34.0</h2>
+    <h2 style="text-align:center; color:#2c3e50; margin-bottom:5px;">DASHBOARD MONITORING PPS v34.0</h2>
+    <div style="text-align:center; margin-bottom:20px;">
+        <button onclick="bukaPanduan()" style="background:#34495e; color:white; border:none; padding:8px 20px; border-radius:20px; font-weight:bold; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); font-size:12px;">
+            📖 BACA BUKU PANDUAN / SOP APLIKASI
+        </button>
+    </div>
     
 <div class="grid">
+
         <!-- ================================== -->
         <!-- KARTU 1: SETUP ADMIN & TARGET -->
         <!-- ================================== -->
@@ -272,8 +295,13 @@
         <!-- ================================== -->
         <div class="card">
             <h3 style="color:#e67e22;">2. INPUT HASIL SHIFT</h3>
-            <label id="labelTglInput">Tanggal Input (BEBAS)</label>
-            <input type="number" id="tglInput" placeholder="1-31" min="1" max="31" oninput="loadReal();">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label id="labelTglInput" style="margin-top:0;">Tanggal Input (KUNCI)</label>
+                <!-- TOMBOL BUKA KUNCI -->
+                <button id="btnBukaKunciTgl" onclick="bukaKunciTanggal()" style="width:auto; padding:4px 8px; font-size:10px; background:#f39c12; color:white; border-radius:4px; border:none; margin:0; cursor:pointer;">🔓 BUKA KUNCI</button>
+            </div>
+            
+            <input type="number" id="tglInput" placeholder="1-31" min="1" max="31" oninput="loadReal();" readonly style="background-color:#e0e0e0; font-weight:bold; cursor:not-allowed;">
             
             <label>Kasir Bertugas</label>
             <input type="text" id="kasirAktif" readonly style="background-color:#e0e0e0; font-weight:bold; cursor:not-allowed; border:1px solid #ccc; text-transform:uppercase;">
@@ -284,6 +312,10 @@
                 <option value="s1" selected>Shift 1</option>
                 <option value="s2">Shift 2</option>
             </select>
+            <!-- INFO JADWAL LAPOR -->
+            <div style="font-size: 9.5px; color: #c0392b; margin-top: 5px; font-weight: bold; background: #fadbd8; padding: 6px; border-radius: 4px; text-align: center; border: 1px dashed #e74c3c;">
+                ⏰ BUKA: S3 (06:00-09:00) | S1 (14:00-17:00) | S2 (21:00-23:55)
+            </div>
             
             <label>Real PWP (Pcs)</label>
             <input type="number" id="r_PWP" oninput="checkTargetStatus()">
@@ -335,8 +367,13 @@
         <!-- ================================== -->
         <!-- KARTU 3: ANALISA & BROADCAST -->
         <!-- ================================== -->
-        <div class="card">
+            <div class="card">
             <h3 style="color:#27ae60;">3. ANALISA & BROADCAST</h3>
+            <!-- FITUR BARU: BRIEFING PAGI -->
+            <button onclick="bukaBriefingHarian()" style="background:#f39c12; color:white; padding:12px; border-radius:6px; margin-bottom:10px; font-weight:bold; border:none; width:100%; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2);">
+                🌅 BRIEFING TARGET HARIAN (WA)
+            </button>
+            
             <button class="btn-wa" id="btnWA" onclick="kirimWA()">🚀 KIRIM LAPORAN WA</button>
             <div id="labelWarning" class="warning-label"></div>
             <textarea id="noteWA" placeholder="Alasan jika item tidak target..." rows="2" style="margin-top:5px;"></textarea>
@@ -386,6 +423,89 @@
         </div>
     </div>
 
+<!-- WADAH MODAL PANDUAN PENGGUNAAN -->
+    <div id="modalPanduan" class="modal-rapor" style="display:none;">
+        <div class="modal-content" style="max-width: 850px; height: auto; max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #3498db; padding-bottom:10px; margin-bottom:15px; position:sticky; top:0; background:linear-gradient(135deg,#ffffff,#f4f8ff); z-index:10;">
+                <b style="font-size:18px; color:#2c3e50;">📖 SOP & CARA PENGGUNAAN APLIKASI</b>
+                <span onclick="tutupPanduan()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#e74c3c;">&times;</span>
+            </div>
+            
+            <div style="font-size:13px; color:#333; line-height:1.6;">
+                
+                <!-- BAGIAN 1: PERBEDAAN HAK AKSES -->
+                <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #34495e;">
+                    <b style="color:#2c3e50; font-size:14px;">1. HAK AKSES: COS/KT vs ACOS/CREW</b><br>
+                    Sistem ini punya kasta pengamanan ketat layaknya CCTV:
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li>👑 <b>Pejabat Toko (Admin/COS/KT):</b> Memegang kendali penuh. Bisa buka gembok tanggal jika ada yang lupa lapor, bisa setting Target & Syarat %, bisa tambah/hapus personil, dan bisa input laporan di jam berapa saja bebas hambatan.</li>
+                        <li>👷 <b>ACOS / Crew:</b> Hanya bisa input hasil penjualan di jam operasional shift masing-masing. Tidak bisa merubah target, tidak bisa ganti tanggal mundur/maju. Nama otomatis terekam dari data login (anti titip absen!).</li>
+                    </ul>
+                </div>
+
+                <!-- BAGIAN 2: CARA INPUT TARGET -->
+                <div style="background:#e8f4f8; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #3498db;">
+                    <b style="color:#2980b9; font-size:14px;">2. CARA SETTING TARGET (KHUSUS COS/KT)</b><br>
+                    Lakukan ini di Menu <b>"1. SETUP ADMIN & TARGET"</b> pada awal periode:
+                    <ol style="margin-top:5px; padding-left:20px;">
+                        <li>Pilih <b>Periode/Week</b> di dropdown (Contoh: Periode 1 untuk tgl 1-15, dst).</li>
+                        <li>Isi <b>Target Pcs</b> sesuai data dari cabang untuk masing-masing item.</li>
+                        <li>Isi <b>Syarat STD (%)</b>. Ini adalah persentase minimal struk yang harus tembus jual barang promo (Contoh: PWP wajib 5% dari total struk harian).</li>
+                        <li>Klik <b>💾 SIMPAN TARGET & SYARAT</b>. Jangan lupa tunggu sampai muncul notif "Berhasil Sinkron Cloud!". Lakukan untuk semua periode (P1, W2, P2, W4).</li>
+                    </ol>
+                </div>
+
+                <!-- BAGIAN 3: CARA INPUT LAPORAN SHIFT -->
+                <div style="background:#fff3cd; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #f1c40f;">
+                    <b style="color:#856404; font-size:14px;">3. CARA INPUT LAPORAN SHIFT (UNTUK SEMUA KASIR)</b><br>
+                    Lakukan ini di Menu <b>"2. INPUT HASIL SHIFT"</b> setiap mau closing:
+                    <ol style="margin-top:5px; padding-left:20px;">
+                        <li>Pastikan nama kalian muncul otomatis di "Kasir Bertugas".</li>
+                        <li>Pilih <b>Shift Lapor</b>. Ingat, tombol hanya terbuka di jam: <b>S3 (06:00-09:00), S1 (14:00-17:00), S2 (21:00-23:55)</b>.</li>
+                        <li>Input angka penjualan real kalian di kolom PWP, PSM, dll. Angka target akan muncul otomatis di bawah kolom untuk panduan kalian.</li>
+                        <li><b>WAJIB:</b> Isi QTY STD (Total Struk khusus di shift kalian saja).</li>
+                        <li><b>WAJIB:</b> Upload 2 bukti foto (Buku Monitoring & Report PPS dari mesin).</li>
+                        <li>Jika kalian <b>TIDAK CAPAI TARGET</b>, wajib isi kolom <b>Catatan/Alasan</b> di Menu ke-3 sebelum menyimpan data.</li>
+                        <li>Klik <b>✅ SIMPAN DATA SHIFT</b>. Setelah sukses, klik 🚀 KIRIM LAPORAN WA ke grup toko!</li>
+                    </ol>
+                </div>
+
+                <!-- BAGIAN 4: ATURAN & RUMUS RAHASIA -->
+                <div style="background:#f4ebf9; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #8e44ad;">
+                    <b style="color:#8e44ad; font-size:14px;">4. MEMBACA RAPOR: %TGT vs %SYR & TARGET DINAMIS</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Target Dinamis:</b> Target harian BUKAN ANGKA TETAP. Rumusnya: <code>(Sisa Target ÷ Sisa Hari)</code>. Kalau kalian hari ini minus, minusnya akan digulung ke besok! Beban target besok akan makin bengkak!</li>
+                        <li style="margin-top:5px;"><b>%TGT (Progress Kuantitas):</b> Mengukur apakah target <i>Pcs</i> harian sudah lunas.</li>
+                        <li style="margin-top:5px;"><b>%SYR (Progress Kualitas):</b> Mengukur kegigihan kasir menawarkan promo. Dihitung murni dari jumlah struk yang masuk. Di bawah 50% berarti kasir pasif/tebang pilih!</li>
+                    </ul>
+                </div>
+
+                <!-- BAGIAN 5: BRIEFING & BROADCAST -->
+                <div style="background:#fadbd8; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #e74c3c;">
+                    <b style="color:#c0392b; font-size:14px;">5. FITUR BRIEFING PAGI & SCREENSHOT</b><br>
+                    Di Menu <b>"3. ANALISA & BROADCAST"</b>, terdapat tombol <b>🌅 BRIEFING TARGET HARIAN</b>.<br>
+                    Tugas PIC Pagi: Buka fitur ini, pastikan tanggal sudah benar, lalu klik <b>📲 KIRIM WA</b>. Sistem akan otomatis memotret target hari itu (beserta sisa hutang dari hari kemarin) dan mem-forward ke grup WhatsApp sebagai pemacu semangat sebelum operasional!
+                </div>
+
+                <!-- BAGIAN 6: KEUNGGULAN FILTER & ANALISA KASIR (BARU) -->
+                <div style="background:#e9f7ef; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #27ae60;">
+                    <b style="color:#27ae60; font-size:14px;">6. KEUNGGULAN FILTER & ANALISA PERFORMA KASIR</b><br>
+                    Aplikasi ini dilengkapi dengan fitur detektif untuk membedah performa toko secara instan:
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Rapor & Ranking Kasir:</b> Sistem otomatis melacak kontribusi penjualan individu. Klik <b>🏆 RANKING PENJUALAN</b> atau <b>🔍 PERBESAR ANALISA KASIR</b>. Ketahuan jelas siapa tulang punggung toko (Top Seller) dan siapa yang jadi beban (Juru Kunci / Nol Penjualan).</li>
+                        <li style="margin-top:5px;"><b>Filter Laporan Harian & Bulanan:</b> Gunakan tombol <b>📸 POP UP FULL (SS)</b> untuk melihat seluruh rekapan shift atau laporan harian dalam sebulan penuh secara rapi. Klik <b>📊 LIHAT AKUMULASI TOKO</b> untuk memantau progres total bulan berjalan.</li>
+                        <li style="margin-top:5px;"><b>Filter Spesifik Item PPS:</b> Klik tombol <b>🔍 FILTER HARIAN BY TARGET / SYARAT</b>. Fitur ini sangat sakti untuk membedah penjualan kasir per item (PWP, PSM, dll). Kalian bisa memfilternya berdasarkan <b>Target Kuota (Pcs)</b> atau <b>Syarat STD (%)</b> untuk melihat performa murni tiap kasir di hari/shift tersebut!</li>
+                    </ul>
+                </div>
+
+            </div>
+            
+            <button onclick="tutupPanduan()" style="width:100%; background:#2c3e50; color:white; padding:12px; border:none; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2);">
+                ✅ SAYA MENGERTI, TUTUP PANDUAN INI
+            </button>
+        </div>
+    </div>
+
 <!-- WADAH UNTUK MODAL POP UP SS -->
     <div id="modalHarian" class="modal-rapor" style="display:none;">
         <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;" id="ssHarianArea">
@@ -422,7 +542,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbz6ekr-qE5B8WZdyjde6L796YOD82l0SQaOB5iemPJbJmh8zUxw-7sBTKt44kdu4ue8pw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbzgt9mRBWYaufJozWb3ozBiGuvYAtkTikNhTVIAZKXnyYJHZxOs-Pr-tJjtIxnwnL865A/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -785,6 +905,34 @@ function generateRanking(){
         pullDataFromCloud();
     };
 
+    // --- FITUR BUKA KUNCI TANGGAL & KATA MUTIARA ---
+    function bukaKunciTanggal() {
+        const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
+        const role = (userSesi.role || "").toLowerCase();
+        
+        if (role.includes("admin") || role.includes("kepala toko") || role.includes("kt") || role.includes("cos") || role.includes("korwil")) {
+            const inputTgl = document.getElementById('tglInput');
+            inputTgl.classList.remove('readonly-date');
+            inputTgl.readOnly = false;
+            inputTgl.style.backgroundColor = "#ffffff";
+            inputTgl.style.cursor = "text";
+            document.getElementById('labelTglInput').innerHTML = "Tanggal Input <span style='color:#27ae60;'>(BEBAS EDIT)</span>";
+            alert("🔓 Gembok tanggal berhasil dibuka!\nSilakan edit tanggal laporannya, Bosku.");
+        } else {
+            alert("⚠️ EITSSS, MAU NGAPAIN LU? ⚠️\n\nYang bisa buka gembok tanggal telat/revisi ini cuma Pejabat Toko (COS/KT/Admin)!\n\nKalau lu kelupaan lapor atau mau ralat data shift lu yang hancur kemarin, ngadep sana ke Pejabat Toko minta dibukain. Jangan kebiasaan jadi beban toko! 🐌🔥");
+        }
+    }
+
+    // Mengisi tanggal hari ini secara otomatis saat aplikasi dibuka
+    setTimeout(() => {
+        const inTgl = document.getElementById('tglInput');
+        if(inTgl && !inTgl.value) {
+            inTgl.value = new Date().getDate();
+            loadReal(); // Tarik data hari ini otomatis
+        }
+    }, 1000);
+
+
     // --- 4. FUNGSI KERJA ---
     function initPPS() {
         const k = getK(); if(!k.tk) return;
@@ -900,10 +1048,27 @@ function hapusKru(namaHapus) {
     saveKru(); 
 }
 
-    function saveKru() {
+function saveKru() {
         const k = getK(); if(!k.tk) return;
         db[k.yr][k.mn][k.tk].kru = document.getElementById('listKru').value;
-        saveDisk(); updateKruList(); updateShiftOption();
+        saveDisk(); 
+        updateKruList(); 
+        updateShiftOption();
+        
+        // --- TAMBAHAN BARU: SYNC LANGSUNG KE CLOUD SAAT HAPUS/TAMBAH ---
+        let wkAktif = document.getElementById('wkTarget') ? document.getElementById('wkTarget').value : 1;
+        let tData = db[k.yr][k.mn][k.tk].target[wkAktif] || {};
+        
+        const payload = { 
+            toko: k.tk, yr: k.yr, mn: k.mn, wk: wkAktif, 
+            targets: tData, kru: db[k.yr][k.mn][k.tk].kru, 
+            tipe: db[k.yr][k.mn][k.tk].tipe, 
+            tipeData: "PPS_TARGET" 
+        };
+        
+        // Kirim perubahan (hapus/tambah) diam-diam ke belakang layar
+        fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .catch(e => console.log("Gagal sync personil ke cloud"));
     }
     
     function saveTipe() { 
@@ -1017,22 +1182,85 @@ function getLogic(tgl, it, yr, mn) {
         cekStatusGembok();
     }
 
-  function updateShiftOption() {
-    const tipe=document.getElementById('tipeToko').value;
-    const shf=document.getElementById('shfInput');
-    const old=shf.value;
-    shf.innerHTML= tipe=="3"
-    ? `<option value="s3">Shift 3</option><option value="s1">Shift 1</option><option value="s2">Shift 2</option>`
-    : `<option value="s1">Shift 1</option><option value="s2">Shift 2</option>`;
-    if([...shf.options].some(o=>o.value===old)){ shf.value=old; }
+function updateShiftOption() {
+    const tipe = document.getElementById('tipeToko').value;
+    const shf = document.getElementById('shfInput');
+    const old = shf.value;
+    
+    // Jika Pejabat Toko (COS/KT), bebas pilih shift kapan saja
+    if (isUserAdmin()) {
+        shf.innerHTML = tipe == "3"
+        ? `<option value="s3">Shift 3</option><option value="s1">Shift 1</option><option value="s2">Shift 2</option>`
+        : `<option value="s1">Shift 1</option><option value="s2">Shift 2</option>`;
+        if([...shf.options].some(o=>o.value===old)){ shf.value=old; }
+        shf.disabled = false; 
+    } 
+    // Jika Crew / ACOS, terkena gembok waktu operasional!
+    else {
+        const now = new Date();
+        const h = now.getHours();
+        const m = now.getMinutes();
+        const timeFloat = h + (m / 60);
+
+        let activeShift = "";
+        let shiftName = "";
+
+        // S3: 06:00 - 09:00
+        if (timeFloat >= 6 && timeFloat <= 9 && tipe == "3") {
+            activeShift = "s3"; shiftName = "Shift 3";
+        }
+        // S1: 14:00 - 17:00
+        else if (timeFloat >= 14 && timeFloat <= 17) {
+            activeShift = "s1"; shiftName = "Shift 1";
+        }
+        // S2: 21:00 - 23:55
+        else if (timeFloat >= 21 && timeFloat <= 23.92) { 
+            activeShift = "s2"; shiftName = "Shift 2";
+        }
+
+        // Tampilkan shift yang sedang aktif saja, sisanya ditendang
+        if (activeShift) {
+            shf.innerHTML = `<option value="${activeShift}">${shiftName} (BUKA)</option>`;
+            shf.value = activeShift;
+        } else {
+            shf.innerHTML = `<option value="">-- DILUAR JAM LAPOR --</option>`;
+            shf.value = "";
+        }
+        shf.disabled = true; // Kunci dropdown biar gak bisa diakali
+    }
   }
+
+// --- MESIN PEMISAH STD MURNI PER SHIFT ---
+    function getStdMurni(harianObj, shfAktif, stdCum, tipeToko) {
+        let stdS3 = 0, stdS1 = 0;
+        Object.keys(harianObj).forEach(k => {
+            if (k.startsWith('s3_') && !k.includes('_nama') && !k.includes('_note') && !k.includes('_jam')) {
+                if (harianObj[k].STD > stdS3) stdS3 = harianObj[k].STD;
+            }
+            if (k.startsWith('s1_') && !k.includes('_nama') && !k.includes('_note') && !k.includes('_jam')) {
+                if (harianObj[k].STD > stdS1) stdS1 = harianObj[k].STD;
+            }
+        });
+
+        if (shfAktif === 's3' || shfAktif === 'S3') return stdCum; // S3 selalu murni
+        if (shfAktif === 's1' || shfAktif === 'S1') return tipeToko === 3 ? Math.max(0, stdCum - stdS3) : stdCum; // Jika 24jam, kurangi S3
+        if (shfAktif === 's2' || shfAktif === 'S2') {
+            let prev = stdS1 > 0 ? stdS1 : stdS3; // Cari shift terakhir sebelum S2
+            return Math.max(0, stdCum - prev);
+        }
+        return stdCum;
+    }
 
 function checkTargetStatus() {
     const k = getK(); 
     const tgl = parseInt(document.getElementById('tglInput').value); 
+    const shfAktif = document.getElementById('shfInput').value;
     const tipe = parseInt(db[k.yr]?.[k.mn]?.[k.tk]?.tipe) || 3;
     const jmlShift = (tipe === 3) ? 3 : 2;
-    const stdShiftVal = parseFloat(document.getElementById('r_STD')?.value) || 0;
+    const stdShiftValCum = parseFloat(document.getElementById('r_STD')?.value) || 0;
+
+    const harianObj = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+    const stdMurni = getStdMurni(harianObj, shfAktif, stdShiftValCum, tipe);
 
     let failItems = [];
 
@@ -1045,21 +1273,19 @@ function checkTargetStatus() {
         let tSyaratQty = 0;
 
         if(tgl) {
-            tS = getTargetDinamis(k, tgl, it, tTotal, jmlShift, log); // Target Shift Dinamis (Kuota Pcs)
-            tSyaratQty = Math.ceil(stdShiftVal * (pSyarat / 100)); // Target Syarat Berdasarkan STD Shift
+            tS = getTargetDinamis(k, tgl, it, tTotal, jmlShift, log); 
+            tSyaratQty = Math.ceil(stdMurni * (pSyarat / 100)); // PENGALI SYARAT PAKAI STD MURNI
         }
 
-// UPDATE TEKS INFO DI BAWAH KOLOM MASING-MASING ITEM
         const infoEl = document.getElementById(`info_${it}`);
         if(infoEl) {
             if(!tgl) {
                 infoEl.innerHTML = `🎯 Target Shift: - | Syarat: -`;
             } else {
-                infoEl.innerHTML = `🎯 Target Shift: <b>${tS} Pcs</b> | Syarat: <b>${pSyarat}%</b>`;
+                infoEl.innerHTML = `🎯 Target Shift: <b>${tS} Pcs</b> | Syarat: <b>${tSyaratQty} Pcs</b> (${pSyarat}%)`;
             }
         }
 
-        // Cek status tercapai atau belum untuk peringatan
         const realVal = parseFloat(document.getElementById(`r_${it}`)?.value) || 0;
         if(tS > 0 && realVal < tS) {
             failItems.push(it.replace('_',' '));
@@ -1160,6 +1386,54 @@ function simpanReal() {
     }
 
 // ==========================================
+    // MESIN AUTO-REGISTER PERSONIL DARI LOGIN
+    // ==========================================
+    function autoRegisterKru() {
+        const userSesi = JSON.parse(sessionStorage.getItem("userArea"));
+        if (!userSesi) return;
+
+        const k = getK();
+        if (!k.tk) return;
+
+        // Ambil nama dari sesi login portal
+        let namaLogin = (userSesi.nama || userSesi.username || userSesi.user || "").trim().toUpperCase();
+        
+        // Abaikan kalau yang login adalah akun Admin pusat atau tidak ada nama
+        if (!namaLogin || namaLogin === "TIDAK_DIKETAHUI" || namaLogin.includes("ADMIN")) return;
+
+        let listElement = document.getElementById('listKru');
+        let currentKru = (listElement.value || "").split(',').map(x => x.trim()).filter(Boolean);
+
+        // Jika nama personil BELUM ADA di daftar, langsung tambahkan otomatis!
+        if (!currentKru.includes(namaLogin)) {
+            currentKru.push(namaLogin);
+            
+            // Update tampilan lokal
+            const kruBaru = currentKru.join(',');
+            listElement.value = kruBaru;
+            db[k.yr][k.mn][k.tk].kru = kruBaru;
+            
+            updateKruList();
+            updateShiftOption();
+            saveDisk();
+
+            // Tembak diam-diam ke Cloud biar permanen untuk semua shift
+            let wkAktif = document.getElementById('wkTarget') ? document.getElementById('wkTarget').value : 1;
+            let tData = db[k.yr][k.mn][k.tk].target[wkAktif] || {};
+            
+            const payload = { 
+                toko: k.tk, yr: k.yr, mn: k.mn, wk: wkAktif, 
+                targets: tData, kru: kruBaru, 
+                tipe: db[k.yr][k.mn][k.tk].tipe, 
+                tipeData: "PPS_TARGET" 
+            };
+            
+            fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+                .catch(e => console.log("Gagal Auto-Save Kru ke Cloud"));
+        }
+    }
+
+// ==========================================
 // FUNGSI MENARIK DATA (ANTI-CRASH & ANTI-SPAM)
 // ==========================================
 let isFetchingCloud = false; // Bumper/Gembok agar tidak narik data dobel-dobel
@@ -1225,15 +1499,17 @@ function pullDataFromCloud() {
             updateShiftOption();
             switchWeek();
             
-            // Pengamanan tambahan saat render Tabel
             try {
                 updateUI(); 
             } catch(uiErr) {
                 console.error("UI ERROR:", uiErr);
                 alert("Data berhasil ditarik, tapi ada error saat memproses tabel. Cek Console!");
             }
+
+            // --- JALANKAN AUTO-REGISTER SETELAH DATA AWAL BERHASIL DIMUAT ---
+            autoRegisterKru();
         }
-        hideLoading(); 
+        hideLoading();
     }).catch(e => {
         isFetchingCloud = false; // Buka gembok kalau eror
         console.error("Cloud Pull Error", e);
@@ -1248,7 +1524,7 @@ function pullDataFromCloud() {
 
     function getTextBar(p) { let pct = Math.round(p) || 0; let filled = Math.min(Math.round(pct/10), 10); return "▓".repeat(filled) + "░".repeat(Math.max(0, 10-filled)) + ` ${pct}%`; }
 
-    function updateUI() {
+function updateUI() {
         const k = getK(); if(!k.tk) return;
         const dM = new Date(k.yr, k.mn, 0).getDate();
         let trToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, ttToko = {PWP:0, PSM:0, SERBA_GRATIS:0, SUGER:0, CEBAN:0}, kStats = {}; 
@@ -1259,7 +1535,19 @@ function pullDataFromCloud() {
         });
         
         const body = document.getElementById('bodyPPS'); 
-        if(document.getElementById('headPPS')) document.getElementById('headPPS').innerHTML = `<tr><th>Tgl</th><th>PWP</th><th>PSM</th><th>SERBA</th><th>SUGER</th><th>CEBAN</th><th>+/-</th></tr>`;
+        
+        // --- 1. HEADER TABEL BARU (TAMBAH STD, % TGT, % SYR) ---
+        if(document.getElementById('headPPS')) {
+            document.getElementById('headPPS').innerHTML = `
+            <tr style="background:#34495e; color:white;">
+                <th>Tgl</th>
+                <th style="background:#f39c12;">STD</th>
+                <th style="background:#2980b9;">%TGT</th>
+                <th style="background:#8e44ad;">%SYR</th>
+                <th>PWP</th><th>PSM</th><th>SERBA</th><th>SUGER</th><th>CEBAN</th><th>+/-</th>
+            </tr>`;
+        }
+
         if(!body) return;
         body.innerHTML = ""; let akumTotal = 0; const colors = ['bg-pwp', 'bg-psm', 'bg-serba', 'bg-suger', 'bg-ceban'];
 
@@ -1267,12 +1555,28 @@ function pullDataFromCloud() {
 
         for(let i=1; i<=dM; i++) {
             const h = harianData[i] || {};
-            let row = `<td>${i}</td>`, hHari = 0;
             
-        items.forEach((it, idx) => {
+            // --- CARI MAX STD HARIAN INI ---
+            let stdMap = {s1:0, s2:0, s3:0};
+            Object.keys(h).forEach(key => {
+                if(key.endsWith('_nama')) {
+                    let sc = key.split('_')[0].toLowerCase();
+                    let dRow = h[key.replace('_nama','')] || {};
+                    let v = parseFloat(dRow['STD'])||0;
+                    if(v > stdMap[sc]) stdMap[sc] = v;
+                }
+            });
+            let maxStd = Math.max(stdMap.s1, stdMap.s2, stdMap.s3);
+
+            let rowItems = "", hHari = 0, totReal = 0, totTgt = 0, totSyr = 0;
+            
+            items.forEach((it, idx) => {
                 const log = getLogic(i, it, k.yr, k.mn); 
                 const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
-                const tH = getTargetDinamis(k, i, it, tTotal, 1, log); // <-- Target Harian Dinamis         
+                const pSyarat = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[`p_${it}`]) || 0;
+                const tH = getTargetDinamis(k, i, it, tTotal, 1, log); // <-- Target Harian Dinamis 
+                const tSyrQty = Math.ceil(maxStd * (pSyarat/100)); // Target Syarat dlm Pcs
+                
                 const listKeys = Object.keys(h).filter(key => key.startsWith('s1_') || key.startsWith('s2_') || key.startsWith('s3_'));                
                 
                 let r = 0;
@@ -1282,9 +1586,32 @@ function pullDataFromCloud() {
                     }
                 });
                 
+                totReal += r; totTgt += tH; totSyr += tSyrQty;
                 trToko[it] += r; ttToko[it] += tH; hHari += (r - tH);
-                row += `<td>${r}/${tH}<div class="progress-container"><div class="progress-bar ${colors[idx]}" style="width:${Math.min(100, tH>0?(r/tH)*100:0)}%"></div></div></td>`;
+                rowItems += `<td>${r}/${tH}<div class="progress-container"><div class="progress-bar ${colors[idx]}" style="width:${Math.min(100, tH>0?(r/tH)*100:0)}%"></div></div></td>`;
             });
+
+            // --- HITUNG PERSENTASE KESELURUHAN ITEM HARI INI ---
+            let pctTgt = totTgt > 0 ? Math.round((totReal/totTgt)*100) : 0;
+            let pctSyr = totSyr > 0 ? Math.round((totReal/totSyr)*100) : (totReal>0?100:0);
+
+            // --- PEWARNAAN OTOMATIS (SUNTIKAN BARU) ---
+            function getWarna(pct) {
+                if (pct >= 100) return "background:#27ae60; color:white;"; 
+                if (pct >= 75) return "background:#f1c40f; color:black;";  
+                if (pct >= 50) return "background:#e67e22; color:white;";  
+                return "background:#e74c3c; color:white;";                 
+            }
+            
+            let styleTgt = (totTgt === 0 && totReal === 0) ? "background:#e8f4f8; color:#2980b9;" : getWarna(pctTgt);
+            let styleSyr = (totSyr === 0 && totReal === 0) ? "background:#f4ebf9; color:#8e44ad;" : getWarna(pctSyr);
+            let styleStd = maxStd > 0 ? "background:#fff3cd; color:#856404;" : (totReal > 0 ? "background:#ffcdd2; color:#e74c3c;" : "background:#fff3cd; color:#856404;");
+
+            let rowPref = `
+                <td><b>${i}</b></td>
+                <td style="${styleStd} font-weight:bold;">${maxStd}</td>
+                <td style="${styleTgt} font-weight:bold;">${pctTgt}%</td>
+                <td style="${styleSyr} font-weight:bold;">${pctSyr}%</td>`;
 
             // 2. HITUNG KONTRIBUSI PERSONIL (TARGET BULAT TOKO)
             for (let personil in kStats) {
@@ -1327,319 +1654,320 @@ function pullDataFromCloud() {
             }
 
             akumTotal += hHari; 
-            body.innerHTML += `<tr>${row}<td style="color:${akumTotal>=0?'green':'red'}"><b>${akumTotal}</b></td></tr>`;
+            let sign = akumTotal > 0 ? '+' : '';
+            body.innerHTML += `<tr>${rowPref}${rowItems}<td style="color:${akumTotal>=0?'green':'red'}; font-size:13px;"><b>${sign}${akumTotal}</b></td></tr>`;
         }
 
-let bulanLaluDetail = db[k.yr]?.[k.mn]?.[k.tk]?.bulanLaluDetail || {};
-let bulanIniDetail = {
-PWP_P1:0, PWP_P2:0, SERBA_P1:0, SERBA_P2:0, SUGER_P1:0, SUGER_P2:0, CEBAN_P1:0, CEBAN_P2:0, PSM_W1:0, PSM_W2:0, PSM_W3:0, PSM_W4:0
-};
+        let bulanLaluDetail = db[k.yr]?.[k.mn]?.[k.tk]?.bulanLaluDetail || {};
+        let bulanIniDetail = {
+        PWP_P1:0, PWP_P2:0, SERBA_P1:0, SERBA_P2:0, SUGER_P1:0, SUGER_P2:0, CEBAN_P1:0, CEBAN_P2:0, PSM_W1:0, PSM_W2:0, PSM_W3:0, PSM_W4:0
+        };
 
-for(let tgl=1; tgl<=dM; tgl++){
-  const h = harianData[tgl] || {};
-  Object.keys(h).forEach(key=>{
-    if(key.endsWith('_nama') || key.endsWith('_note') || key.endsWith('_jam')) return;
-    const row = h[key];
-    const pwp   = parseFloat(row.PWP)||0;
-    const psm   = parseFloat(row.PSM)||0;
-    const serba = parseFloat(row.SERBA_GRATIS)||0;
-    const suger = parseFloat(row.SUGER)||0;
-    const ceban = parseFloat(row.CEBAN)||0;
+        for(let tgl=1; tgl<=dM; tgl++){
+          const h = harianData[tgl] || {};
+          Object.keys(h).forEach(key=>{
+            if(key.endsWith('_nama') || key.endsWith('_note') || key.endsWith('_jam')) return;
+            const row = h[key];
+            const pwp   = parseFloat(row.PWP)||0;
+            const psm   = parseFloat(row.PSM)||0;
+            const serba = parseFloat(row.SERBA_GRATIS)||0;
+            const suger = parseFloat(row.SUGER)||0;
+            const ceban = parseFloat(row.CEBAN)||0;
 
-    if(tgl<=15){
-      bulanIniDetail.PWP_P1 += pwp; bulanIniDetail.SERBA_P1 += serba; bulanIniDetail.SUGER_P1 += suger; bulanIniDetail.CEBAN_P1 += ceban;
-    }else{
-      bulanIniDetail.PWP_P2 += pwp; bulanIniDetail.SERBA_P2 += serba; bulanIniDetail.SUGER_P2 += suger; bulanIniDetail.CEBAN_P2 += ceban;
-    }
+            if(tgl<=15){
+              bulanIniDetail.PWP_P1 += pwp; bulanIniDetail.SERBA_P1 += serba; bulanIniDetail.SUGER_P1 += suger; bulanIniDetail.CEBAN_P1 += ceban;
+            }else{
+              bulanIniDetail.PWP_P2 += pwp; bulanIniDetail.SERBA_P2 += serba; bulanIniDetail.SUGER_P2 += suger; bulanIniDetail.CEBAN_P2 += ceban;
+            }
 
-    if(tgl<=7) bulanIniDetail.PSM_W1 += psm;
-    else if(tgl<=15) bulanIniDetail.PSM_W2 += psm;
-    else if(tgl<=23) bulanIniDetail.PSM_W3 += psm;
-    else bulanIniDetail.PSM_W4 += psm;
-  });
-}
-
-let targetVS = {
-PWP_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PWP)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PWP)||0),
-PWP_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PWP)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PWP)||0),
-SERBA_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SERBA_GRATIS)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SERBA_GRATIS)||0),
-SERBA_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SERBA_GRATIS)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SERBA_GRATIS)||0),
-SUGER_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SUGER)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SUGER)||0),
-SUGER_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SUGER)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SUGER)||0),
-CEBAN_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.CEBAN)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.CEBAN)||0),
-CEBAN_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.CEBAN)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.CEBAN)||0),
-PSM_W1: parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PSM)||0,
-PSM_W2: parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PSM)||0,
-PSM_W3: parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PSM)||0,
-PSM_W4: parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PSM)||0
-};
-
-let rankingVS = [
-{nama:"PWP P1", trend: pctGrowth(bulanIniDetail.PWP_P1, bulanLaluDetail.PWP_P1)},
-{nama:"PWP P2", trend: pctGrowth(bulanIniDetail.PWP_P2, bulanLaluDetail.PWP_P2)},
-{nama:"PSM W1", trend: pctGrowth(bulanIniDetail.PSM_W1, bulanLaluDetail.PSM_W1)},
-{nama:"PSM W2", trend: pctGrowth(bulanIniDetail.PSM_W2, bulanLaluDetail.PSM_W2)},
-{nama:"PSM W3", trend: pctGrowth(bulanIniDetail.PSM_W3, bulanLaluDetail.PSM_W3)},
-{nama:"PSM W4", trend: pctGrowth(bulanIniDetail.PSM_W4, bulanLaluDetail.PSM_W4)},
-{nama:"SERBA P1", trend: pctGrowth(bulanIniDetail.SERBA_P1, bulanLaluDetail.SERBA_P1)},
-{nama:"SERBA P2", trend: pctGrowth(bulanIniDetail.SERBA_P2, bulanLaluDetail.SERBA_P2)},
-{nama:"SUGER P1", trend: pctGrowth(bulanIniDetail.SUGER_P1, bulanLaluDetail.SUGER_P1)},
-{nama:"SUGER P2", trend: pctGrowth(bulanIniDetail.SUGER_P2, bulanLaluDetail.SUGER_P2)},
-{nama:"CEBAN P1", trend: pctGrowth(bulanIniDetail.CEBAN_P1, bulanLaluDetail.CEBAN_P1)},
-{nama:"CEBAN P2", trend: pctGrowth(bulanIniDetail.CEBAN_P2, bulanLaluDetail.CEBAN_P2)}
-];
-
-const terbaik = [...rankingVS].sort((a,b)=>b.trend-a.trend).slice(0,2);
-const terburuk = [...rankingVS].sort((a,b)=>a.trend-b.trend).slice(0,2);
-
-let summaryVS = `
-<div class="rapor-card">
-<div style="font-size:18px;font-weight:bold;margin-bottom:10px;">📊 RINGKASAN BULAN INI</div>
-<div style="margin-bottom:10px;">
-🏆 TERBAIK<br>
-1. ${terbaik[0].nama} (${terbaik[0].trend >= 999 ? 'NEW' : terbaik[0].trend + '%' })<br>
-2. ${terbaik[1].nama} (${terbaik[1].trend >= 999 ? 'NEW' : terbaik[1].trend + '%' })
-</div>
-<div>
-⚠️ PERLU PERHATIAN<br>
-1. ${terburuk[0].nama} (${terburuk[0].trend >= 999 ? 'NEW' : terburuk[0].trend + '%' })<br>
-2. ${terburuk[1].nama} (${terburuk[1].trend >= 999 ? 'NEW' : terburuk[1].trend + '%' })
-</div></div>`;
-
-let vsHtml = summaryVS + `
-<div class="rapor-card">
-<div style="font-size:16px;font-weight:bold;margin-bottom:10px;">ACTUAL 📈 VS ACTUAL BULAN LALU</div>
-<table class="rapor-table">
-<tr><th>ITEM</th><th>BULAN LALU</th><th>BULAN INI</th><th>TARGET</th><th>%</th><th>SELISIH</th><th>TREND</th></tr>
-`;
-
-const barisVS = (label, bLalu, bIni, tgt) => `<tr>
-<td>${label}</td><td>${bLalu||0}</td><td>${bIni||0}</td><td>${tgt}</td>
-<td>${renderPctVS(bIni,tgt)}</td><td>${bIni-bLalu}</td><td>${trendVS(bIni,bLalu)}</td></tr>`;
-
-vsHtml += barisVS("PWP (01-15)", bulanLaluDetail.PWP_P1, bulanIniDetail.PWP_P1, targetVS.PWP_P1);
-vsHtml += barisVS("PWP (16-AKHIR)", bulanLaluDetail.PWP_P2, bulanIniDetail.PWP_P2, targetVS.PWP_P2);
-vsHtml += barisVS("PSM WEEK 1", bulanLaluDetail.PSM_W1, bulanIniDetail.PSM_W1, targetVS.PSM_W1);
-vsHtml += barisVS("PSM WEEK 2", bulanLaluDetail.PSM_W2, bulanIniDetail.PSM_W2, targetVS.PSM_W2);
-vsHtml += barisVS("PSM WEEK 3", bulanLaluDetail.PSM_W3, bulanIniDetail.PSM_W3, targetVS.PSM_W3);
-vsHtml += barisVS("PSM WEEK 4", bulanLaluDetail.PSM_W4, bulanIniDetail.PSM_W4, targetVS.PSM_W4);
-vsHtml += barisVS("SERBA (01-15)", bulanLaluDetail.SERBA_P1, bulanIniDetail.SERBA_P1, targetVS.SERBA_P1);
-vsHtml += barisVS("SERBA (16-AKHIR)", bulanLaluDetail.SERBA_P2, bulanIniDetail.SERBA_P2, targetVS.SERBA_P2);
-vsHtml += barisVS("SUGER (01-15)", bulanLaluDetail.SUGER_P1, bulanIniDetail.SUGER_P1, targetVS.SUGER_P1);
-vsHtml += barisVS("SUGER (16-AKHIR)", bulanLaluDetail.SUGER_P2, bulanIniDetail.SUGER_P2, targetVS.SUGER_P2);
-vsHtml += barisVS("CEBAN (01-15)", bulanLaluDetail.CEBAN_P1, bulanIniDetail.CEBAN_P1, targetVS.CEBAN_P1);
-vsHtml += barisVS("CEBAN (16-AKHIR)", bulanLaluDetail.CEBAN_P2, bulanIniDetail.CEBAN_P2, targetVS.CEBAN_P2);
-vsHtml += `</table></div>`;
-
-let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
-
-[['PWP','PWP'], ['SERBA_GRATIS','SERBA'], ['SUGER','SUGER'], ['CEBAN','CEBAN']].forEach(([key,label]) => {
-    for(let p=1; p<=2; p++) {
-        let real=0, target=0;
-        for(let tgl=1; tgl<=dM; tgl++) {
-            const periode = (tgl<=15)?1:2;
-            if(periode!==p) continue;
-            const h = harianData[tgl] || {};
-            Object.keys(h).forEach(k => {
-                if(!k.endsWith('_nama') && !k.endsWith('_note') && !k.endsWith('_jam') && h[k])
-                    real += parseFloat(h[k][key]) || 0;
-            });
+            if(tgl<=7) bulanIniDetail.PSM_W1 += psm;
+            else if(tgl<=15) bulanIniDetail.PSM_W2 += psm;
+            else if(tgl<=23) bulanIniDetail.PSM_W3 += psm;
+            else bulanIniDetail.PSM_W4 += psm;
+          });
         }
-        if(p===1) target = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[key])||0);
-        else target = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[key])||0);
-        const pct = target>0 ? (real/target)*100 : 0;
-        akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
-    }
-});
 
-for(let w=1; w<=4; w++) {
-    let real = 0;
-    for(let tgl=1; tgl<=dM; tgl++) {
-        const log = getLogic(tgl,'PSM',k.yr,k.mn);
-        if(log.wk !== w) continue;
-        const h = harianData[tgl] || {};
-        Object.keys(h).forEach(key => {
-            if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key])
-                real += parseFloat(h[key].PSM) || 0;
-        });
-    }
-    const target = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.PSM) || 0;
-    const pct = target > 0 ? (real/target)*100 : 0;
-    akHtml += `<tr><td>PSM WEEK ${w}</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
-}
+        let targetVS = {
+        PWP_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PWP)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PWP)||0),
+        PWP_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PWP)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PWP)||0),
+        SERBA_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SERBA_GRATIS)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SERBA_GRATIS)||0),
+        SERBA_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SERBA_GRATIS)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SERBA_GRATIS)||0),
+        SUGER_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.SUGER)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.SUGER)||0),
+        SUGER_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.SUGER)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.SUGER)||0),
+        CEBAN_P1: (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.CEBAN)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[2]?.CEBAN)||0),
+        CEBAN_P2: (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.CEBAN)||0)+(parseFloat(db[k.yr][k.mn][k.tk].target[4]?.CEBAN)||0),
+        PSM_W1: parseFloat(db[k.yr][k.mn][k.tk].target[1]?.PSM)||0,
+        PSM_W2: parseFloat(db[k.yr][k.mn][k.tk].target[2]?.PSM)||0,
+        PSM_W3: parseFloat(db[k.yr][k.mn][k.tk].target[3]?.PSM)||0,
+        PSM_W4: parseFloat(db[k.yr][k.mn][k.tk].target[4]?.PSM)||0
+        };
 
-akHtml += "</table>";
-document.getElementById('akumulasiArea').innerHTML = akHtml;
-document.getElementById('vsBulanArea').innerHTML = vsHtml;
+        let rankingVS = [
+        {nama:"PWP P1", trend: pctGrowth(bulanIniDetail.PWP_P1, bulanLaluDetail.PWP_P1)},
+        {nama:"PWP P2", trend: pctGrowth(bulanIniDetail.PWP_P2, bulanLaluDetail.PWP_P2)},
+        {nama:"PSM W1", trend: pctGrowth(bulanIniDetail.PSM_W1, bulanLaluDetail.PSM_W1)},
+        {nama:"PSM W2", trend: pctGrowth(bulanIniDetail.PSM_W2, bulanLaluDetail.PSM_W2)},
+        {nama:"PSM W3", trend: pctGrowth(bulanIniDetail.PSM_W3, bulanLaluDetail.PSM_W3)},
+        {nama:"PSM W4", trend: pctGrowth(bulanIniDetail.PSM_W4, bulanLaluDetail.PSM_W4)},
+        {nama:"SERBA P1", trend: pctGrowth(bulanIniDetail.SERBA_P1, bulanLaluDetail.SERBA_P1)},
+        {nama:"SERBA P2", trend: pctGrowth(bulanIniDetail.SERBA_P2, bulanLaluDetail.SERBA_P2)},
+        {nama:"SUGER P1", trend: pctGrowth(bulanIniDetail.SUGER_P1, bulanLaluDetail.SUGER_P1)},
+        {nama:"SUGER P2", trend: pctGrowth(bulanIniDetail.SUGER_P2, bulanLaluDetail.SUGER_P2)},
+        {nama:"CEBAN P1", trend: pctGrowth(bulanIniDetail.CEBAN_P1, bulanLaluDetail.CEBAN_P1)},
+        {nama:"CEBAN P2", trend: pctGrowth(bulanIniDetail.CEBAN_P2, bulanLaluDetail.CEBAN_P2)}
+        ];
 
-let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
+        const terbaik = [...rankingVS].sort((a,b)=>b.trend-a.trend).slice(0,2);
+        const terburuk = [...rankingVS].sort((a,b)=>a.trend-b.trend).slice(0,2);
 
-for(let n in kStats) {
-    rHtml += `
+        let summaryVS = `
         <div class="rapor-card">
-        <div style="font-size:18px; border-bottom:2px solid #eee; padding-bottom:5px; margin-bottom:10px;">👤 <b>${n}</b></div>
-        <table class="rapor-table" style="width:100%; border-collapse:collapse;">
-            <tr style="background:#f8f9fa;">
-                <th style="text-align:left; padding:8px; border:1px solid #ddd;">ITEM & PERIODE</th>
-                <th style="text-align:center; padding:8px; border:1px solid #ddd;">REAL/TGT</th>
-                <th style="text-align:center; padding:8px; border:1px solid #ddd;">PROGRESS</th>
-            </tr>`;
+        <div style="font-size:18px;font-weight:bold;margin-bottom:10px;">📊 RINGKASAN BULAN INI</div>
+        <div style="margin-bottom:10px;">
+        🏆 TERBAIK<br>
+        1. ${terbaik[0].nama} (${terbaik[0].trend >= 999 ? 'NEW' : terbaik[0].trend + '%' })<br>
+        2. ${terbaik[1].nama} (${terbaik[1].trend >= 999 ? 'NEW' : terbaik[1].trend + '%' })
+        </div>
+        <div>
+        ⚠️ PERLU PERHATIAN<br>
+        1. ${terburuk[0].nama} (${terburuk[0].trend >= 999 ? 'NEW' : terburuk[0].trend + '%' })<br>
+        2. ${terburuk[1].nama} (${terburuk[1].trend >= 999 ? 'NEW' : terburuk[1].trend + '%' })
+        </div></div>`;
 
-    const buatBar = (label, real, target, colorClass) => {
-        let pct = target > 0 ? Math.min(100, Math.round((real / target) * 100)) : 0;
-        return `<tr>
-            <td style="text-align:left; padding:8px; border:1px solid #ddd;"><b>${label}</b></td>
-            <td style="text-align:center; padding:8px; border:1px solid #ddd;"><b>${real}/${target}</b></td>
-            <td style="padding:8px; border:1px solid #ddd;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <div class="progress-container" style="flex:1; height:14px; background:#eee; border-radius:10px; overflow:hidden; border:1px solid #ccc;">
-                        <div class="progress-bar ${colorClass}" style="width:${pct}%; height:100%;"></div>
-                    </div>
-                    <span style="font-weight:bold; min-width:35px;">${pct}%</span>
-                </div>
-            </td>
-        </tr>`;
-    };
+        let vsHtml = summaryVS + `
+        <div class="rapor-card">
+        <div style="font-size:16px;font-weight:bold;margin-bottom:10px;">ACTUAL 📈 VS ACTUAL BULAN LALU</div>
+        <table class="rapor-table">
+        <tr><th>ITEM</th><th>BULAN LALU</th><th>BULAN INI</th><th>TARGET</th><th>%</th><th>SELISIH</th><th>TREND</th></tr>
+        `;
 
-    const listUtama = [
-        {k: 'PWP', l: 'PWP', c: 'bg-pwp'},
-        {k: 'SERBA_GRATIS', l: 'SERBA', c: 'bg-serba'},
-        {k: 'SUGER', l: 'SUGER', c: 'bg-suger'},
-        {k: 'CEBAN', l: 'CEBAN', c: 'bg-ceban'}
-    ];
+        const barisVS = (label, bLalu, bIni, tgt) => `<tr>
+        <td>${label}</td><td>${bLalu||0}</td><td>${bIni||0}</td><td>${tgt}</td>
+        <td>${renderPctVS(bIni,tgt)}</td><td>${bIni-bLalu}</td><td>${trendVS(bIni,bLalu)}</td></tr>`;
 
-    listUtama.forEach(it => {
-        let t1 = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it.k])||0);
-        let t2 = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it.k])||0);
-        let r1 = kStats[n].p[1].items?.[it.k] || 0;
-        let r2 = kStats[n].p[2].items?.[it.k] || 0;
+        vsHtml += barisVS("PWP (01-15)", bulanLaluDetail.PWP_P1, bulanIniDetail.PWP_P1, targetVS.PWP_P1);
+        vsHtml += barisVS("PWP (16-AKHIR)", bulanLaluDetail.PWP_P2, bulanIniDetail.PWP_P2, targetVS.PWP_P2);
+        vsHtml += barisVS("PSM WEEK 1", bulanLaluDetail.PSM_W1, bulanIniDetail.PSM_W1, targetVS.PSM_W1);
+        vsHtml += barisVS("PSM WEEK 2", bulanLaluDetail.PSM_W2, bulanIniDetail.PSM_W2, targetVS.PSM_W2);
+        vsHtml += barisVS("PSM WEEK 3", bulanLaluDetail.PSM_W3, bulanIniDetail.PSM_W3, targetVS.PSM_W3);
+        vsHtml += barisVS("PSM WEEK 4", bulanLaluDetail.PSM_W4, bulanIniDetail.PSM_W4, targetVS.PSM_W4);
+        vsHtml += barisVS("SERBA (01-15)", bulanLaluDetail.SERBA_P1, bulanIniDetail.SERBA_P1, targetVS.SERBA_P1);
+        vsHtml += barisVS("SERBA (16-AKHIR)", bulanLaluDetail.SERBA_P2, bulanIniDetail.SERBA_P2, targetVS.SERBA_P2);
+        vsHtml += barisVS("SUGER (01-15)", bulanLaluDetail.SUGER_P1, bulanIniDetail.SUGER_P1, targetVS.SUGER_P1);
+        vsHtml += barisVS("SUGER (16-AKHIR)", bulanLaluDetail.SUGER_P2, bulanIniDetail.SUGER_P2, targetVS.SUGER_P2);
+        vsHtml += barisVS("CEBAN (01-15)", bulanLaluDetail.CEBAN_P1, bulanIniDetail.CEBAN_P1, targetVS.CEBAN_P1);
+        vsHtml += barisVS("CEBAN (16-AKHIR)", bulanLaluDetail.CEBAN_P2, bulanIniDetail.CEBAN_P2, targetVS.CEBAN_P2);
+        vsHtml += `</table></div>`;
 
-        rHtml += buatBar(`${it.l} (01-15)`, r1, t1, it.c);
-        rHtml += buatBar(`${it.l} (16-AKHIR)`, r2, t2, it.c);
-    });
+        let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
 
-    for(let w=1; w<=4; w++) {
-        let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
-        let rW = kStats[n].w[w].items?.['PSM'] || 0;
-        if(tW > 0 || rW > 0) rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
+        [['PWP','PWP'], ['SERBA_GRATIS','SERBA'], ['SUGER','SUGER'], ['CEBAN','CEBAN']].forEach(([key,label]) => {
+            for(let p=1; p<=2; p++) {
+                let real=0, target=0;
+                for(let tgl=1; tgl<=dM; tgl++) {
+                    const periode = (tgl<=15)?1:2;
+                    if(periode!==p) continue;
+                    const h = harianData[tgl] || {};
+                    Object.keys(h).forEach(k => {
+                        if(!k.endsWith('_nama') && !k.endsWith('_note') && !k.endsWith('_jam') && h[k])
+                            real += parseFloat(h[k][key]) || 0;
+                    });
+                }
+                if(p===1) target = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[key])||0);
+                else target = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[key])||0);
+                const pct = target>0 ? (real/target)*100 : 0;
+                akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
+            }
+        });
+
+        for(let w=1; w<=4; w++) {
+            let real = 0;
+            for(let tgl=1; tgl<=dM; tgl++) {
+                const log = getLogic(tgl,'PSM',k.yr,k.mn);
+                if(log.wk !== w) continue;
+                const h = harianData[tgl] || {};
+                Object.keys(h).forEach(key => {
+                    if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key])
+                        real += parseFloat(h[key].PSM) || 0;
+                });
+            }
+            const target = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.PSM) || 0;
+            const pct = target > 0 ? (real/target)*100 : 0;
+            akHtml += `<tr><td>PSM WEEK ${w}</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
+        }
+
+        akHtml += "</table>";
+        document.getElementById('akumulasiArea').innerHTML = akHtml;
+        document.getElementById('vsBulanArea').innerHTML = vsHtml;
+
+        let rHtml = "<b style='font-size:16px;'>🏆 ANALISA PERFORMA KASIR (TARGET BULAT)</b>";
+
+        for(let n in kStats) {
+            rHtml += `
+                <div class="rapor-card">
+                <div style="font-size:18px; border-bottom:2px solid #eee; padding-bottom:5px; margin-bottom:10px;">👤 <b>${n}</b></div>
+                <table class="rapor-table" style="width:100%; border-collapse:collapse;">
+                    <tr style="background:#f8f9fa;">
+                        <th style="text-align:left; padding:8px; border:1px solid #ddd;">ITEM & PERIODE</th>
+                        <th style="text-align:center; padding:8px; border:1px solid #ddd;">REAL/TGT</th>
+                        <th style="text-align:center; padding:8px; border:1px solid #ddd;">PROGRESS</th>
+                    </tr>`;
+
+            const buatBar = (label, real, target, colorClass) => {
+                let pct = target > 0 ? Math.min(100, Math.round((real / target) * 100)) : 0;
+                return `<tr>
+                    <td style="text-align:left; padding:8px; border:1px solid #ddd;"><b>${label}</b></td>
+                    <td style="text-align:center; padding:8px; border:1px solid #ddd;"><b>${real}/${target}</b></td>
+                    <td style="padding:8px; border:1px solid #ddd;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="progress-container" style="flex:1; height:14px; background:#eee; border-radius:10px; overflow:hidden; border:1px solid #ccc;">
+                                <div class="progress-bar ${colorClass}" style="width:${pct}%; height:100%;"></div>
+                            </div>
+                            <span style="font-weight:bold; min-width:35px;">${pct}%</span>
+                        </div>
+                    </td>
+                </tr>`;
+            };
+
+            const listUtama = [
+                {k: 'PWP', l: 'PWP', c: 'bg-pwp'},
+                {k: 'SERBA_GRATIS', l: 'SERBA', c: 'bg-serba'},
+                {k: 'SUGER', l: 'SUGER', c: 'bg-suger'},
+                {k: 'CEBAN', l: 'CEBAN', c: 'bg-ceban'}
+            ];
+
+            listUtama.forEach(it => {
+                let t1 = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[it.k])||0);
+                let t2 = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[it.k])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[it.k])||0);
+                let r1 = kStats[n].p[1].items?.[it.k] || 0;
+                let r2 = kStats[n].p[2].items?.[it.k] || 0;
+
+                rHtml += buatBar(`${it.l} (01-15)`, r1, t1, it.c);
+                rHtml += buatBar(`${it.l} (16-AKHIR)`, r2, t2, it.c);
+            });
+
+            for(let w=1; w<=4; w++) {
+                let tW = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.['PSM']) || 0;
+                let rW = kStats[n].w[w].items?.['PSM'] || 0;
+                if(tW > 0 || rW > 0) rHtml += buatBar(`PSM WEEK ${w}`, rW, tW, 'bg-psm');
+            }
+            rHtml += `</table></div>`; 
+        } 
+
+        let kasirNol = [], semuaKasir = [];
+        for(let nama in kStats){
+            let total = 0;
+            Object.values(kStats[nama].p).forEach(p=>{
+                if(!p.items) return;
+                Object.values(p.items).forEach(v=>{ total += parseFloat(v)||0; });
+            });
+            semuaKasir.push({nama,total});
+            if(total===0) kasirNol.push(nama);
+        }
+
+        let kartuMematikan = "";
+        if(kasirNol.length){
+            kartuMematikan += `
+            <div class="rapor-card" style="background:linear-gradient(135deg,#ff0000,#8b0000); color:white; border:4px solid #ffcccc; animation:pulseDanger 1.2s infinite;">
+            <div style="font-size:24px;font-weight:bold;text-align:center;margin-bottom:10px;">🚨 ALERT PPS 🚨</div>
+            <div style="font-size:18px;text-align:center;line-height:1.8;">
+            💀 KASIR TANPA PENJUALAN BULAN INI 💀<br><br>${kasirNol.map(x=>`🔥 ${x}`).join("<br>")}<br><br>⚠️ BELUM ADA KONTRIBUSI PPS SAMA SEKALI
+            </div></div>`;
+        }
+
+        const kasirSorted = semuaKasir.sort((a,b)=>a.total-b.total);
+        const juruKunci = kasirSorted[0];
+
+        if(juruKunci && juruKunci.total > 0){
+            kartuMematikan += `
+            <div class="rapor-card" style="background:linear-gradient(135deg,#ff9800,#e74c3c); color:white;">
+            <div style="font-size:20px; font-weight:bold; text-align:center;">⚠️ JURU KUNCI BULAN INI</div>
+            <div style="text-align:center; font-size:16px; margin-top:10px;">👤 ${juruKunci.nama}<br>Total PPS: ${juruKunci.total}</div>
+            </div>`;
+        }
+
+        const alertArea = document.getElementById('alertKasirArea');
+        if(alertArea) alertArea.innerHTML = kartuMematikan;
+
+        let trendHtml = `
+        <div class="rapor-card">
+        <div style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#2980b9;">
+        📈 TREND KASIR BULAN LALU VS BULAN INI<br><small style="color:#666;">(Tanggal 1-${new Date().getDate()} dibanding periode yang sama bulan lalu)</small>
+        </div>`;
+
+        let trendNow = {};
+        const dataLalu = db[k.yr][k.mn][k.tk].bulanLaluKasir || {}; 
+        const dataNow = trendNow;
+        const today = new Date().getDate();
+
+        for(let tgl=1; tgl<=today; tgl++){
+          const h = harianData[tgl] || {};
+          Object.keys(h).forEach(key=>{
+            if(!key.endsWith('_nama')) return;
+            const nama = h[key];
+            const dataKey = key.replace('_nama','');
+            const row = h[dataKey];
+            if(!row) return;
+
+            if(!trendNow[nama]){
+              trendNow[nama]={ PWP_P1:0,PWP_P2:0, SERBA_P1:0,SERBA_P2:0, SUGER_P1:0,SUGER_P2:0, CEBAN_P1:0,CEBAN_P2:0, PSM_W1:0,PSM_W2:0, PSM_W3:0,PSM_W4:0 };
+            }
+
+            const pwp   = parseFloat(row.PWP)||0;
+            const psm   = parseFloat(row.PSM)||0;
+            const serba = parseFloat(row.SERBA_GRATIS)||0;
+            const suger = parseFloat(row.SUGER)||0;
+            const ceban = parseFloat(row.CEBAN)||0;
+
+            if(tgl<=15){
+              trendNow[nama].PWP_P1 += pwp; trendNow[nama].SERBA_P1 += serba; trendNow[nama].SUGER_P1 += suger; trendNow[nama].CEBAN_P1 += ceban;
+            }else{
+              trendNow[nama].PWP_P2 += pwp; trendNow[nama].SERBA_P2 += serba; trendNow[nama].SUGER_P2 += suger; trendNow[nama].CEBAN_P2 += ceban;
+            }
+
+            if(tgl<=7) trendNow[nama].PSM_W1 += psm;
+            else if(tgl<=15) trendNow[nama].PSM_W2 += psm;
+            else if(tgl<=23) trendNow[nama].PSM_W3 += psm;
+            else trendNow[nama].PSM_W4 += psm;
+          });
+        }
+
+        for(let nama in dataLalu){
+            let bl = dataLalu[nama] || {};
+            let nw = dataNow[nama] || {};
+
+            let bulanLaluTotal = (bl.PWP_P1||0)+(bl.PWP_P2||0)+(bl.PSM_W1||0)+(bl.PSM_W2||0)+(bl.PSM_W3||0)+(bl.PSM_W4||0)+(bl.SERBA_P1||0)+(bl.SERBA_P2||0)+(bl.SUGER_P1||0)+(bl.SUGER_P2||0)+(bl.CEBAN_P1||0)+(bl.CEBAN_P2||0);
+            let bulanIniTotal = (nw.PWP_P1||0)+(nw.PWP_P2||0)+(nw.PSM_W1||0)+(nw.PSM_W2||0)+(nw.PSM_W3||0)+(nw.PSM_W4||0)+(nw.SERBA_P1||0)+(nw.SERBA_P2||0)+(nw.SUGER_P1||0)+(nw.SUGER_P2||0)+(nw.CEBAN_P1||0)+(nw.CEBAN_P2||0);
+            
+            let selisih = bulanIniTotal-bulanLaluTotal;
+            let pct = 0;
+            let status = "🟡 STABIL";
+
+            if(bulanLaluTotal === 0){ status = "⚠️ DATA PEMBANDING BELUM TERSEDIA"; }
+            else{
+                pct = Math.round((selisih/bulanLaluTotal)*100);
+                if(pct>=20) status="🔥 MELEJIT";
+                else if(pct>=5) status="🟢 MENINGKAT";
+                else if(pct<=-20) status="🔴 TURUN TAJAM";
+                else if(pct<0) status="🟠 MENURUN";
+            }
+
+            trendHtml += `
+            <div style="background:#fff; padding:10px; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.1);">
+            <b>${nama}</b><br><br>
+            Bulan Lalu : <b>${bulanLaluTotal}</b><br>
+            Bulan Ini : <b>${bulanIniTotal}</b><br>
+            Selisih : <b style="color:${selisih>=0?'green':'red'};">${selisih>=0?'+':''}${selisih}</b><br>
+            ${status} ${bulanLaluTotal===0 ? '' : `(${pct}%)`}
+            </div>`;
+        }
+        trendHtml += "</div>";
+        rHtml += trendHtml;
+
+        const rArea = document.getElementById('raporArea');
+        if(rArea) rArea.innerHTML = rHtml;
+        renderLaporanHarian(); 
     }
-    rHtml += `</table></div>`; 
-} 
-
-let kasirNol = [], semuaKasir = [];
-for(let nama in kStats){
-    let total = 0;
-    Object.values(kStats[nama].p).forEach(p=>{
-        if(!p.items) return;
-        Object.values(p.items).forEach(v=>{ total += parseFloat(v)||0; });
-    });
-    semuaKasir.push({nama,total});
-    if(total===0) kasirNol.push(nama);
-}
-
-let kartuMematikan = "";
-if(kasirNol.length){
-    kartuMematikan += `
-    <div class="rapor-card" style="background:linear-gradient(135deg,#ff0000,#8b0000); color:white; border:4px solid #ffcccc; animation:pulseDanger 1.2s infinite;">
-    <div style="font-size:24px;font-weight:bold;text-align:center;margin-bottom:10px;">🚨 ALERT PPS 🚨</div>
-    <div style="font-size:18px;text-align:center;line-height:1.8;">
-    💀 KASIR TANPA PENJUALAN BULAN INI 💀<br><br>${kasirNol.map(x=>`🔥 ${x}`).join("<br>")}<br><br>⚠️ BELUM ADA KONTRIBUSI PPS SAMA SEKALI
-    </div></div>`;
-}
-
-const kasirSorted = semuaKasir.sort((a,b)=>a.total-b.total);
-const juruKunci = kasirSorted[0];
-
-if(juruKunci && juruKunci.total > 0){
-    kartuMematikan += `
-    <div class="rapor-card" style="background:linear-gradient(135deg,#ff9800,#e74c3c); color:white;">
-    <div style="font-size:20px; font-weight:bold; text-align:center;">⚠️ JURU KUNCI BULAN INI</div>
-    <div style="text-align:center; font-size:16px; margin-top:10px;">👤 ${juruKunci.nama}<br>Total PPS: ${juruKunci.total}</div>
-    </div>`;
-}
-
-const alertArea = document.getElementById('alertKasirArea');
-if(alertArea) alertArea.innerHTML = kartuMematikan;
-
-let trendHtml = `
-<div class="rapor-card">
-<div style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#2980b9;">
-📈 TREND KASIR BULAN LALU VS BULAN INI<br><small style="color:#666;">(Tanggal 1-${new Date().getDate()} dibanding periode yang sama bulan lalu)</small>
-</div>`;
-
-let trendNow = {};
-const dataLalu = db[k.yr][k.mn][k.tk].bulanLaluKasir || {}; 
-const dataNow = trendNow;
-const today = new Date().getDate();
-
-for(let tgl=1; tgl<=today; tgl++){
-  const h = harianData[tgl] || {};
-  Object.keys(h).forEach(key=>{
-    if(!key.endsWith('_nama')) return;
-    const nama = h[key];
-    const dataKey = key.replace('_nama','');
-    const row = h[dataKey];
-    if(!row) return;
-
-    if(!trendNow[nama]){
-      trendNow[nama]={ PWP_P1:0,PWP_P2:0, SERBA_P1:0,SERBA_P2:0, SUGER_P1:0,SUGER_P2:0, CEBAN_P1:0,CEBAN_P2:0, PSM_W1:0,PSM_W2:0, PSM_W3:0,PSM_W4:0 };
-    }
-
-    const pwp   = parseFloat(row.PWP)||0;
-    const psm   = parseFloat(row.PSM)||0;
-    const serba = parseFloat(row.SERBA_GRATIS)||0;
-    const suger = parseFloat(row.SUGER)||0;
-    const ceban = parseFloat(row.CEBAN)||0;
-
-    if(tgl<=15){
-      trendNow[nama].PWP_P1 += pwp; trendNow[nama].SERBA_P1 += serba; trendNow[nama].SUGER_P1 += suger; trendNow[nama].CEBAN_P1 += ceban;
-    }else{
-      trendNow[nama].PWP_P2 += pwp; trendNow[nama].SERBA_P2 += serba; trendNow[nama].SUGER_P2 += suger; trendNow[nama].CEBAN_P2 += ceban;
-    }
-
-    if(tgl<=7) trendNow[nama].PSM_W1 += psm;
-    else if(tgl<=15) trendNow[nama].PSM_W2 += psm;
-    else if(tgl<=23) trendNow[nama].PSM_W3 += psm;
-    else trendNow[nama].PSM_W4 += psm;
-  });
-}
-
-for(let nama in dataLalu){
-    let bl = dataLalu[nama] || {};
-    let nw = dataNow[nama] || {};
-
-    let bulanLaluTotal = (bl.PWP_P1||0)+(bl.PWP_P2||0)+(bl.PSM_W1||0)+(bl.PSM_W2||0)+(bl.PSM_W3||0)+(bl.PSM_W4||0)+(bl.SERBA_P1||0)+(bl.SERBA_P2||0)+(bl.SUGER_P1||0)+(bl.SUGER_P2||0)+(bl.CEBAN_P1||0)+(bl.CEBAN_P2||0);
-    let bulanIniTotal = (nw.PWP_P1||0)+(nw.PWP_P2||0)+(nw.PSM_W1||0)+(nw.PSM_W2||0)+(nw.PSM_W3||0)+(nw.PSM_W4||0)+(nw.SERBA_P1||0)+(nw.SERBA_P2||0)+(nw.SUGER_P1||0)+(nw.SUGER_P2||0)+(nw.CEBAN_P1||0)+(nw.CEBAN_P2||0);
-    
-    let selisih = bulanIniTotal-bulanLaluTotal;
-    let pct = 0;
-    let status = "🟡 STABIL";
-
-    if(bulanLaluTotal === 0){ status = "⚠️ DATA PEMBANDING BELUM TERSEDIA"; }
-    else{
-        pct = Math.round((selisih/bulanLaluTotal)*100);
-        if(pct>=20) status="🔥 MELEJIT";
-        else if(pct>=5) status="🟢 MENINGKAT";
-        else if(pct<=-20) status="🔴 TURUN TAJAM";
-        else if(pct<0) status="🟠 MENURUN";
-    }
-
-    trendHtml += `
-    <div style="background:#fff; padding:10px; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.1);">
-    <b>${nama}</b><br><br>
-    Bulan Lalu : <b>${bulanLaluTotal}</b><br>
-    Bulan Ini : <b>${bulanIniTotal}</b><br>
-    Selisih : <b style="color:${selisih>=0?'green':'red'};">${selisih>=0?'+':''}${selisih}</b><br>
-    ${status} ${bulanLaluTotal===0 ? '' : `(${pct}%)`}
-    </div>`;
-}
-trendHtml += "</div>";
-rHtml += trendHtml;
-
-const rArea = document.getElementById('raporArea');
-if(rArea) rArea.innerHTML = rHtml;
-renderLaporanHarian(); 
-}
 
 function pctVS(real,target){ return target>0 ? Math.round((real/target)*100) : 0; }
 function warnaPctVS(pct){ if(pct>=100) return "#27ae60"; if(pct>=50) return "#f1c40f"; return "#e74c3c"; }
@@ -1667,16 +1995,32 @@ function pctGrowth(sekarang,lalu){
         if(btnSimpan) { btnSimpan.disabled = !bolehEdit; btnSimpan.style.background = bolehEdit ? "#27ae60" : "#95a5a6"; }
     }
 
-    function cekStatusGembok() {
+function cekStatusGembok() {
         const k = getK(); const tgl = document.getElementById('tglInput').value; const shfAktif = document.getElementById('shfInput').value;
-        const userSesi = JSON.parse(sessionStorage.getItem("userArea")) || {};
-        const role = (userSesi.role || "").toLowerCase();
-        if (role.includes("admin") || role.includes("kepala toko") || role.includes("kt")) { setInputState(true); return; }
+        const btnSimpan = document.getElementById('btnSimpanShift');
+        
+        // Bebaskan akses untuk COS/KT
+        if (isUserAdmin()) { 
+            setInputState(true); 
+            if(btnSimpan) btnSimpan.innerText = "✅ SIMPAN DATA SHIFT";
+            return; 
+        }
+        
+        // HUKUMAN UNTUK CREW/ACOS JIKA DILUAR JAM OPERASIONAL
+        if (!shfAktif) {
+            setInputState(false, "DILUAR JAM LAPOR");
+            if(btnSimpan) btnSimpan.innerText = "❌ BELUM WAKTUNYA LAPOR";
+            return;
+        } else {
+            if(btnSimpan) btnSimpan.innerText = "✅ SIMPAN DATA SHIFT";
+        }
+
+        // Cek Gembok 3 Jam (Jika jam operasional masih buka tapi sudah lapor sebelumnya)
         const harian = db[k.yr]?.[k.mn]?.[k.tk]?.harian[tgl];
         const waktuSimpan = harian ? harian[shfAktif + "_jam"] : null;
         if (waktuSimpan) {
             const selisihMenit = (new Date().getTime() - waktuSimpan) / (1000 * 60);
-            if (selisihMenit > 180) { setInputState(false, `SHIFT ${shfAktif.toUpperCase()} TERKUNCI`); } 
+            if (selisihMenit > 180) { setInputState(false, `SHIFT TERKUNCI`); } 
             else { setInputState(true); }
         } else { setInputState(true); }
     }
@@ -1702,9 +2046,11 @@ async function kirimWA() {
             let pDetail = "📊 *HASIL SHIFT INI:*\n";
             let adaBebanShift = false;
 
-            // --- 1. AMBIL QTY STD YANG DIINPUT KASIR (ANTI 0) ---
-            const stdVal = parseFloat(document.getElementById('r_STD').value) || 0;
-            pDetail += `🧾 QTY STD (Struk): *${stdVal}*\n\n`;
+            const stdValCum = parseFloat(document.getElementById('r_STD').value) || 0;
+            const stdMurni = getStdMurni(harianSkrg, shf, stdValCum, tipe);
+            
+            pDetail += `🧾 QTY STD (Kumulatif): *${stdValCum}*\n`;
+            pDetail += `🔥 QTY STD (Murni Shift Ini): *${stdMurni}*\n\n`;
 
             itm.forEach(it => {
                 tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
@@ -1716,16 +2062,15 @@ async function kirimWA() {
                 const log = getLogic(tgl, it, k.yr, k.mn);
                 const tS = getTargetDinamis(k, tgl, it, tTokoBulat[it], tipe, log);
 
-                // --- 2. HITUNG TARGET SYARAT BERDASARKAN STD ---
+                // --- HITUNG TARGET SYARAT PAKAI STD MURNI ---
                 const pSyarat = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[`p_${it}`]) || 0;
-                const tSyaratPcs = Math.ceil(stdVal * (pSyarat / 100));
+                const tSyaratPcs = Math.ceil(stdMurni * (pSyarat / 100));
 
                 const rS = parseFloat(document.getElementById(`r_${it}`).value) || 0;
                 const pct = tS > 0 ? (rS/tS)*100 : 0;
 
                 if(rS < tS) adaBebanShift = true;
 
-                // --- 3. FORMAT TEKS WA BARU (MENAMPILKAN KUOTA & SYARAT) ---
                 pDetail += `🔹 *${it.replace('_',' ')}*\n`;
                 pDetail += `🎯 Tgt Kuota: *${tS}* | Syarat: *${tSyaratPcs}* (${pSyarat}%)\n`;
                 pDetail += `✅ Realisasi: *${rS}*\n`;
@@ -1754,7 +2099,7 @@ async function kirimWA() {
             const payloadWA = { 
                 toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
                 namaPersonil: ksr, note: note, 
-                std: stdVal, // <--- ANTI 0 DI CLOUD! 🔥
+                std: stdValCum, // <--- ANTI 0 DI CLOUD! 🔥
                 pwp: document.getElementById('r_PWP').value || 0, 
                 psm: document.getElementById('r_PSM').value || 0, 
                 serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
@@ -2050,46 +2395,62 @@ function generateFilterHarian(){
     
     const h = harianData[tgl] || {};
     
+    // --- 1. AMBIL MAX STD MASING-MASING SHIFT DULU (UNTUK PENGURANGAN) ---
+    let stdCumMap = { s3: 0, s1: 0, s2: 0 };
+    Object.keys(h).forEach(key => {
+        if(key.endsWith('_nama')) {
+            const shfKey = key.replace('_nama', ''); 
+            const shfCode = shfKey.split('_')[0].toLowerCase();
+            const dRow = h[shfKey] || {};
+            const vSTD = parseFloat(dRow['STD']) || 0;
+            if (vSTD > stdCumMap[shfCode]) stdCumMap[shfCode] = vSTD;
+        }
+    });
+
+    // Fungsi Pembantu Cerdas: STD Murni Lokal
+    function getPureSTD(shfCode, cumVal) {
+        const sc = shfCode.toLowerCase();
+        if (sc === 's3') return cumVal;
+        if (sc === 's1') return tipeToko === 3 ? Math.max(0, cumVal - stdCumMap['s3']) : cumVal;
+        if (sc === 's2') {
+            let prev = stdCumMap['s1'] > 0 ? stdCumMap['s1'] : stdCumMap['s3'];
+            return Math.max(0, cumVal - prev);
+        }
+        return cumVal;
+    }
+
     let shiftEntries = [];
     Object.keys(h).forEach(key => {
         if(key.endsWith('_nama')) {
             const shiftKey = key.replace('_nama', ''); 
-            const parts = shiftKey.split('_');
-            const shfCode = parts[0]; // s3, s1, s2
+            const shfCode = shiftKey.split('_')[0].toLowerCase();
             const namaKasir = h[key].toUpperCase();
             const dataRow = h[shiftKey] || {};
+            const cumSTD = parseFloat(dataRow['STD']) || 0;
             
             shiftEntries.push({
-                shift: shfCode,
+                shift: shfCode.toUpperCase(),
                 nama: namaKasir,
                 real: parseFloat(dataRow[item]) || 0,
-                std: parseFloat(dataRow['STD']) || 0
+                stdMurni: getPureSTD(shfCode, cumSTD) // <-- SIMPAN STD MURNI DI SINI
             });
         }
     });
 
-    // --- 1. TOTAL STD HARIAN TOKO: AMBIL NILAI STD TERBESAR (CLOSING AKHIR) ---
-    let maxStdDay = 0;
-    shiftEntries.forEach(e => {
-        if(e.std > maxStdDay) maxStdDay = e.std;
-    });
-    let totalStdHarian = maxStdDay; 
+    // Total STD Harian Toko tetap pakai nilai kumulatif paling besar (Closing)
+    let totalStdHarian = Math.max(stdCumMap.s3, stdCumMap.s1, stdCumMap.s2); 
 
-    // --- 2. AGREGASI PER KASIR (MASING-MASING KASIR MENDAPATKAN STD MEREKA) ---
+    // --- 2. AGREGASI PER KASIR (GABUNG JIKA KERJA 2 SHIFT) ---
     let processedShiftData = {};
     shiftEntries.forEach(entry => {
         if(!processedShiftData[entry.nama]) {
-            processedShiftData[entry.nama] = { real: 0, std: 0, shifts: [] };
+            processedShiftData[entry.nama] = { real: 0, stdMurni: 0, shifts: [] };
         }
         processedShiftData[entry.nama].real += entry.real;
+        processedShiftData[entry.nama].stdMurni += entry.stdMurni; 
         
-        // Ambil nilai STD yang diinput kasir (jika lapor beberapa kali, ambil yang terbesar/terakhir)
-        if(entry.std > processedShiftData[entry.nama].std) {
-            processedShiftData[entry.nama].std = entry.std;
-        }
-        
-        if(!processedShiftData[entry.nama].shifts.includes(entry.shift.toUpperCase())) {
-            processedShiftData[entry.nama].shifts.push(entry.shift.toUpperCase());
+        if(!processedShiftData[entry.nama].shifts.includes(entry.shift)) {
+            processedShiftData[entry.nama].shifts.push(entry.shift);
         }
     });
 
@@ -2100,7 +2461,7 @@ function generateFilterHarian(){
     const tHarianTokoFixed = getTargetDinamis(k, tgl, item, tTotal, 1, log); 
     
     kru.forEach(namaUpper => {
-        let dataKasir = processedShiftData[namaUpper] || { real: 0, std: 0, shifts: [] };
+        let dataKasir = processedShiftData[namaUpper] || { real: 0, stdMurni: 0, shifts: [] };
         realHarian += dataKasir.real;
         
         let targetKasir = 0;
@@ -2109,14 +2470,14 @@ function generateFilterHarian(){
             targetKasir = dataKasir.shifts.length > 0 ? (tShift * dataKasir.shifts.length) : 0;
             totalTargetHarian = tHarianTokoFixed; 
         } else {
-            // Target Syarat Kasir = STD Kasir * (% Syarat)
-            targetKasir = Math.ceil(dataKasir.std * (pSyarat / 100));
+            // Target Syarat Kasir = STD Murni Kasir * (% Syarat)
+            targetKasir = Math.ceil(dataKasir.stdMurni * (pSyarat / 100));
         }
 
         hasilKasir.push({
             nama: namaUpper,
             real: dataKasir.real,
-            std: dataKasir.std,
+            stdMurni: dataKasir.stdMurni,
             targetKasir: targetKasir,
             shift: dataKasir.shifts.length > 0 ? dataKasir.shifts.join(', ') : 'LIBUR / BELUM LAPOR'
         });
@@ -2182,8 +2543,8 @@ function generateFilterHarian(){
         
         if(x.shift === 'LIBUR / BELUM LAPOR') {
             statusHTML = "💤 BELUM LAPOR / LIBUR"; gapColor = "#95a5a6"; emoWA = "💤";
-        } else if(mode === 'std' && x.std <= 0) {
-            statusHTML = "⚠️ STD NOL (TIDAK ADA DATA)"; gapColor = "#95a5a6"; emoWA = "⚠️";
+        } else if(mode === 'std' && x.stdMurni <= 0) {
+            statusHTML = "⚠️ STD MURNI NOL"; gapColor = "#95a5a6"; emoWA = "⚠️";
         } else if(pct >= 100) {
             statusHTML = "🔥 LUNAS!"; gapColor = "#27ae60"; emoWA = "✅";
         } else if(pct >= 75) {
@@ -2195,8 +2556,9 @@ function generateFilterHarian(){
         const medalHTML = i === 0 && x.real > 0 ? "🥇" : i === 1 && x.real > 0 ? "🥈" : i === 2 && x.real > 0 ? "🥉" : (i+1) + ".";
         const medalWA = i === 0 && x.real > 0 ? "🥇" : i === 1 && x.real > 0 ? "🥈" : i === 2 && x.real > 0 ? "🥉" : "👤";
         
-        let stdInfoHTML = mode === 'std' ? `<div style="font-size:11px; color:#856404; background:#fff3cd; padding:2px 6px; border-radius:4px; font-weight:bold;">STD: ${x.std}</div>` : "";
-        let stdInfoWA = mode === 'std' ? `     ├ STD Shift: ${x.std}\n` : "";
+        // Menampilkan STD Murni di Box Kasir
+        let stdInfoHTML = mode === 'std' ? `<div style="font-size:11px; color:#856404; background:#fff3cd; padding:2px 6px; border-radius:4px; font-weight:bold;">STD Murni: ${x.stdMurni}</div>` : "";
+        let stdInfoWA = mode === 'std' ? `     ├ STD Murni: ${x.stdMurni}\n` : "";
         
         listKasirWA += `${medalWA} *${x.nama}* (${x.shift})\n${stdInfoWA}     ├ Target: ${actualTarget} | Real: *${x.real}*\n     └ Pencapaian: *${Math.round(pct)}%* ${emoWA} ${x.shift !== 'LIBUR / BELUM LAPOR' && x.real < actualTarget ? `(Minus: ${gap})` : ''}\n\n`;
 
@@ -2381,6 +2743,190 @@ async function kirimWAFilterHarian() {
             window.open(`https://wa.me/?text=${encodeURIComponent(pesanWA)}`, '_blank');
             btnTarget.innerText = prevText;
         }, 800);
+    }
+
+    // ==========================================
+// FITUR BARU: BRIEFING TARGET HARIAN
+// ==========================================
+function tutupBriefingHarian() {
+    const modal = document.getElementById('briefingModal');
+    if (modal) modal.remove();
+}
+
+function bukaBriefingHarian() {
+    const k = getK();
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    let tglOptions = "";
+    for(let i = 1; i <= dM; i++){ tglOptions += `<option value="${i}">Tanggal ${i}</option>`; }
+
+    const html = `
+    <div class="modal-rapor" id="briefingModal" style="display:block;">
+        <div class="modal-content" style="max-width: 95%; max-height:90vh; display:flex; flex-direction:column; padding:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px dashed #eee; padding-bottom:10px;">
+                <h3 style="margin:0; font-size:16px; color:#e67e22;">🌅 BRIEFING TARGET HARIAN</h3>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <select id="tglBriefing" onchange="renderBriefingHarian()" style="padding:5px; border-radius:5px; font-weight:bold; border:1px solid #ccc;">${tglOptions}</select>
+                    <button onclick="kirimWABriefing()" style="background:#25d366; color:white; border:2px solid #128c7e; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
+                    <span class="btn-tutup" onclick="tutupBriefingHarian()">×</span>
+                </div>
+            </div>
+            <div id="areaSSBriefing" style="background:#e9ecef; padding:15px; border-radius:10px; overflow-y:auto;">
+                <!-- Konten di-render disini -->
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    const today = new Date().getDate();
+    if (document.getElementById('tglBriefing') && today <= dM) {
+        document.getElementById('tglBriefing').value = today;
+    }
+    renderBriefingHarian();
+}
+
+function renderBriefingHarian() {
+    const k = getK(); if(!k.tk) return;
+    const tgl = parseInt(document.getElementById('tglBriefing').value);
+    const tipeToko = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+    const jmlShift = (tipeToko === 3) ? 3 : 2;
+    const h = db[k.yr][k.mn][k.tk].harian[tgl] || {};
+
+    let maxStd = 0;
+    Object.keys(h).forEach(key => {
+        if(key.endsWith('_nama')) {
+            let v = parseFloat(h[key.replace('_nama','')]['STD']) || 0;
+            if(v > maxStd) maxStd = v;
+        }
+    });
+
+    let htmlCards = `
+    <div style="background:white; padding:15px; border-radius:12px; border-top:5px solid #f39c12; margin-bottom:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); text-align:center;">
+        <h2 style="margin:0; font-size:18px; color:#2c3e50;">🎯 TARGET HARIAN TOKO</h2>
+        <div style="font-size:13px; color:#7f8c8d; margin-top:5px;">Periode Tanggal <b>${tgl}</b> • Current STD: <b>${maxStd}</b></div>
+    </div>`;
+
+    let waTextData = "";
+
+    items.forEach(it => {
+        const log = getLogic(tgl, it, k.yr, k.mn);
+        const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
+        const pSyarat = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[`p_${it}`]) || 0;
+        const tHarian = getTargetDinamis(k, tgl, it, tTotal, 1, log);
+        const tShift = getTargetDinamis(k, tgl, it, tTotal, jmlShift, log);
+        
+        let realHarian = 0;
+        Object.keys(h).forEach(key => {
+            if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key]) {
+                realHarian += parseFloat(h[key][it]) || 0;
+            }
+        });
+
+        const gap = Math.max(0, tHarian - realHarian);
+        const pct = tHarian > 0 ? Math.round((realHarian / tHarian) * 100) : 0;
+        const statusHTML = gap === 0 ? `<span style="color:#27ae60;">✅ LUNAS</span>` : `<span style="color:#e74c3c;">🔥 SISA: ${gap}</span>`;
+
+        htmlCards += `
+        <div style="background:#fff; padding:12px; border-radius:10px; margin-bottom:10px; border-left:5px solid #3498db; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #eee; padding-bottom:8px; margin-bottom:8px;">
+                <b style="font-size:15px; color:#2c3e50;">📦 ${it.replace('_',' ')}</b>
+                <span style="font-size:12px; background:#e8f4f8; padding:3px 8px; border-radius:5px; color:#2980b9; font-weight:bold;">Syarat: ${pSyarat}%</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px;">
+                <div>🎯 Target Harian: <b style="font-size:14px; color:#34495e;">${tHarian}</b> Pcs</div>
+                <div>⏱️ Target/Shift: <b style="font-size:14px; color:#8e44ad;">${tShift}</b> Pcs</div>
+                <div>✅ Realisasi: <b style="font-size:14px; color:#27ae60;">${realHarian}</b> Pcs</div>
+                <div>${statusHTML}</div>
+            </div>
+            <div style="margin-top:8px; height:8px; background:#ecf0f1; border-radius:5px; overflow:hidden;">
+                <div style="height:100%; width:${Math.min(100, pct)}%; background:${pct>=100?'#27ae60':'#3498db'};"></div>
+            </div>
+        </div>`;
+
+        waTextData += `🔹 *${it.replace('_',' ')}*\n`;
+        waTextData += `🎯 Target Harian: *${tHarian}* Pcs\n`;
+        waTextData += `⏱️ Target / Shift: *${tShift}* Pcs\n`;
+        waTextData += `⚖️ Syarat (Kawal Struk): *${pSyarat}%*\n`;
+        waTextData += `✅ Realisasi: *${realHarian}* Pcs\n`;
+        waTextData += `${gap === 0 ? '🏁 *STATUS: LUNAS BERSIH!*' : '🔥 *SISA/GAP:* '+gap+' Pcs'}\n\n`;
+    });
+
+    document.getElementById('areaSSBriefing').innerHTML = htmlCards;
+    window.dataBriefingWA = { tgl: tgl, text: waTextData };
+}
+
+async function kirimWABriefing() {
+    const data = window.dataBriefingWA;
+    const k = getK();
+    const btn = event.target;
+    const prevText = btn.innerText;
+    
+    // --- TRIK ANTI FOTO SEPARO ---
+    const areaSS = document.getElementById('areaSSBriefing');
+    const modalContent = areaSS.parentElement; 
+    
+    // Simpan batasan scroll
+    const oriModalMaxHeight = modalContent.style.maxHeight;
+    const oriAreaMaxHeight = areaSS.style.maxHeight;
+    const oriAreaOverflow = areaSS.style.overflowY;
+
+    // Lepas batasan tinggi agar tabel memanjang full ke bawah
+    modalContent.style.maxHeight = 'none';
+    areaSS.style.maxHeight = 'none';
+    areaSS.style.overflowY = 'visible';
+
+    if (typeof html2canvas !== 'undefined') {
+        btn.innerText = "📸 Memotret...";
+        // Kasih jeda 0.5 detik agar browser me-render layout secara full ke bawah
+        await new Promise(r => setTimeout(r, 500)); 
+        
+        try {
+            const canvas = await html2canvas(areaSS, { 
+                scale: 2.5, 
+                backgroundColor: "#e9ecef",
+                scrollY: -window.scrollY // Kunci posisi agar tidak terpotong atasnya
+            });
+            const imgData = canvas.toDataURL("image/jpeg", 0.9);
+            const link = document.createElement('a');
+            link.download = `BRIEFING_TARGET_TGL_${data.tgl}.jpg`;
+            link.href = imgData; link.click();
+        } catch(e) { console.error(e); }
+    }
+
+    // Kembalikan style seperti semula dengan kilat
+    modalContent.style.maxHeight = oriModalMaxHeight;
+    areaSS.style.maxHeight = oriAreaMaxHeight;
+    areaSS.style.overflowY = oriAreaOverflow;
+
+    btn.innerText = "🚀 Mengirim...";
+
+    const kataMutiara = "☀️ *SEMANGAT PAGI TIM HEBAT!* ☀️\nHari ini kita gass pol, kawal terus setiap transaksi, tawarkan ke setiap konsumen! Jangan kasih kendor, ingat target kita adalah mutlak!\n\n*Buktikan toko kita bukan kaleng-kaleng!* 💪🔥";
+
+    const pesanWA = `*📢 BRIEFING TARGET HARIAN [${k.tk}]*\n`
+        + `📅 Tanggal: *${data.tgl} ${blnNama[parseInt(k.mn)-1]}*\n`
+        + `------------------------------------\n`
+        + `${kataMutiara}\n`
+        + `------------------------------------\n`
+        + `${data.text}`
+        + `------------------------------------\n`
+        + `🚀 *SIAP TEMPUR? GASS!*\n*#omkopipait* ☕🔥`;
+
+    setTimeout(() => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(pesanWA)}`, '_blank');
+        btn.innerText = prevText;
+    }, 800);
+}
+
+// ==========================================
+    // FUNGSI BUKA/TUTUP BUKU PANDUAN PENGGUNAAN
+    // ==========================================
+    function bukaPanduan() {
+        document.getElementById('modalPanduan').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Kunci scroll layar belakang
+    }
+    
+    function tutupPanduan() {
+        document.getElementById('modalPanduan').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Lepas scroll layar belakang
     }
 
 </script>
