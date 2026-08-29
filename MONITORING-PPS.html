@@ -506,6 +506,7 @@
         </div>
     </div>
 
+
 <!-- WADAH UNTUK MODAL POP UP SS -->
     <div id="modalHarian" class="modal-rapor" style="display:none;">
         <div class="modal-content" style="max-width: 95%; height: auto; overflow: visible;" id="ssHarianArea">
@@ -2854,6 +2855,111 @@ function renderBriefingHarian() {
     window.dataBriefingWA = { tgl: tgl, text: waTextData };
 }
 
+function renderBriefingHarian() {
+    const k = getK(); if(!k.tk) return;
+    const tgl = parseInt(document.getElementById('tglBriefing').value);
+    const tipeToko = parseInt(db[k.yr][k.mn][k.tk].tipe) || 3;
+    const jmlShift = (tipeToko === 3) ? 3 : 2;
+    const h = db[k.yr][k.mn][k.tk].harian[tgl] || {};
+
+    let maxStd = 0;
+    Object.keys(h).forEach(key => {
+        if(key.endsWith('_nama')) {
+            let v = parseFloat(h[key.replace('_nama','')]['STD']) || 0;
+            if(v > maxStd) maxStd = v;
+        }
+    });
+
+    let htmlCards = `
+    <div style="background:white; padding:15px; border-radius:12px; border-top:5px solid #f39c12; margin-bottom:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); text-align:center;">
+        <h2 style="margin:0; font-size:18px; color:#2c3e50;">🎯 TARGET ESTAFET PER SHIFT</h2>
+        <div style="font-size:13px; color:#7f8c8d; margin-top:5px;">Periode Tanggal <b>${tgl}</b> • Current STD: <b>${maxStd}</b></div>
+    </div>`;
+
+    let waTextData = "";
+
+    items.forEach(it => {
+        const log = getLogic(tgl, it, k.yr, k.mn);
+        const tTotal = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[it]) || 0;
+        const pSyarat = parseFloat(db[k.yr][k.mn][k.tk].target[log.wk]?.[`p_${it}`]) || 0;
+        const tHarian = getTargetDinamis(k, tgl, it, tTotal, 1, log);
+        const tBaseShift = getTargetDinamis(k, tgl, it, tTotal, jmlShift, log); // Jatah murni per shift
+        
+        // --- LOGIKA TARGET ESTAFET (CARRY OVER GAP) ---
+        let shiftList = tipeToko === 3 ? ['s3', 's1', 's2'] : ['s1', 's2'];
+        let shiftDetails = [];
+        let kumulatifReal = 0;
+        let sisaGapMurni = 0; // Beban dosa dari shift sebelumnya
+
+        shiftList.forEach((shCode, idx) => {
+            let namaKasir = "-";
+            let realShift = 0;
+            
+            Object.keys(h).forEach(key => {
+                if(key.startsWith(shCode + '_') && key.endsWith('_nama')) {
+                    namaKasir = h[key].toUpperCase();
+                    let actualKey = key.replace('_nama', '');
+                    realShift = parseFloat(h[actualKey]?.[it]) || 0;
+                }
+            });
+
+            // Target shift ini = Target Base Murni + Sisa Minus Shift Sebelumnya
+            let targetShiftFinal = tBaseShift + sisaGapMurni;
+            
+            // Hitung kinerja shift ini (Minus atau Surplus)
+            let gapShiftIni = targetShiftFinal - realShift;
+            
+            // Gulung sisa minus untuk shift berikutnya (jika surplus/lunas, di-set 0)
+            sisaGapMurni = Math.max(0, gapShiftIni);
+            kumulatifReal += realShift;
+
+            let statusShf = realShift >= targetShiftFinal ? "✅ LUNAS" : `🔥 MINUS: ${gapShiftIni}`;
+            if(namaKasir === "-") statusShf = "⏳ BELUM LAPOR";
+
+            shiftDetails.push({
+                shiftName: shCode.toUpperCase(),
+                nama: namaKasir,
+                target: targetShiftFinal,
+                real: realShift,
+                status: statusShf
+            });
+        });
+
+        const totalGapToko = Math.max(0, tHarian - kumulatifReal);
+
+        htmlCards += `
+        <div style="background:#fff; padding:12px; border-radius:10px; margin-bottom:10px; border-left:5px solid #3498db; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #eee; padding-bottom:8px; margin-bottom:8px;">
+                <b style="font-size:15px; color:#2c3e50;">📦 ${it.replace('_',' ')}</b>
+                <span style="font-size:12px; background:#e8f4f8; padding:3px 8px; border-radius:5px; color:#2980b9; font-weight:bold;">Tgt Harian: ${tHarian} Pcs</span>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:12px; margin-bottom:8px;">`;
+
+        waTextData += `🔹 *${it.replace('_',' ')}* (Tgt Harian: ${tHarian} Pcs)\n`;
+
+        shiftDetails.forEach(sd => {
+            let colorReal = sd.real >= sd.target ? '#27ae60' : '#e74c3c';
+            htmlCards += `
+                <div style="background:#f8f9fa; padding:6px 10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
+                    <div><b>${sd.shiftName} (${sd.nama})</b><br><span style="color:#666; font-size:11px;">Tgt: ${sd.target} | Real: <b style="color:${colorReal}">${sd.real}</b></span></div>
+                    <div style="font-weight:bold; font-size:11px;">${sd.status}</div>
+                </div>`;
+
+            waTextData += `  ⏱️ *${sd.shiftName}* [${sd.nama}] ➔ Tgt: ${sd.target} | Real: *${sd.real}* (${sd.status})\n`;
+        });
+
+        htmlCards += `</div>
+            <div style="font-size:11px; font-weight:bold; color:#e74c3c; text-align:right;">Total Sisa Gap Toko: ${totalGapToko} Pcs</div>
+        </div>`;
+
+        waTextData += `  🔥 *Total Sisa Gap Toko:* ${totalGapToko} Pcs\n\n`;
+    });
+
+    document.getElementById('areaSSBriefing').innerHTML = htmlCards;
+    window.dataBriefingWA = { tgl: tgl, text: waTextData };
+}
+
 async function kirimWABriefing() {
     const data = window.dataBriefingWA;
     const k = getK();
@@ -2864,26 +2970,23 @@ async function kirimWABriefing() {
     const areaSS = document.getElementById('areaSSBriefing');
     const modalContent = areaSS.parentElement; 
     
-    // Simpan batasan scroll
     const oriModalMaxHeight = modalContent.style.maxHeight;
     const oriAreaMaxHeight = areaSS.style.maxHeight;
     const oriAreaOverflow = areaSS.style.overflowY;
 
-    // Lepas batasan tinggi agar tabel memanjang full ke bawah
     modalContent.style.maxHeight = 'none';
     areaSS.style.maxHeight = 'none';
     areaSS.style.overflowY = 'visible';
 
     if (typeof html2canvas !== 'undefined') {
         btn.innerText = "📸 Memotret...";
-        // Kasih jeda 0.5 detik agar browser me-render layout secara full ke bawah
         await new Promise(r => setTimeout(r, 500)); 
         
         try {
             const canvas = await html2canvas(areaSS, { 
                 scale: 2.5, 
                 backgroundColor: "#e9ecef",
-                scrollY: -window.scrollY // Kunci posisi agar tidak terpotong atasnya
+                scrollY: -window.scrollY
             });
             const imgData = canvas.toDataURL("image/jpeg", 0.9);
             const link = document.createElement('a');
@@ -2892,16 +2995,15 @@ async function kirimWABriefing() {
         } catch(e) { console.error(e); }
     }
 
-    // Kembalikan style seperti semula dengan kilat
     modalContent.style.maxHeight = oriModalMaxHeight;
     areaSS.style.maxHeight = oriAreaMaxHeight;
     areaSS.style.overflowY = oriAreaOverflow;
 
     btn.innerText = "🚀 Mengirim...";
 
-    const kataMutiara = "☀️ *SEMANGAT PAGI TIM HEBAT!* ☀️\nHari ini kita gass pol, kawal terus setiap transaksi, tawarkan ke setiap konsumen! Jangan kasih kendor, ingat target kita adalah mutlak!\n\n*Buktikan toko kita bukan kaleng-kaleng!* 💪🔥";
+    const kataMutiara = "☀️ *SEMANGAT PAGI TIM HEBAT!* ☀️\nBerikut adalah update target estafet kita hari ini. Kasir shift awal jangan ninggalin dosa (minus) buat shift selanjutnya! Kawal terus setiap struk transaksi!\n\n*Buktikan toko kita bukan kaleng-kaleng!* 💪🔥";
 
-    const pesanWA = `*📢 BRIEFING TARGET HARIAN [${k.tk}]*\n`
+    const pesanWA = `*📢 BRIEFING TARGET ESTAFET [${k.tk}]*\n`
         + `📅 Tanggal: *${data.tgl} ${blnNama[parseInt(k.mn)-1]}*\n`
         + `------------------------------------\n`
         + `${kataMutiara}\n`
