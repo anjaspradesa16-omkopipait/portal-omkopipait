@@ -6,61 +6,354 @@
     <title>Monitoring Sales Pro v11 - ULTIMATE IKT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .locked-mode .btn-admin-only { display: none !important; }
-        .locked-mode .readonly-date { pointer-events: none !important; background-color: #dddddd !important; color: #888888 !important; }
-        .locked-mode input:disabled, .locked-mode select:disabled { background-color: #dddddd !important; color: #888888 !important; cursor: not-allowed; border: 1px solid #bbbbbb !important; pointer-events: none; }
-        #lockMsg { font-weight: bold; font-size: 12px; margin-bottom: 5px; display: block; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070') no-repeat center center fixed; background-size: cover; color: #333; }
-        .container { max-width: 1400px; margin: auto; background: rgba(255, 255, 255, 0.98); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 5px solid #f1c40f; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-        .card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; position: relative; overflow: hidden; }
-        h3 { margin-top: 0; color: #2980b9; font-size: 14px; border-bottom: 2px solid #eee; padding-bottom: 5px; display: flex; justify-content: space-between; }
-        label { display: block; font-size: 11px; font-weight: bold; margin-top: 10px; color: #666; text-transform: uppercase; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight:bold; }
-        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; }
-        .btn-blue { background: #3498db; color: white; box-shadow: 0 4px #2980b9; }
-        .btn-green { background: #27ae60; color: white; box-shadow: 0 4px #1e8449; }
-        .btn-wa { background: #25d366; color: white; border: 2px solid #fff; box-shadow: 0 4px #128c7e; }
-        .btn-back { background: linear-gradient(135deg, #e67e22, #d35400); color: white; box-shadow: 0 4px #c0392b; padding: 10px 20px; display: inline-block; text-decoration: none; border-radius: 50px; font-size: 13px; font-weight: bold; border: 2px solid #fff; transition: 0.3s; }
-        button:active, .btn-back:active { transform: translateY(4px); box-shadow: 0 0px; }
-        .tag-jsm { font-size: 9px; background: #e74c3c; color: white; padding: 2px 6px; border-radius: 10px; animation: pulse 1s infinite; }
-        .tag-jsm-lalu { font-size: 9px; background: #9b59b6; color: white; padding: 2px 6px; border-radius: 10px; }
-        .table-box { margin-top: 25px; background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th, td { border: 1px solid #eee; padding: 10px; text-align: center; font-size: 11px; }
-        th { background: #2c3e50; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .jsm-row { background: #fff5f5 !important; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-        
-        .modal-ai { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
-        .modal-content { background-color: #fff; margin: 3vh auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 50px rgba(0,0,0,0.5); gap:0 !important; }
-        #aiQuestionBox{ margin-top:0 !important; padding-top:10px !important; }
-        #aiAnalysisContent{ margin-bottom:0 !important; padding-bottom:0 !important; }
-        #aiDecision{ margin-top:6px !important; margin-bottom:2px !important; padding:12px !important; border-radius:15px; text-align:center; }
-        .ai-header{ background: linear-gradient(270deg, #3498db, #9b59b6, #f1c40f, #3498db); background-size:600% 600%; animation:gradientMove 8s ease infinite; padding:15px; color:white; border-radius:15px; text-align:center; margin-bottom:20px; }
-        @keyframes gradientMove{ 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
-        .status-badge{ padding:8px 15px; border-radius:50px; display:inline-block; font-size:12px; font-weight:bold; animation:pulseBadge 1.5s infinite; }
-        @keyframes pulseBadge{ 0%{transform:scale(1);} 50%{transform:scale(1.05);} 100%{transform:scale(1);} }
-        .close-ai{ position: sticky; top: 0; float: right; font-size: 40px; z-index: 10000; cursor:pointer;}
-        .close-ai:hover { color: #e74c3c; }
-
-        @media screen and (max-width:768px){
-            body{ padding:8px; }
-            .container{ padding:10px; border-radius:15px; }
-            .grid{ grid-template-columns:1fr !important; gap:12px; }
-            .card{ padding:12px; border-radius:12px; }
-            h2{ font-size:18px !important; letter-spacing:1px !important; }
-            h3{ font-size:12px !important; }
-            input, select, button{ font-size:16px; padding:12px; }
-            .table-box{ overflow-x:auto; padding:10px; }
-            .modal-content{ width:96% !important; max-width:none !important; max-height:85vh; height:auto; margin:2vh auto; padding:12px !important; overflow-y:auto; border-radius:15px; }
+        /* ==========================================
+           SISTEM TAMPILAN GEMBOK KRU & BASIC UI
+           ========================================== */
+        .locked-mode .btn-admin-only { 
+            display: none !important; 
         }
-        @keyframes muterJoss { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .locked-mode .readonly-date { 
+            pointer-events: none !important; 
+            background-color: #dddddd !important; 
+            color: #888888 !important; 
+        }
+
+        .locked-mode input:disabled, .locked-mode select:disabled { 
+            background-color: #dddddd !important; 
+            color: #888888 !important; 
+            cursor: not-allowed; 
+            border: 1px solid #bbbbbb !important; 
+            pointer-events: none; 
+        }
+
+        #lockMsg { 
+            font-weight: bold; 
+            font-size: 12px; 
+            margin-bottom: 5px; 
+            display: block; 
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070') no-repeat center center fixed; 
+            background-size: cover; 
+            color: #333; 
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.98); 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            border-top: 5px solid #f1c40f; 
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 20px; 
+        }
+
+        .card { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #ddd; 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        h3 { 
+            margin-top: 0; 
+            color: #2980b9; 
+            font-size: 14px; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 5px; 
+            display: flex; 
+            justify-content: space-between; 
+        }
+
+        label { 
+            display: block; 
+            font-size: 11px; 
+            font-weight: bold; 
+            margin-top: 10px; 
+            color: #666; 
+            text-transform: uppercase; 
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 5px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            font-weight: bold; 
+        }
+
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 10px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.3s; 
+            text-transform: uppercase; 
+        }
+
+        .btn-blue { 
+            background: #3498db; 
+            color: white; 
+            box-shadow: 0 4px #2980b9; 
+        }
+
+        .btn-green { 
+            background: #27ae60; 
+            color: white; 
+            box-shadow: 0 4px #1e8449; 
+        }
+
+        .btn-wa { 
+            background: #25d366; 
+            color: white; 
+            border: 2px solid #fff; 
+            box-shadow: 0 4px #128c7e; 
+        }
+
+        button:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px; 
+        }
+
+        /* ==========================================
+           TABEL & TAG STYLING
+           ========================================== */
+        .tag-jsm { 
+            font-size: 9px; 
+            background: #e74c3c; 
+            color: white; 
+            padding: 2px 6px; 
+            border-radius: 10px; 
+            animation: pulse 1s infinite; 
+        }
+
+        .tag-jsm-lalu { 
+            font-size: 9px; 
+            background: #9b59b6; 
+            color: white; 
+            padding: 2px 6px; 
+            border-radius: 10px; 
+        }
+
+        .table-box { 
+            margin-top: 25px; 
+            background: white; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #ddd; 
+            overflow-x: auto; 
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 1100px; 
+        }
+
+        th, td { 
+            border: 1px solid #eee; 
+            padding: 10px; 
+            text-align: center; 
+            font-size: 11px; 
+        }
+
+        th { 
+            background: #2c3e50; 
+            color: white; 
+        }
+
+        tr:nth-child(even) { 
+            background-color: #f9f9f9; 
+        }
+
+        .jsm-row { 
+            background: #fff5f5 !important; 
+        }
+
+        @keyframes pulse { 
+            0% { opacity: 1; } 
+            50% { opacity: 0.7; } 
+            100% { opacity: 1; } 
+        }
+        
+        /* ==========================================
+           MODAL AI STYLING
+           ========================================== */
+        .modal-ai { 
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.7); 
+            backdrop-filter: blur(5px); 
+        }
+
+        .modal-content { 
+            background-color: #fff; 
+            margin: 3vh auto; 
+            padding: 25px; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 900px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            position: relative; 
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5); 
+            gap: 0 !important; 
+        }
+
+        #aiQuestionBox { 
+            margin-top: 0 !important; 
+            padding-top: 10px !important; 
+        }
+
+        #aiAnalysisContent { 
+            margin-bottom: 0 !important; 
+            padding-bottom: 0 !important; 
+        }
+
+        #aiDecision { 
+            margin-top: 6px !important; 
+            margin-bottom: 2px !important; 
+            padding: 12px !important; 
+            border-radius: 15px; 
+            text-align: center; 
+        }
+
+        .ai-header { 
+            background: linear-gradient(270deg, #3498db, #9b59b6, #f1c40f, #3498db); 
+            background-size: 600% 600%; 
+            animation: gradientMove 8s ease infinite; 
+            padding: 15px; 
+            color: white; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+
+        @keyframes gradientMove { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
+        }
+
+        .status-badge { 
+            padding: 8px 15px; 
+            border-radius: 50px; 
+            display: inline-block; 
+            font-size: 12px; 
+            font-weight: bold; 
+            animation: pulseBadge 1.5s infinite; 
+        }
+
+        @keyframes pulseBadge { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.05); } 
+            100% { transform: scale(1); } 
+        }
+
+        .close-ai { 
+            position: sticky; 
+            top: 0; 
+            float: right; 
+            font-size: 40px; 
+            z-index: 10000; 
+            cursor: pointer;
+        }
+
+        .close-ai:hover { 
+            color: #e74c3c; 
+        }
+        
+        /* ==========================================
+           PERSONIL & INFO WAKTU JAM LAPOR
+           ========================================== */
+        .box-personil { 
+            background: #f7f0ff; 
+            padding: 10px; 
+            border-radius: 8px; 
+            border: 1px dashed #8e44ad; 
+            font-size: 11px; 
+            font-weight: bold; 
+            color: #555; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 5px; 
+            margin-top: 5px; 
+        }
+
+        .tag-personil { 
+            background: #8e44ad; 
+            color: white; 
+            padding: 4px 10px; 
+            border-radius: 15px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+        }
+
+        .info-jam { 
+            font-size: 11px; 
+            margin-top: 6px; 
+            font-weight: bold; 
+            padding: 8px; 
+            border-radius: 5px; 
+            text-align: center; 
+            background: #eee; 
+        }
+
+        /* ==========================================
+           RESPONSIVE MOBILE
+           ========================================== */
+        @media screen and (max-width:768px) {
+            body { padding: 8px; }
+            .container { padding: 10px; border-radius: 15px; }
+            .grid { grid-template-columns: 1fr !important; gap: 12px; }
+            .card { padding: 12px; border-radius: 12px; }
+            h2 { font-size: 18px !important; letter-spacing: 1px !important; }
+            h3 { font-size: 12px !important; }
+            input, select, button { font-size: 16px; padding: 12px; }
+            .table-box { overflow-x: auto; padding: 10px; }
+            .modal-content { 
+                width: 96% !important; 
+                max-width: none !important; 
+                max-height: 85vh; 
+                height: auto; 
+                margin: 2vh auto; 
+                padding: 12px !important; 
+                overflow-y: auto; 
+                border-radius: 15px; 
+            }
+        }
+        
+        @keyframes muterJoss { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
     </style>
 </head>
 <body>
 
+<!-- SISTEM LOADING OVERLAY -->
 <div id="loadingOverlayJoss" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 999999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(6px); cursor: wait;">
     <div style="width: 70px; height: 70px; border: 6px solid rgba(255,255,255,0.1); border-top: 6px solid #f1c40f; border-right: 6px solid #3498db; border-radius: 50%; animation: muterJoss 1s linear infinite; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);"></div>
     <div id="textLoadingJoss" style="color: #fff; font-weight: bold; margin-top: 25px; font-size: 15px; letter-spacing: 2px; animation: pulse 1s infinite; text-shadow: 0 0 10px #000; text-align: center;">MEMUAT DATA...</div>
@@ -69,6 +362,10 @@
 <div class="container">
     <div style="text-align:center; margin-bottom:20px;">
         <h2 style="margin:0 0 10px 0; color:#2c3e50; letter-spacing: 2px;">🚀 MONITORING SALES ULTIMATE 🚀</h2>
+        <div id="liveClock" style="font-weight: bold; color: #e67e22; margin-bottom: 15px;"></div>
+        
+        <!-- TOMBOL PANDUAN -->
+        <button onclick="bukaPanduan()" style="width:auto; padding:8px 25px; background:linear-gradient(135deg, #8e44ad, #9b59b6); color:white; border-radius:25px; font-size:12px; box-shadow:0 4px #732d91; margin:0;">📖 BACA BUKU PANDUAN</button>
     </div>
 
     <div class="grid">
@@ -98,15 +395,24 @@
             
             <button class="btn-blue btn-admin-only" style="background:#2980b9; margin-top:15px;" onclick="simpanTargetAwal()">💾 SIMPAN PROFIL & TARGET</button>
 
+            <!-- DAFTAR PERSONIL AUTO-SYNC -->
+            <label style="margin-top:20px; color:#8e44ad; display:flex; align-items:center; gap:5px;">
+                👥 DAFTAR PERSONIL TOKO <small style="color:#aaa;">(Auto-Sync)</small>
+            </label>
+            <div id="listPersonil" class="box-personil">Memuat personil...</div>
+
             <!-- Histori Tanggal Harian Admin -->
             <div class="btn-admin-only" style="background:#fdf9e7; padding:10px; border-radius:8px; margin-top:15px; border: 1px dashed #f1c40f;">
                 <label style="color:#d35400;">Input Histori Harian Bln Lalu (Permanen)</label>
-                <div style="display:flex; gap:5px;"><input type="number" id="tglHistori" placeholder="Tgl"><input type="text" inputmode="numeric" id="valHistori" placeholder="Rp" oninput="formatRupiahInput(this)"></div>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" id="tglHistori" placeholder="Tgl">
+                    <input type="text" inputmode="numeric" id="valHistori" placeholder="Rp" oninput="formatRupiahInput(this)">
+                </div>
                 <button class="btn-wa" style="background:#e67e22; box-shadow:0 4px #d35400;" onclick="simpanLalu()">SIMPAN HISTORI KE CLOUD</button>
             </div>
         </div>
 
-        <!-- 2. KOTAK LAPORAN SHIFT HARIAN (DINAMIS & ANTI KUSUT) -->
+        <!-- 2. KOTAK LAPORAN SHIFT HARIAN -->
         <div class="card" style="border: 2px solid #27ae60;">
             <h3 style="background:#27ae60; color:white; padding:10px; border-radius:6px; margin:-15px -15px 15px -15px; text-align:center; justify-content:center;">
                 2. INPUT LAPORAN SHIFT 📝
@@ -115,6 +421,7 @@
             <div style="display:flex; gap:5px; margin-bottom:10px;">
                 <select id="thnKini" onchange="loadData()"></select>
                 <select id="blnKini" onchange="loadData()"></select>
+                <!-- Select bulan lalu disembunyikan tapi diperlukan script -->
                 <select id="thnLalu" style="display:none;"></select>
                 <select id="blnLalu" style="display:none;"></select>
             </div>
@@ -126,33 +433,47 @@
                         <input type="number" id="inTgl" oninput="cekKunci(); loadFormShift()" readonly style="background-color:#e0e0e0; font-weight:bold; color:#333;">
                         <button onclick="bukaRevisiTgl()" style="background:#f39c12; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer; margin-top:5px; width:auto; font-size:11px;" title="Buka Kunci Tanggal">🔓 REVISI</button>
                     </div>
+                    <div id="lockMsg" style="font-size:10px; font-weight:bold; margin-top:5px;"></div>
                 </div>
                 <div style="flex:1;">
                     <label style="color:#c0392b;">Shift Lapor</label>
-                    <select id="shiftLapor" onchange="aturInputShift(); loadFormShift()" style="border: 2px solid #e74c3c; font-size:11px;">
+                    <select id="shiftLapor" onchange="aturInputShift(); loadFormShift(); cekKunci();" style="border: 2px solid #e74c3c; font-size:11px;">
                         <option value="s1" selected>Shift 1 (Pagi)</option>
                         <option value="s2">Shift 2 (Akhir Hari)</option>
                         <option value="s3" id="optS3">Shift 3 (Malam)</option>
                     </select>
+                    <div id="infoWaktuShift" class="info-jam">Memeriksa jam...</div>
                 </div>
             </div>
-            <div id="lockMsg" style="font-size:10px; font-weight:bold;"></div>
             
             <div id="areaShift">
                 <!-- SALES PER SHIFT -->
                 <div style="margin-top:12px;padding:12px;background:#fafafa;border-radius:10px;border:1px solid #ddd;">
                     <b style="color:#333;">SALES PER SHIFT — INPUT CLOSING (Rp)</b>
-                    <div id="rowS3"><label style="font-size:10px;">Sales S3 (Malam)</label><input type="text" inputmode="numeric" id="s3" placeholder="Closing S3" style="border-left:5px solid #2c3e50;" oninput="formatRupiahInput(this); hitungPreviewMurni()"></div>
-                    <div id="rowS1"><label style="font-size:10px;margin-top:5px;display:block;">Sales S1 (Pagi)</label><input type="text" inputmode="numeric" id="s1" placeholder="Closing S1" style="border-left:5px solid #e67e22;" oninput="formatRupiahInput(this); hitungPreviewMurni()"></div>
-                    <div id="rowS2"><label style="font-size:10px;margin-top:5px;display:block;">Sales S2 (Siang / Akhir Hari)</label><input type="text" inputmode="numeric" id="s2" placeholder="Closing S2" style="border-left:5px solid #9b59b6;" oninput="formatRupiahInput(this); hitungPreviewMurni()"></div>
+                    <div id="rowS3">
+                        <label style="font-size:10px;">Sales S3 (Malam)</label>
+                        <input type="text" inputmode="numeric" id="s3" placeholder="Closing S3" style="border-left:5px solid #2c3e50;" oninput="formatRupiahInput(this); hitungPreviewMurni()">
+                    </div>
+                    <div id="rowS1">
+                        <label style="font-size:10px;margin-top:5px;display:block;">Sales S1 (Pagi)</label>
+                        <input type="text" inputmode="numeric" id="s1" placeholder="Closing S1" style="border-left:5px solid #e67e22;" oninput="formatRupiahInput(this); hitungPreviewMurni()">
+                    </div>
+                    <div id="rowS2">
+                        <label style="font-size:10px;margin-top:5px;display:block;">Sales S2 (Siang / Akhir Hari)</label>
+                        <input type="text" inputmode="numeric" id="s2" placeholder="Closing S2" style="border-left:5px solid #9b59b6;" oninput="formatRupiahInput(this); hitungPreviewMurni()">
+                    </div>
                     
-                    <div style="margin-top:10px;padding:10px;background:#eafaf1;border-radius:8px;text-align:center;"><small>ACTUAL SALES HARI INI</small><br><b id="actualSalesHariIni" style="font-size:20px;color:#1e8449;">Rp 0</b></div>
+                    <div style="margin-top:10px;padding:10px;background:#eafaf1;border-radius:8px;text-align:center;">
+                        <small>ACTUAL SALES HARI INI</small><br>
+                        <b id="actualSalesHariIni" style="font-size:20px;color:#1e8449;">Rp 0</b>
+                    </div>
                     <div id="shiftActualPreview" style="font-size:10px;margin-top:7px;color:#555; text-align:center;"></div>
                 </div>
 
-                <!-- DAILY PERFORMANCE (DINAMIS: S2 ONLY UNTUK APC, GM, SO) -->
+                <!-- DAILY PERFORMANCE -->
                 <div style="margin-top:12px;padding:12px;background:#fffdf5;border-radius:10px;border:1px solid #f1c40f;">
                     <b style="color:#d35400;">DAILY PERFORMANCE</b>
+                    
                     <label>Actual STD (Struk)</label>
                     <input type="number" id="realSTD" placeholder="Angka Biasa (Misal: 350)">
                     
@@ -175,21 +496,27 @@
                 <!-- KONTRIBUSI MEMBER -->
                 <div style="margin-top:12px;padding:12px;background:#f7f0ff;border-radius:10px;border:1px solid #8e44ad;">
                     <b style="color:#8e44ad;">KONTRIBUSI MEMBER</b>
+                    
                     <label>Jml Struk Retail</label>
                     <input type="number" id="strukRetail" placeholder="Angka Biasa" oninput="hitungPreviewMurni()">
+                    
                     <label>Jml Struk Member</label>
                     <input type="number" id="strukMember" placeholder="Angka Biasa" oninput="hitungPreviewMurni()">
-                    <div style="margin-top:8px;text-align:center;"><small>ACTUAL MEMBER %</small><br><b id="memberPct" style="font-size:20px;color:#8e44ad;">0.00%</b></div>
+                    
+                    <div style="margin-top:8px;text-align:center;">
+                        <small>ACTUAL MEMBER %</small><br>
+                        <b id="memberPct" style="font-size:20px;color:#8e44ad;">0.00%</b>
+                    </div>
                 </div>
 
-                <!-- FOTO BUKU PICKUP (WAJIB SEMUA SHIFT) -->
+                <!-- FOTO BUKU PICKUP -->
                 <div id="wrapBukuPickup" style="margin-top:12px;padding:12px;background:#e8f4f8;border-radius:10px;border:2px dashed #3498db;">
                     <b style="color:#2980b9;">📸 FOTO BUKU PICKUP KASIR (WAJIB)</b>
                     <input type="file" id="bukuPhoto" accept="image/*" capture="environment" style="margin-top:8px;" onchange="previewImg(this, 'bukuPreview')">
                     <div id="bukuPreview" style="margin-top:8px;text-align:center;font-size:11px;color:#777;">Belum ada foto Buku</div>
                 </div>
 
-                <!-- FOTO EOD (KHUSUS SHIFT 2 / AKHIR) -->
+                <!-- FOTO EOD -->
                 <div id="wrapEOD" style="margin-top:12px;padding:12px;background:#fff5f5;border-radius:10px;border:2px dashed #e74c3c; display:none;">
                     <b style="color:#e74c3c;">📸 FOTO REPORT EOD (WAJIB SHIFT 2)</b>
                     <input type="file" id="eodPhoto" accept="image/*" capture="environment" style="margin-top:8px;" onchange="previewImg(this, 'eodPreview')">
@@ -197,7 +524,9 @@
                 </div>
             </div>
             
-            <button id="btnSave" class="btn-wa" style="background: linear-gradient(90deg, #27ae60, #25d366); box-shadow: 0 4px #1e8449; font-size: 15px; margin-top:20px;" onclick="simpanDanKirimWA()">🚀 SIMPAN Laporan Harian & WA</button>
+            <!-- TOMBOL 2 TAHAP: SIMPAN & WA DIBUAT TERPISAH -->
+            <button id="btnSave1" class="btn-blue" style="font-size: 15px; margin-top:20px; padding:15px;" onclick="tahapSatuSimpan()">💾 1. SIMPAN CLOUD & UNDUH FOTO</button>
+            <button id="btnSave2" class="btn-wa" style="display:none; background: linear-gradient(90deg, #27ae60, #25d366); box-shadow: 0 4px #1e8449; font-size: 15px; margin-top:20px; padding:15px;" onclick="tahapDuaWA()">🚀 2. KIRIM LAPORAN WA</button>
         </div>
 
         <!-- 3. KOTAK DASHBOARD VISUAL & AI -->
@@ -206,14 +535,18 @@
                 4. DASHBOARD VISUAL 📊
                 <button onclick="bukaModalAI()" style="width: auto; padding: 4px 10px; margin: 0; font-size: 10px; background: #2c3e50; color: white;">🔍 DETAIL Pencapaian IKT</button>
             </h3>
+            
             <div id="summaryDashboard"></div>
             
             <div id="aiPredictionBox" style="margin-top: 15px; padding: 15px; border-radius: 10px; background: #fffde7; border: 1px solid #f1c40f;">
-                <div style="font-weight: bold; color: #d35400; font-size: 12px; margin-bottom: 8px; display: flex; align-items: center;">🤖 AI PREDICTION (IKT ANALYST)</div>
+                <div style="font-weight: bold; color: #d35400; font-size: 12px; margin-bottom: 8px; display: flex; align-items: center;">
+                    🤖 AI PREDICTION (IKT ANALYST)
+                </div>
                 <div id="aiStatusIKT" style="font-size: 16px; font-weight: bold; margin-bottom: 5px;"></div>
                 <div id="aiNote" style="font-size: 11px; line-height: 1.4; color: #2c3e50;"></div>
                 <div id="aiTargetKejar" style="margin-top: 10px; font-size: 10px; padding: 8px; background: rgba(255,255,255,0.5); border-radius: 5px; border-left: 3px solid #e67e22;"></div>
             </div>
+            
             <button class="btn-admin-only" onclick="resetDb()" style="background:#eee; color:#999; font-size:9px; box-shadow:none; margin-top:10px;">RESET DATA LOKAL</button>
         </div>
 
@@ -221,21 +554,101 @@
         <div id="aiModal" class="modal-ai">
             <div class="modal-content">
                <span class="close-ai" onclick="tutupModalAI()">&times;</span>
-               <div class="ai-header"><h2>🤖 AI EXECUTIVE REPORT</h2><small>IKT Analyst • Smart Prediction Engine</small></div>
-                <div id="aiAnalysisContent" style="margin-top: 20px;"></div>
-                <div id="aiDecision"></div>
-                <div id="aiQuestionBox" style="margin-top:15px; background:#f8f9fa; padding:15px; border-radius:15px; border:1px solid #ddd;">
+               <div class="ai-header">
+                   <h2>🤖 AI EXECUTIVE REPORT</h2>
+                   <small>IKT Analyst • Smart Prediction Engine</small>
+               </div>
+               
+               <div id="aiAnalysisContent" style="margin-top: 20px;"></div>
+               
+               <div id="aiDecision"></div>
+               
+               <div id="aiQuestionBox" style="margin-top:15px; background:#f8f9fa; padding:15px; border-radius:15px; border:1px solid #ddd;">
                     <div style="font-size:28px; margin-bottom:5px;">🧠 <b style="font-size:16px;color:#2c3e50">Tanya IA IKT</b></div>
                     <div style="font-size:12px; color:#666; margin-bottom:12px;">Pilih pertanyaan untuk mendapatkan analisa IA.</div>
+                    
                     <select id="pilihanAI" style="width:100%; padding:14px; font-size:14px; border-radius:10px; border:1px solid #ccc;">
                         <option value="">Pilih Pertanyaan...</option>
-                        <option value="harapan">🌱 1. Apakah masih ada harapan menang IKT?</option>
-                        <option value="strategi">🎯 2. Strategi apa yang harus difokuskan?</option>
+                        <option value="harapan">🌱 1. Apakah masih ada harapan untuk menang IKT dengan data ini?</option>
+                        <option value="strategi">🎯 2. Strategi apa yang harus dikejar dan difokuskan?</option>
                         <option value="prediksi">🧮 3. Apakah sampai akhir bulan akan menang?</option>
+                        <option value="kenapa">❓ 4. Kenapa tidak ada harapan menang IKT?</option>
+                        <option value="faktor">⚠️ 5. Faktor apa yang mengakibatkan tidak menang?</option>
                     </select>
+                    
                     <button onclick="jawabAI()" style="margin-top:12px; background:linear-gradient(90deg, #2f80ed, #56ccf2); color:white; font-size:15px; border-radius:10px; padding:14px;">🔍 ANALISA IA</button>
+                    
                     <div id="jawabanAI" style="margin-top:15px; display:none; padding:18px; border-radius:12px; background:#eef5ff; border-left:5px solid #3498db; line-height:1.8; font-size:14px;"></div>
-                </div>
+               </div>
+            </div>
+        </div>
+
+        <!-- MODAL BUKU PANDUAN -->
+        <div id="modalPanduan" class="modal-ai">
+            <div class="modal-content" style="max-width: 850px;">
+               <span class="close-ai" onclick="tutupPanduan()">&times;</span>
+               <div class="ai-header" style="background: linear-gradient(270deg, #27ae60, #f39c12, #d35400, #27ae60);">
+                   <h2>📖 BUKU PANDUAN PENGGUNAAN</h2>
+                   <small>Sistem Monitoring Sales Terpadu</small>
+               </div>
+               
+               <div style="font-size: 14px; line-height: 1.6; color: #333; margin-top: 20px; text-align: left;">
+                   <h3 style="color:#d35400; border-bottom: 2px solid #eee; padding-bottom: 5px;">🌟 KEUNGGULAN SISTEM KITA</h3>
+                   <ul style="padding-left: 20px; margin-bottom: 20px;">
+                       <li><b>Disiplin Waktu (Time-Lock):</b> Tombol lapor otomatis terkunci di luar jam shift operasional. Tidak ada lagi celah untuk lapor asal-asalan.</li>
+                       <li><b>Auto-Watermark Foto:</b> Saat upload foto Buku Pickup / EOD, sistem otomatis mencetak <i>Watermark</i> (Nama Toko, Tgl, & Shift) permanen di dalam foto untuk mencegah pemalsuan bukti.</li>
+                       <li><b>AI IKT Analyst:</b> Dilengkapi robot cerdas (IA) yang bisa memprediksi peluang menang IKT dan memberikan strategi harian untuk kejar target.</li>
+                       <li><b>Auto-Sync Personil:</b> Nama personil yang login ke portal otomatis terekam dan disinkronisasi ke server pusat.</li>
+                   </ul>
+
+                   <h3 style="color:#2980b9; border-bottom: 2px solid #eee; padding-bottom: 5px;">📝 CARA PENGGUNAAN (STEP-BY-STEP)</h3>
+                   <div style="background:#f9f9f9; padding:12px; border-left:4px solid #3498db; border-radius:5px; margin-bottom:10px;">
+                       <b>STEP 1: Isi Profil & Target (Wewenang COS/Admin)</b><br>
+                       Atur Tipe Toko, isi nominal <b>Target Sales Bulan Ini</b>, <b>Target GM %</b>, dan <b>Target Bulan Lalu</b>. Klik Simpan.
+                   </div>
+                   <div style="background:#f9f9f9; padding:12px; border-left:4px solid #e67e22; border-radius:5px; margin-bottom:10px;">
+                       <b>STEP 2: Pilih Shift & Input Sales (ACOS / Crew)</b><br>
+                       Pilih Shift (S1/S2/S3). Masukkan angka <b>Closing Sales Murni</b> (Bukan akumulasi dengan shift sebelumnya). Khusus Shift 2 (Akhir Hari), wajib melengkapi data STD, APC, Real GM, & Koreksi NSB.
+                   </div>
+                   <div style="background:#f9f9f9; padding:12px; border-left:4px solid #9b59b6; border-radius:5px; margin-bottom:10px;">
+                       <b>STEP 3: Upload Foto Bukti</b><br>
+                       Klik tombol biru untuk upload <b>Foto Buku Pickup</b> (Wajib semua Shift). Khusus Shift 2, wajib tambah upload <b>Foto Report EOD</b> di kotak merah.
+                   </div>
+                   <div style="background:#f9f9f9; padding:12px; border-left:4px solid #27ae60; border-radius:5px; margin-bottom:20px;">
+                       <b>STEP 4: Simpan & Kirim WA</b><br>
+                       Klik tombol biru <b>💾 1. SIMPAN CLOUD</b>. Tunggu proses selesai sampai muncul tombol hijau, lalu klik <b>🚀 2. KIRIM LAPORAN WA</b>.
+                   </div>
+
+                   <h3 style="color:#8e44ad; border-bottom: 2px solid #eee; padding-bottom: 5px;">📊 RUMUS & CARA BACA DASHBOARD / TABEL</h3>
+                   <div style="background:#f4f1fa; padding:15px; border:1px solid #d2b4de; border-radius:5px; margin-bottom:20px; font-size:13px;">
+                       <p style="margin-top:0;"><b>1. Membaca Tabel LAPORAN SALES HARIAN:</b></p>
+                       <ul style="padding-left: 20px; margin-bottom: 15px;">
+                           <li><b>% Kontr. (Kontribusi Historis):</b> <code>(Sales Tgl Tersebut Bulan Lalu ÷ Total Sales Bulan Lalu) × 100%</code>. Ini untuk mendeteksi bobot keramaian hari tersebut berdasarkan tren bulan lalu.</li>
+                           <li><b>Target Harian:</b> <code>% Kontribusi Tgl Tersebut × Target Sales Bulan Ini</code>. Target setiap hari <b>dinamis</b> (naik-turun) menyesuaikan pola keramaian bulan sebelumnya.</li>
+                           <li><b>Accum +/- (Akumulasi Gap):</b> <code>Total Realisasi Sales Kini - Total Target Harian</code>. Jika angkanya <b><span style="color:green">Hijau (+)</span></b> berarti toko Surplus. Jika <b><span style="color:red">Merah (-)</span></b> berarti Defisit/Hutang Sales.</li>
+                           <li><b>STD & MEMBER:</b> Menampilkan angka transaksi (Struk) dan persentase kontribusi member secara <i>harian</i> pada tanggal tersebut.</li>
+                       </ul>
+                       
+                       <p><b>2. Membaca Dashboard Visual (MTD / Akumulasi Bulanan):</b></p>
+                       <ul style="padding-left: 20px; margin-bottom: 0;">
+                           <li><b>Time Factor (Waktu):</b> <code>(Hari Berjalan ÷ Total Hari Dalam Sebulan) × 100%</code>.</li>
+                           <li><b>Achievement (Pencapaian Sales):</b> <code>(Total Sales Saat Ini ÷ Target Bulanan) × 100%</code>.</li>
+                           <li><b>Speed Sales:</b> <code>Achievement % - Time Factor %</code>. Jika Speed bernilai Plus (+), artinya kecepatan lari sales toko Anda mengalahkan waktu.</li>
+                           <li><b>Target vs Actual GM Rupiah:</b> Selisihnya menentukan apakah toko Anda Nabung Margin atau Hutang Margin.</li>
+                           <li><b>MEMBER MTD:</b> <code>(Total Struk Member Bulan Ini ÷ Total Struk Retail Bulan Ini) × 100%</code>. Ini adalah akumulasi pencapaian member dari awal bulan sampai hari ini.</li>
+                           <li><b>TOTAL STD MTD:</b> Total keseluruhan jumlah pelanggan (struk) yang berbelanja dari tanggal 1 sampai hari ini.</li>
+                       </ul>
+                   </div>
+
+                   <h3 style="color:#e74c3c; border-bottom: 2px solid #eee; padding-bottom: 5px;">⚠️ ATURAN KUNCI & REVISI TANGGAL</h3>
+                   <p style="background:#fff5f5; padding:12px; border:1px solid #ffcccc; border-radius:5px; font-weight:bold; color:#c0392b; margin-bottom:0;">
+                       Crew dan ACOS DILARANG KERAS merubah tanggal mundur (Revisi). Jika Anda telat lapor / lupa closing shift, sistem otomatis terkunci. Fitur "Buka Kunci Revisi Tanggal" HANYA BISA diakses apabila yang login ke portal adalah Kepala Toko (COS) atau Admin/Korwil.
+                   </p>
+               </div>
+               
+               <div style="text-align: center; margin-top: 25px;">
+                   <button onclick="tutupPanduan()" style="width: auto; padding: 12px 40px; background: #2c3e50; color: white; border-radius: 25px; box-shadow: 0 4px #1a252f; font-weight: bold; cursor: pointer;">SAYA MENGERTI & SIAP LAPOR!</button>
+               </div>
             </div>
         </div>
 
@@ -254,6 +667,8 @@
                     <th rowspan="2">REALISASI SHIFT</th>
                     <th rowspan="2">TOTAL KINI</th>
                     <th rowspan="2">ACCUM +/-</th>
+                    <th rowspan="2">STD</th>
+                    <th rowspan="2">MEMBER</th>
                 </tr>
                 <tr>
                     <th style="background:#34495e">LALU</th>
@@ -263,542 +678,738 @@
             <tbody></tbody>
         </table>
     </div>
+    
+    <div style="text-align: center; margin: 20px 0; padding-bottom: 30px;">
+        <a href="index.html" style="background: #f39c12; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: inline-block; border: 2px solid #fff;">⬅ KEMBALI KE MENU UTAMA</a>
+    </div>
 
-    <!-- CANVAS UNTUK GABUNG FOTO (TERSEMBUNYI) -->
+    <!-- CANVAS UNTUK GABUNG FOTO WATERMARK -->
     <canvas id="canvasJoin" style="display:none;"></canvas>
-
 </div>
 
 <script>
     // ==========================================
-    // FUNGSI UTILITIES & PREVIEW GAMBAR
+    // BAGIAN 1: FUNGSI UTILITIES DASAR
     // ==========================================
-    function tampilLoading(pesan = "MEMUAT...") {
-        document.getElementById('textLoadingJoss').innerHTML = pesan;
-        document.getElementById('loadingOverlayJoss').style.display = "flex";
+    function tampilLoading(pesan = "MEMUAT...") { 
+        document.getElementById('textLoadingJoss').innerHTML = pesan; 
+        document.getElementById('loadingOverlayJoss').style.display = "flex"; 
     }
-    function tutupLoading() { document.getElementById('loadingOverlayJoss').style.display = "none"; }
-
+    
+    function tutupLoading() { 
+        document.getElementById('loadingOverlayJoss').style.display = "none"; 
+    }
+    
     function formatRupiahInput(e, allowNegative = false) {
         let val = e.value.replace(/[^0-9\-]/g, ''); 
-        if (!allowNegative) val = val.replace(/-/g, '');
-        let isNegative = val.startsWith('-');
+        
+        if (!allowNegative) {
+            val = val.replace(/-/g, '');
+        }
+        
+        let isNegative = val.startsWith('-'); 
         val = val.replace(/-/g, ''); 
+        
         if (val) {
-            val = parseInt(val, 10).toLocaleString('id-ID'); 
+            val = parseInt(val, 10).toLocaleString('id-ID');
             e.value = (isNegative ? '-' : '') + val;
-        } else { e.value = isNegative ? '-' : ''; }
+        } else {
+            e.value = isNegative ? '-' : '';
+        }
     }
-
+    
     function formatDecimalInput(e) {
-        let val = e.value.replace(/[^0-9.,]/g, ''); 
-        val = val.replace(/,/g, '.'); 
-        const parts = val.split('.');
-        if (parts.length > 2) { val = parts[0] + '.' + parts.slice(1).join(''); }
+        let val = e.value.replace(/[^0-9.,]/g, '');
+        val = val.replace(/,/g, '.');
+        
+        const parts = val.split('.'); 
+        if (parts.length > 2) {
+            val = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
         e.value = val;
     }
-
-    function getRawRupiah(val) {
+    
+    function getRawRupiah(val) { 
         if (!val) return 0;
-        if (typeof val === 'number') return val;
-        let str = String(val).replace(/\./g, ''); 
-        return parseFloat(str) || 0;
+        let str = String(val).replace(/\./g, '');
+        return parseFloat(str) || 0; 
     }
-
-    function getRawDecimal(val) {
-        if (!val) return 0;
-        if (typeof val === 'number') return val;
-        return parseFloat(String(val)) || 0;
+    
+    function getRawDecimal(val) { 
+        return parseFloat(String(val)) || 0; 
     }
-
+    
     function setFormattedValue(id, val, isRupiah = true) {
-        const el = document.getElementById(id);
-        if(!el) return;
-        if(val === undefined || val === null || val === 0 || val === "0") {
-            el.value = ""; return;
+        const el = document.getElementById(id); 
+        if (!el) return;
+        
+        if (!val) { 
+            el.value = ""; 
+            return; 
         }
-        if(isRupiah) {
+        
+        if (isRupiah) {
             let isNeg = val < 0;
             el.value = (isNeg ? '-' : '') + Math.abs(val).toLocaleString('id-ID');
         } else {
             el.value = val;
         }
     }
-
+    
     function previewImg(input, previewId) {
-        const f = input.files[0];
+        const f = input.files[0]; 
         const p = document.getElementById(previewId);
-        if(!f) { p.innerHTML = 'Belum ada foto'; return; }
+        
+        if (!f) { 
+            p.innerHTML = 'Belum ada foto'; 
+            return; 
+        }
+        
         const u = URL.createObjectURL(f);
-        // Hapus crossorigin agar toDataURL canvas tidak error
         p.innerHTML = `<img id="img_${previewId}" src="${u}" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid #ccc;"><br><b>✅ ${f.name}</b>`;
     }
-
-    // FUNGSI WATERMARK UNTUK FOTO WA
+    
     function applyWatermark(context, w, h, t, tgl, mK, yK, shiftLapor) {
-        context.fillStyle = "rgba(0, 0, 0, 0.7)";
+        context.fillStyle = "rgba(0, 0, 0, 0.7)"; 
         context.fillRect(0, h - 40, w, 40);
-        context.font = "bold 20px sans-serif";
-        context.fillStyle = "#f1c40f";
+        
+        context.font = "bold 20px sans-serif"; 
+        context.fillStyle = "#f1c40f"; 
         context.textAlign = "center";
+        
         let txtWatermark = `TOKO: ${t} | TGL: ${tgl}/${mK}/${yK} | SHIFT: ${shiftLapor.toUpperCase()}`;
         context.fillText(txtWatermark, w/2, h - 14);
     }
 
+    // ==========================================
+    // BAGIAN 2: INISIALISASI VARIABEL & DATABASE LOKAL
+    // ==========================================
     let db = JSON.parse(localStorage.getItem('alfaSalesPaten_v10')) || {};
-    if(typeof db!=="object") db={};
+    if (typeof db !== "object") {
+        db = {};
+    }
     
-    // GANTI DENGAN LINK APPS SCRIPT DATABASE SALES BAPAK
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzSyor0580wZ5h3odlhbUVsuQXN-VSrFgVTMoktkJw5bBmudT_V9KbMZLBN0brEaxYj6w/exec";
+    // ⚠️ GANTI DENGAN WEB APP URL BARU ANDA DARI CODE.GS YANG BARU ⚠️
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwWzkGc0UDS43APjxfFDF03v6XME2aejQD9krOEhhmy8cvhAbc_pavD7yWzzYHevg1E5w/exec";
     
-    const tglSkrg = new Date().getDate();
+    const tglSkrg = new Date().getDate(); 
     document.getElementById('tglOto').innerText = tglSkrg;
-
-    const blnNama = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    ['blnLalu','blnKini'].forEach(id => blnNama.forEach((n,i) => { 
-        let s = (id==='blnLalu'&&i===(new Date().getMonth()-1))||(id==='blnKini'&&i===new Date().getMonth());
-        document.getElementById(id).innerHTML += `<option value="${i+1}" ${s?'selected':''}>${n}</option>`;
-    }));
-    const tahunNow=new Date().getFullYear();
-    ['thnLalu','thnKini'].forEach(id=>{
-        for(let y=2025;y<=2027;y++){ document.getElementById(id).innerHTML+=`<option value="${y}" ${y==tahunNow?'selected':''}>${y}</option>`; }
+    
+    const blnNama = [
+        "Januari", "Februari", "Maret", "April", 
+        "Mei", "Juni", "Juli", "Agustus", 
+        "September", "Oktober", "November", "Desember"
+    ];
+    
+    ['blnLalu','blnKini'].forEach(id => {
+        blnNama.forEach((n,i) => { 
+            let isSelected = (id === 'blnLalu' && i === (new Date().getMonth() - 1)) || 
+                             (id === 'blnKini' && i === new Date().getMonth());
+            document.getElementById(id).innerHTML += `<option value="${i+1}" ${isSelected ? 'selected' : ''}>${n}</option>`;
+        });
+    });
+    
+    const tahunNow = new Date().getFullYear();
+    ['thnLalu','thnKini'].forEach(id => { 
+        for (let y = 2025; y <= 2027; y++) { 
+            document.getElementById(id).innerHTML += `<option value="${y}" ${y == tahunNow ? 'selected' : ''}>${y}</option>`; 
+        }
     });
 
     // ==========================================
-    // FUNGSI UPDATE DB LANGSUNG SAAT INPUT "TOTAL LALU"
+    // BAGIAN 3: SISTEM DISIPLIN WAKTU & REVISI
     // ==========================================
-    function updateDbTotalLalu() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        if (!t) return;
-        let yK = Number(document.getElementById('thnKini').value);
-        let mK = Number(document.getElementById('blnKini').value);
-        let yL = yK; let mL = mK - 1; if(mL < 1){ mL = 12; yL--; }
-        let val = getRawRupiah(document.getElementById('totalLalu').value);
+    let isRevisiMode = false;
+
+    function cekWaktuShift(isBebasWaktu) {
+        const infoEl = document.getElementById('infoWaktuShift');
         
-        if (!db[t]) db[t] = {}; if (!db[t][yL]) db[t][yL] = {};
-        if (!db[t][yL][mL]) db[t][yL][mL] = { totalLalu: 0, harianLalu: {} };
-        
-        if (val > 0) {
-            db[t][yL][mL].totalLalu = val;
-            localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
+        if (isRevisiMode || isBebasWaktu) {
+            infoEl.innerHTML = "🔓 AKSES KEPALA TOKO (Bebas Jam Lapor)";
+            infoEl.style.background = "#fff3cd"; 
+            infoEl.style.color = "#856404";
+            return true;
         }
+
+        const now = new Date();
+        const h = now.getHours(); 
+        const m = now.getMinutes();
+        const shift = document.getElementById('shiftLapor').value;
+        
+        let msg = ""; 
+        let isValid = false;
+
+        if (shift === 's3') {
+            isValid = (h >= 6 && h < 8) || (h === 8 && m <= 30); 
+            msg = "Buka: 06:00 - 08:30";
+        } else if (shift === 's1') {
+            isValid = (h >= 14 && h < 16) || (h === 16 && m <= 30); 
+            msg = "Buka: 14:00 - 16:30";
+        } else if (shift === 's2') {
+            isValid = (h >= 22 && h <= 23 && m <= 55); 
+            msg = "Buka: 22:00 - 23:55";
+        }
+
+        if (!isValid) {
+            infoEl.innerHTML = `⚠️ DILUAR JAM LAPOR!<br><small>(${msg})</small>`;
+            infoEl.style.background = "#f8d7da"; 
+            infoEl.style.color = "#721c24";
+        } else {
+            infoEl.innerHTML = `✅ JAM SESUAI<br><small>(${msg})</small>`;
+            infoEl.style.background = "#d4edda"; 
+            infoEl.style.color = "#155724";
+        }
+        
+        return isValid;
     }
 
-    // ==========================================
-    // SISTEM PENGUNCIAN & REVISI TANGGAL DARI PORTAL
-    // ==========================================
-    function cekKunci() {
+function cekKunci() {
         let v = parseInt(document.getElementById('inTgl').value);
-        let b = document.getElementById('btnSave');
+        
+        // SUDAH DIPERBAIKI: Mengarah ke 2 Tombol Baru
+        let b1 = document.getElementById('btnSave1'); 
+        let b2 = document.getElementById('btnSave2'); 
         let m = document.getElementById('lockMsg');
         
-        let ses = JSON.parse(sessionStorage.getItem("userAreaJawahir")) || {};
+        let ses = JSON.parse(sessionStorage.getItem("userArea")) || JSON.parse(sessionStorage.getItem("userAreaJawahir")) || {};
         const paramUrl = new URLSearchParams(window.location.search);
-        if(paramUrl.get('toko')) {
-            ses.kodeToko = paramUrl.get('toko');
-            ses.namaLengkap = paramUrl.get('nama');
+        if (paramUrl.get('toko')) {
+            ses.kodeToko = paramUrl.get('toko'); 
+            ses.namaLengkap = paramUrl.get('nama'); 
             ses.jabatan = paramUrl.get('jabatan');
-            sessionStorage.setItem("userAreaJawahir", JSON.stringify(ses));
+            sessionStorage.setItem("userArea", JSON.stringify(ses));
         }
 
-        const jab = String(ses.jabatan || "").toUpperCase();
+        const jab = String(ses.jabatan || ses.role || "").toUpperCase();
         
-        // PEMISAHAN STRICT ANTARA ACOS, COS, DAN KORWIL (ANTI BUG)
         let isACOS = jab === 'ACOS' || jab.includes('ASST') || jab.includes('ASSISTANT');
         let isKORWIL = jab.includes('KORWIL') || jab.includes('AREA') || jab.includes('AM');
-        let isCOS = (jab.includes('COS') || jab.includes('KT') || jab.includes('KEPALA')) && !isACOS;
+        let isCOS = (jab.includes('COS') || jab.includes('KT') || jab.includes('KEPALA') || jab === 'ADMIN') && !isACOS;
+        let isAdminToko = isKORWIL || isCOS || jab === 'ADMIN'; 
         
-        // Hanya COS dan KORWIL yang berhak buka gembok profil toko
-        let isAdminToko = isKORWIL || isCOS;
-        
-        // Kunci input target profil jika bukan Admin Toko (ACOS dan Crew dilarang edit)
         if (!isAdminToko) {
-            let profilFields = ['kodeToko', 'tipeToko', 'targetKini', 'tgtGM', 'totalLalu'];
-            profilFields.forEach(id => {
+            ['kodeToko', 'tipeToko', 'targetKini', 'tgtGM', 'totalLalu'].forEach(id => {
                 let el = document.getElementById(id);
-                if(el) {
-                    el.disabled = true;
-                    el.readOnly = true;
-                    el.style.backgroundColor = "#e0e0e0";
-                    el.style.color = "#666";
-                    el.style.border = "1px solid #ccc";
-                    el.style.cursor = "not-allowed";
+                if (el) { 
+                    el.disabled = true; 
+                    el.style.backgroundColor = "#e0e0e0"; 
+                    el.style.cursor = "not-allowed"; 
                 }
             });
             document.querySelectorAll('.btn-admin-only').forEach(el => el.style.display = 'none');
         }
 
-        // Semua Pejabat Toko (Termasuk ACOS) bisa lapor shift
-        let isAuthorizedShift = isAdminToko || isACOS;
-        const role = isAuthorizedShift ? "admin" : "locked";
+        let isAuthorizedShift = isAdminToko || isACOS || jab === "USER";
+        const role = isAuthorizedShift ? "admin" : (ses.role || "locked");
 
         const t = document.getElementById('kodeToko').value.toUpperCase();
-        const yK = document.getElementById('thnKini').value;
+        const yK = document.getElementById('thnKini').value; 
         const mK = document.getElementById('blnKini').value;
         const isToday = (v === tglSkrg && mK == (new Date().getMonth() + 1));
         
-        if(role !== "locked" || isToday) {
-            b.disabled = false; b.style.opacity = "1"; m.innerText = "✅ OPEN"; m.style.color = "green";
-        } else { b.disabled = true; b.style.opacity = "0.3"; m.innerText = "⚠️ LOCK (TGL INI)"; m.style.color = "red"; }
+        let isBebasWaktu = isAdminToko; 
+        let isWaktuValid = cekWaktuShift(isBebasWaktu);
+
+        // Eksekusi Kunci 2 Tombol
+        if (role !== "locked" || isToday) {
+            if (!isWaktuValid) {
+                if(b1) { b1.disabled = true; b1.style.opacity = "0.3"; }
+                if(b2) { b2.disabled = true; b2.style.opacity = "0.3"; }
+                if(m) { m.innerText = "⚠️ DILUAR JAM LAPOR (Minta COS Buka Akses Revisi)"; m.style.color = "red"; }
+            } else {
+                if(b1) { b1.disabled = false; b1.style.opacity = "1"; }
+                if(b2) { b2.disabled = false; b2.style.opacity = "1"; }
+                if(m) { m.innerText = "✅ OPEN (BISA LAPOR)"; m.style.color = "green"; }
+            }
+        } else { 
+            if(b1) { b1.disabled = true; b1.style.opacity = "0.3"; }
+            if(b2) { b2.disabled = true; b2.style.opacity = "0.3"; }
+            if(m) { m.innerText = "⚠️ LOCK (TGL LALU)"; m.style.color = "red"; }
+        }
     }
 
     function bukaRevisiTgl() {
-        const ses = JSON.parse(sessionStorage.getItem("userAreaJawahir")) || {};
-        let jab = String(ses.jabatan || "").toUpperCase();
-        let isACOS = jab === 'ACOS' || jab.includes('ASST') || jab.includes('ASSISTANT');
+        const ses = JSON.parse(sessionStorage.getItem("userArea")) || {};
+        let jab = String(ses.jabatan || ses.role || "").toUpperCase();
         
-        // ACOS atau CREW tidak boleh revisi tanggal mundur
-        if (isACOS || jab.includes('CREW') || jab === "") {
-            alert("🚨 AKSES REVISI DITOLAK!\n\nHanya Kepala Toko (COS) atau KORWIL yang berhak merevisi tanggal laporan mundur.\n\nKelewat lapor shift ya? Hayoo lapor ke COS mu minta dibukain tanggalnya (siap-siap dimarahin wkwkwk 🤣✌️).");
+        let isACOS = jab === 'ACOS' || jab.includes('ASST') || jab.includes('ASSISTANT');
+        let isKORWIL = jab.includes('KORWIL') || jab.includes('AREA') || jab.includes('AM');
+        let isCOS = (jab.includes('COS') || jab.includes('KT') || jab.includes('KEPALA') || jab === 'ADMIN') && !isACOS;
+        let isAdminToko = isKORWIL || isCOS || jab === 'ADMIN';
+        
+        if (!isAdminToko) {
+            alert("🚨 AKSES REVISI DITOLAK!\n\nHanya Kepala Toko (COS) atau Admin yang berhak membuka akses lupa lapor atau ganti tanggal mundur.\n\nSilakan lapor ke COS Anda untuk dibukakan aksesnya."); 
             return;
         }
 
-        // Buka Kunci untuk COS, KORWIL
+        isRevisiMode = true;
         const inTgl = document.getElementById('inTgl');
-        inTgl.readOnly = false;
-        inTgl.style.backgroundColor = "#fff";
+        
+        inTgl.readOnly = false; 
+        inTgl.style.backgroundColor = "#fff"; 
         inTgl.style.border = "2px solid #e74c3c";
-        alert("🔓 KUNCI TANGGAL DIBUKA!\n\nSilakan ketik manual tanggal yang ingin direvisi (Contoh: ketik tanggal kemarin jika lupa closing).");
+        
+        alert("🔓 AKSES REVISI DIBUKA!\n\nAnda dapat mengubah tanggal lapor mundur dan menginput di luar jam reguler.");
+        cekKunci();
     }
 
     // ==========================================
-    // LOGIKA PERUBAHAN FORM BERDASARKAN SHIFT (ANTI KUSUT)
+    // BAGIAN 4: LOGIKA FORM & SHIFT LAPORAN
     // ==========================================
+    function renderPersonil(arr) {
+        let lp = document.getElementById('listPersonil');
+        
+        if (!arr || arr.length === 0) { 
+            lp.innerHTML = "Belum ada personil yg login bulan ini."; 
+            return; 
+        }
+        
+        let uniqueArr = [...new Set(arr)];
+        lp.innerHTML = uniqueArr.map(n => `<span class="tag-personil">👤 ${n}</span>`).join('');
+    }
+
     function aturInputShift() {
-        const shf = document.getElementById('shiftLapor').value;
+        const shf = document.getElementById('shiftLapor').value; 
         const tipe = document.getElementById('tipeToko').value;
         
-        const rowS3 = document.getElementById('rowS3');
-        const rowS1 = document.getElementById('rowS1');
+        const rowS3 = document.getElementById('rowS3'); 
+        const rowS1 = document.getElementById('rowS1'); 
         const rowS2 = document.getElementById('rowS2');
         const optS3 = document.getElementById('optS3');
         
-        const inS3 = document.getElementById('s3');
-        const inS1 = document.getElementById('s1');
+        const inS3 = document.getElementById('s3'); 
+        const inS1 = document.getElementById('s1'); 
         const inS2 = document.getElementById('s2');
 
-        if(tipe === 'non24') {
-            if(optS3) optS3.style.display = 'none';
-            if(shf === 's3') document.getElementById('shiftLapor').value = 's1';
-        } else {
-            if(optS3) optS3.style.display = 'block';
+        if (tipe === 'non24') { 
+            if (optS3) optS3.style.display = 'none'; 
+            if (shf === 's3') document.getElementById('shiftLapor').value = 's1'; 
+        } else { 
+            if (optS3) optS3.style.display = 'block'; 
         }
-
+        
         const activeShf = document.getElementById('shiftLapor').value;
-
-        // Reset display dan ReadOnly
-        rowS3.style.display = 'none'; rowS1.style.display = 'none'; rowS2.style.display = 'none';
+        
+        rowS3.style.display = 'none'; 
+        rowS1.style.display = 'none'; 
+        rowS2.style.display = 'none';
+        
         inS3.readOnly = false; inS3.style.backgroundColor = "#fff";
         inS1.readOnly = false; inS1.style.backgroundColor = "#fff";
         inS2.readOnly = false; inS2.style.backgroundColor = "#fff";
 
-        if(tipe === '24jam') {
-            if(activeShf === 's3') {
-                rowS3.style.display = 'block';
-            } else if(activeShf === 's1') {
-                rowS3.style.display = 'block'; inS3.readOnly = true; inS3.style.backgroundColor = "#e0e0e0";
-                rowS1.style.display = 'block';
-            } else if(activeShf === 's2') {
-                rowS3.style.display = 'block'; inS3.readOnly = true; inS3.style.backgroundColor = "#e0e0e0";
-                rowS1.style.display = 'block'; inS1.readOnly = true; inS1.style.backgroundColor = "#e0e0e0";
-                rowS2.style.display = 'block';
+        if (tipe === '24jam') {
+            if (activeShf === 's3') { 
+                rowS3.style.display = 'block'; 
+            } else if (activeShf === 's1') { 
+                rowS3.style.display = 'block'; 
+                inS3.readOnly = true; 
+                inS3.style.backgroundColor = "#e0e0e0"; 
+                rowS1.style.display = 'block'; 
+            } else if (activeShf === 's2') { 
+                rowS3.style.display = 'block'; 
+                inS3.readOnly = true; 
+                inS3.style.backgroundColor = "#e0e0e0"; 
+                rowS1.style.display = 'block'; 
+                inS1.readOnly = true; 
+                inS1.style.backgroundColor = "#e0e0e0"; 
+                rowS2.style.display = 'block'; 
             }
         } else {
-            if(activeShf === 's1') {
-                rowS1.style.display = 'block';
-            } else if(activeShf === 's2') {
-                rowS1.style.display = 'block'; inS1.readOnly = true; inS1.style.backgroundColor = "#e0e0e0";
-                rowS2.style.display = 'block';
+            if (activeShf === 's1') { 
+                rowS1.style.display = 'block'; 
+            } else if (activeShf === 's2') { 
+                rowS1.style.display = 'block'; 
+                inS1.readOnly = true; 
+                inS1.style.backgroundColor = "#e0e0e0"; 
+                rowS2.style.display = 'block'; 
             }
         }
 
         const isS2 = (activeShf === 's2');
-        document.getElementById('wrapAPC').style.display = isS2 ? 'block' : 'none';
+        document.getElementById('wrapAPC').style.display = isS2 ? 'block' : 'none'; 
         document.getElementById('wrapGM').style.display = isS2 ? 'block' : 'none';
-        document.getElementById('wrapSO').style.display = isS2 ? 'block' : 'none';
+        document.getElementById('wrapSO').style.display = isS2 ? 'block' : 'none'; 
         document.getElementById('wrapEOD').style.display = isS2 ? 'block' : 'none';
+        
+        // Reset tampilan tombol simpan kembali ke tahap 1 tiap ganti shift
+        document.getElementById('btnSave1').style.display = "block";
+        document.getElementById('btnSave2').style.display = "none";
     }
 
-    // ==========================================
-    // FUNGSI LOAD FORM SHIFT (KOSONGKAN KOTAK SEBELUM ISI)
-    // ==========================================
     function loadFormShift() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        if(!t) return;
-        let yK = document.getElementById('thnKini').value;
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
+        if (!t) return;
+        
+        let yK = document.getElementById('thnKini').value; 
         let mK = document.getElementById('blnKini').value;
         let tglAktif = parseInt(document.getElementById('inTgl').value) || tglSkrg;
 
-        let hS = {};
-        if(db[t] && db[t][yK] && db[t][yK][mK] && db[t][yK][mK].harianKini) {
-            hS = db[t][yK][mK].harianKini[tglAktif] || {};
+        let hS = {}; 
+        if (db[t] && db[t][yK] && db[t][yK][mK] && db[t][yK][mK].harianKini) { 
+            hS = db[t][yK][mK].harianKini[tglAktif] || {}; 
         }
-
-        const activeShf = document.getElementById('shiftLapor').value;
+        
+        const activeShf = document.getElementById('shiftLapor').value; 
         const tipe = document.getElementById('tipeToko').value;
 
-        // Ambil nilai murni dari histori
-        let m3 = parseFloat(hS.m_s3) || 0;
-        let m1 = parseFloat(hS.m_s1) || 0;
+        let m3 = parseFloat(hS.m_s3) || 0; 
+        let m1 = parseFloat(hS.m_s1) || 0; 
         let m2 = parseFloat(hS.m_s2) || 0;
-
-        let cumS3 = m3;
-        let cumS1 = m3 + m1;
+        
+        let cumS3 = m3; 
+        let cumS1 = m3 + m1; 
         let cumS2 = m3 + m1 + m2;
 
-        // Kosongkan semua inputan secara *default*
-        document.getElementById('s3').value = "";
-        document.getElementById('s1').value = "";
+        document.getElementById('s3').value = ""; 
+        document.getElementById('s1').value = ""; 
         document.getElementById('s2').value = "";
-        document.getElementById('realSTD').value = "";
-        document.getElementById('strukRetail').value = "";
+        document.getElementById('realSTD').value = ""; 
+        document.getElementById('strukRetail').value = ""; 
         document.getElementById('strukMember').value = "";
-        document.getElementById('dailyAPC').value = "";
-        document.getElementById('realGM').value = "";
+        document.getElementById('dailyAPC').value = ""; 
+        document.getElementById('realGM').value = ""; 
         document.getElementById('koreksiSO').value = "";
 
-        // Isi form sesuai shift yang aktif. 
-        // HANYA TERISI JIKA SHIFT TERSEBUT SUDAH BENAR-BENAR MENYIMPAN DATA (murni > 0)
-        if(activeShf === 's3') {
-            if (m3 > 0) {
-                setFormattedValue('s3', cumS3, true); 
-                document.getElementById('realSTD').value = hS.std || "";
-                document.getElementById('strukRetail').value = hS.struk_retail || "";
-                document.getElementById('strukMember').value = hS.struk_member || "";
-            }
-        } 
-        else if(activeShf === 's1') {
+        if (activeShf === 's3' && m3 > 0) { 
+            setFormattedValue('s3', cumS3, true); 
+            document.getElementById('realSTD').value = hS.std || ""; 
+            document.getElementById('strukRetail').value = hS.struk_retail || ""; 
+            document.getElementById('strukMember').value = hS.struk_member || ""; 
+        } else if (activeShf === 's1') {
             if (m3 > 0) setFormattedValue('s3', cumS3, true); 
-            // S1 akan terisi HANYA JIKA M1 > 0 (Shift 1 sudah ada sales). Jika belum, dia tetap kosong.
-            if (m1 > 0 || (tipe === 'non24' && cumS1 > 0)) {
+            if (m1 > 0 || (tipe === 'non24' && cumS1 > 0)) { 
                 setFormattedValue('s1', cumS1, true); 
-                document.getElementById('realSTD').value = hS.std || "";
-                document.getElementById('strukRetail').value = hS.struk_retail || "";
-                document.getElementById('strukMember').value = hS.struk_member || "";
+                document.getElementById('realSTD').value = hS.std || ""; 
+                document.getElementById('strukRetail').value = hS.struk_retail || ""; 
+                document.getElementById('strukMember').value = hS.struk_member || ""; 
             }
-        } 
-        else if(activeShf === 's2') {
+        } else if (activeShf === 's2') {
             if (m3 > 0) setFormattedValue('s3', cumS3, true); 
             if (cumS1 > 0) setFormattedValue('s1', cumS1, true); 
-            
-            // S2 akan terisi HANYA JIKA M2 > 0 (Shift 2 sudah ada sales).
             if (m2 > 0) {
                 setFormattedValue('s2', cumS2, true); 
                 document.getElementById('realSTD').value = hS.std || "";
-                document.getElementById('strukRetail').value = hS.struk_retail || "";
+                document.getElementById('strukRetail').value = hS.struk_retail || ""; 
                 document.getElementById('strukMember').value = hS.struk_member || "";
-                setFormattedValue('dailyAPC', hS.apc, true);
-                setFormattedValue('koreksiSO', hS.nsb, true);
+                setFormattedValue('dailyAPC', hS.apc, true); 
+                setFormattedValue('koreksiSO', hS.nsb, true); 
                 setFormattedValue('realGM', hS.gm_persen, false);
             }
         }
-
+        
         hitungPreviewMurni();
     }
 
     function hitungPreviewMurni() {
-        const a3 = (document.getElementById('tipeToko').value==='24jam') ? getRawRupiah(document.getElementById('s3').value) : 0;
+        const a3 = (document.getElementById('tipeToko').value === '24jam') ? getRawRupiah(document.getElementById('s3').value) : 0;
         const a1 = getRawRupiah(document.getElementById('s1').value); 
         const a2 = getRawRupiah(document.getElementById('s2').value);
         
-        const x3 = a3, x1 = Math.max(0, a1-a3), x2 = Math.max(0, a2-a1);
+        const x3 = a3; 
+        const x1 = Math.max(0, a1 - a3); 
+        const x2 = Math.max(0, a2 - a1); 
+        
         const total = Math.max(a3, a1, a2);
         
-        const el = document.getElementById('actualSalesHariIni'); if(el) el.innerText='Rp '+ total.toLocaleString('id-ID');
-        const pv = document.getElementById('shiftActualPreview'); if(pv) pv.innerHTML=`S3 Murni: Rp ${x3.toLocaleString('id-ID')} &nbsp;|&nbsp; S1 Murni: Rp ${x1.toLocaleString('id-ID')} &nbsp;|&nbsp; S2 Murni: Rp ${x2.toLocaleString('id-ID')}`;
+        const el = document.getElementById('actualSalesHariIni'); 
+        if (el) el.innerText = 'Rp ' + total.toLocaleString('id-ID');
         
-        const sr = parseInt(document.getElementById('strukRetail').value)||0;
-        const sm = parseInt(document.getElementById('strukMember').value)||0;
-        const pctMem = sr > 0 ? (sm/sr*100) : 0;
-        const mp = document.getElementById('memberPct');
-        if(mp) mp.innerText = pctMem.toFixed(2) + '%';
+        const pv = document.getElementById('shiftActualPreview'); 
+        if (pv) {
+            pv.innerHTML = `S3 Murni: Rp ${x3.toLocaleString('id-ID')} &nbsp;|&nbsp; S1 Murni: Rp ${x1.toLocaleString('id-ID')} &nbsp;|&nbsp; S2 Murni: Rp ${x2.toLocaleString('id-ID')}`;
+        }
+        
+        const sr = parseInt(document.getElementById('strukRetail').value) || 0; 
+        const sm = parseInt(document.getElementById('strukMember').value) || 0;
+        const pctMem = sr > 0 ? (sm / sr * 100) : 0; 
+        
+        const mp = document.getElementById('memberPct'); 
+        if (mp) mp.innerText = pctMem.toFixed(2) + '%';
+    }
+
+    // ==========================================
+    // BAGIAN 5: SIMPAN DATA CLOUD
+    // ==========================================
+    function updateDbTotalLalu() {
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
+        if (!t) return;
+        
+        let yK = Number(document.getElementById('thnKini').value); 
+        let mK = Number(document.getElementById('blnKini').value);
+        let yL = yK; 
+        let mL = mK - 1; 
+        
+        if (mL < 1) { 
+            mL = 12; 
+            yL--; 
+        }
+        
+        let val = getRawRupiah(document.getElementById('totalLalu').value);
+        
+        if (!db[t]) db[t] = {}; 
+        if (!db[t][yL]) db[t][yL] = {};
+        if (!db[t][yL][mL]) db[t][yL][mL] = { totalLalu: 0, harianLalu: {} };
+        
+        if (val > 0) { 
+            db[t][yL][mL].totalLalu = val; 
+            localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); 
+        }
     }
 
     async function simpanTargetAwal() {
-        let btn = document.querySelector('button[onclick="simpanTargetAwal()"]');
+        let btn = document.querySelector('button[onclick="simpanTargetAwal()"]'); 
         btn.disabled = true;
+        
         tampilLoading("MENYIMPAN PROFIL & TARGET KE CLOUD...");
-
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        let yK = Number(document.getElementById('thnKini').value);
+        
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
+        let yK = Number(document.getElementById('thnKini').value); 
         let mK = Number(document.getElementById('blnKini').value);
-        let targetBulanan = getRawRupiah(document.getElementById('targetKini').value);
+        let targetBulanan = getRawRupiah(document.getElementById('targetKini').value); 
         let tGM = getRawDecimal(document.getElementById('tgtGM').value);
-        let tipeOperasional = document.getElementById('tipeToko').value;
-        let totalInputLalu = getRawRupiah(document.getElementById('totalLalu').value)||0;
+        let tipeOperasional = document.getElementById('tipeToko').value; 
+        let totalInputLalu = getRawRupiah(document.getElementById('totalLalu').value) || 0;
 
-        if(!t) { alert("Kode Toko kosong!"); btn.disabled=false; tutupLoading(); return; }
-
-        if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {}; 
+        if (!t) { 
+            alert("Kode Toko kosong!"); 
+            btn.disabled = false; 
+            tutupLoading(); 
+            return; 
+        }
+        
+        if (!db[t]) db[t] = {}; 
+        if (!db[t][yK]) db[t][yK] = {}; 
         if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
-
-        db[t][yK][mK].target = targetBulanan;
+        
+        db[t][yK][mK].target = targetBulanan; 
         db[t][yK][mK].targetGM = tGM;
         
-        let yL = yK; let mL = mK - 1; if(mL < 1){ mL = 12; yL--; }
-        if(totalInputLalu > 0) {
-            if(!db[t][yL]) db[t][yL]={}; if(!db[t][yL][mL]) db[t][yL][mL]={ totalLalu:0, harianLalu:{} };
-            db[t][yL][mL].totalLalu = totalInputLalu;
+        let yL = yK; 
+        let mL = mK - 1; 
+        
+        if (mL < 1) { 
+            mL = 12; 
+            yL--; 
         }
-
+        
+        if (totalInputLalu > 0) { 
+            if (!db[t][yL]) db[t][yL] = {}; 
+            if (!db[t][yL][mL]) db[t][yL][mL] = { totalLalu:0, harianLalu:{} }; 
+            db[t][yL][mL].totalLalu = totalInputLalu; 
+        }
+        
         save();
 
         let payload = { 
-            action: "save", toko: t, bulan: mK, tahun: yK, key: 99, target: targetBulanan, tipe: tipeOperasional,
+            action: "save", 
+            toko: t, 
+            bulan: mK, 
+            tahun: yK, 
+            key: 99, 
+            target: targetBulanan, 
+            tipe: tipeOperasional,
             payload: { 
-                s1: 0, s2: 0, s3: 0, m_s1: 0, m_s2: 0, m_s3: 0, 
-                total: 0, gm_persen: 0, target_gm: tGM,
-                std: 0, apc: 0, nsb: 0, struk_retail: 0, struk_member: 0, pct_member: 0 
+                s1: 0, s2: 0, s3: 0, 
+                m_s1: 0, m_s2: 0, m_s3: 0, 
+                total: 0, gm_persen: 0, target_gm: tGM, 
+                std: 0, apc: 0, nsb: 0, 
+                struk_retail: 0, struk_member: 0, pct_member: 0 
             } 
         };
-
-        try {
-            await fetch(scriptURL,{ method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload) });
-            alert("✅ PROFIL & TARGET TERSIMPAN DI CLOUD!\nSilakan lanjutkan mengisi Laporan Harian di bawah.");
+        
+        try { 
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                headers: {'Content-Type': 'text/plain;charset=utf-8'}, 
+                body: JSON.stringify(payload) 
+            }); 
+            alert("✅ PROFIL & TARGET TERSIMPAN!"); 
         } catch(e) {
-            alert("⚠️ Gagal sinkron ke Cloud, Data tersimpan secara Lokal.");
+            // Silently fail if no internet
         }
-        btn.disabled = false;
+        
+        btn.disabled = false; 
         tutupLoading();
     }
 
-    async function simpanLalu(){
-        let t = document.getElementById('kodeToko').value.toUpperCase();
-        let yL = document.getElementById('thnLalu').value;
+    async function simpanLalu() {
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
+        let yL = document.getElementById('thnLalu').value; 
         let mL = document.getElementById('blnLalu').value;
-        let tgl = parseInt(document.getElementById('tglHistori').value);
-        let val = getRawRupiah(document.getElementById('valHistori').value)||0;
+        let tgl = parseInt(document.getElementById('tglHistori').value); 
+        let val = getRawRupiah(document.getElementById('valHistori').value) || 0;
         
-        if(!t || !tgl || val <= 0) return alert("Harap lengkapi Kode Toko, Tanggal, dan Nominal (Rp) sebelum menyimpan histori!");
-
+        if (!t || !tgl || val <= 0) {
+            return alert("Lengkapi Kode, Tgl & Nominal!");
+        }
+        
         tampilLoading("MENYIMPAN HISTORI KE CLOUD...");
-
-        let payload = { action: "saveLalu", toko: t, tahun: Number(yL), bulan: Number(mL), key: tgl, total: val };
-
+        
+        let payload = { 
+            action: "saveLalu", 
+            toko: t, 
+            tahun: Number(yL), 
+            bulan: Number(mL), 
+            key: tgl, 
+            total: val 
+        };
+        
         try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-
-            if(!db[t]) db[t]={}; if(!db[t][yL]) db[t][yL]={};
-            if(!db[t][yL][mL]) db[t][yL][mL]={ totalLalu:0, harianLalu:{} };
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify(payload) 
+            });
+            
+            if (!db[t]) db[t] = {}; 
+            if (!db[t][yL]) db[t][yL] = {}; 
+            if (!db[t][yL][mL]) db[t][yL][mL] = { totalLalu:0, harianLalu:{} };
+            
             db[t][yL][mL].harianLalu[tgl] = val;
+            let currentTotalLalu = db[t][yL][mL].totalLalu || 0; 
+            let sumHarian = Object.values(db[t][yL][mL].harianLalu).reduce((a,b) => a+b, 0);
             
-            let currentTotalLalu = db[t][yL][mL].totalLalu || 0;
-            let sumHarian = Object.values(db[t][yL][mL].harianLalu).reduce((a,b)=>a+b,0);
+            db[t][yL][mL].totalLalu = currentTotalLalu > sumHarian ? currentTotalLalu : sumHarian; 
             
-            db[t][yL][mL].totalLalu = currentTotalLalu > sumHarian ? currentTotalLalu : sumHarian;
             document.getElementById('totalLalu').value = db[t][yL][mL].totalLalu.toLocaleString('id-ID');
-
-            save();
-            document.getElementById('tglHistori').value = "";
-            document.getElementById('valHistori').value = "";
-            tutupLoading();
-            alert("✅ HISTORI TANGGAL " + tgl + " TERSIMPAN DI CLOUD SECARA PERMANEN!");
-        } catch(e) {
-            tutupLoading();
-            alert("⚠️ Gagal menyimpan ke Cloud. Pastikan koneksi internet Anda lancar.");
+            
+            save(); 
+            document.getElementById('tglHistori').value = ""; 
+            document.getElementById('valHistori').value = ""; 
+            
+            tutupLoading(); 
+            alert("✅ HISTORI TERSIMPAN PERMANEN!");
+        } catch(e) { 
+            tutupLoading(); 
+            alert("⚠️ Gagal koneksi internet."); 
         }
     }
 
-    async function simpanDanKirimWA() {
-        let btn = document.getElementById('btnSave'); 
-        btn.disabled = true; 
+// ==========================================
+    // BAGIAN 6: FUNGSI 2 TAHAP (SIMPAN & WA)
+    // ==========================================
+    async function tahapSatuSimpan() {
+        let btn1 = document.getElementById('btnSave1');
+        btn1.disabled = true;
 
         let targetBulanan = getRawRupiah(document.getElementById('targetKini').value);
-        
-        if(targetBulanan <= 0) {
-            if(!confirm("⚠️ Peringatan: Target Net Sales Bulan Ini masih kosong (0).\nApakah Anda yakin ingin tetap menyimpan laporan shift harian?\n\n(Laporan tetap bisa dikirim)")) {
-                btn.disabled = false; return;
-            }
+        if (targetBulanan <= 0 && !confirm("⚠️ Target kosong (0). Tetap simpan laporan?")) {
+            btn1.disabled = false;
+            return;
         }
 
         let shiftLapor = document.getElementById('shiftLapor').value;
+        let tipeOperasional = document.getElementById('tipeToko').value;
+
+        // --- 1. VALIDASI WAJIB ISI (ANTI KOSONG) ---
+        let s3In = document.getElementById('s3').value;
+        let s1In = document.getElementById('s1').value;
+        let s2In = document.getElementById('s2').value;
+        let stdIn = document.getElementById('realSTD').value;
+        let sRetIn = document.getElementById('strukRetail').value;
+        let sMemIn = document.getElementById('strukMember').value;
+        let apcIn = document.getElementById('dailyAPC').value;
+        let gmIn = document.getElementById('realGM').value;
+        let soIn = document.getElementById('koreksiSO').value;
+
+        if (tipeOperasional === '24jam' && shiftLapor === 's3' && s3In === "") { alert("🚨 Sales S3 (Malam) belum diisi!"); btn1.disabled = false; return; }
+        if (shiftLapor === 's1' && s1In === "") { alert("🚨 Sales S1 (Pagi) belum diisi!"); btn1.disabled = false; return; }
+        if (shiftLapor === 's2' && s2In === "") { alert("🚨 Sales S2 (Akhir Hari) belum diisi!"); btn1.disabled = false; return; }
+        if (stdIn === "") { alert("🚨 Actual STD (Struk) belum diisi!"); btn1.disabled = false; return; }
+        if (sRetIn === "") { alert("🚨 Jml Struk Retail belum diisi!"); btn1.disabled = false; return; }
+        if (sMemIn === "") { alert("🚨 Jml Struk Member belum diisi!"); btn1.disabled = false; return; }
+
+        if (shiftLapor === 's2') {
+            if (apcIn === "") { alert("🚨 Actual APC belum diisi!"); btn1.disabled = false; return; }
+            if (gmIn === "") { alert("🚨 Actual GM % Hari Ini belum diisi!"); btn1.disabled = false; return; }
+            if (soIn === "") { alert("🚨 Koreksi SO / NSB belum diisi! (Ketik 0 jika tidak ada koreksi)"); btn1.disabled = false; return; }
+        }
+
+        // --- 2. VALIDASI FOTO ---
         const fotoBuku = document.getElementById('bukuPhoto').files[0];
         const fotoEOD = document.getElementById('eodPhoto').files[0];
-        
-        if(!fotoBuku) { alert("🚨 STOP! 📸 FOTO BUKU PICKUP KASIRAN WAJIB DIUPLOAD UNTUK SEMUA SHIFT!"); btn.disabled=false; return; }
-        if(shiftLapor === 's2' && !fotoEOD) { alert("🚨 STOP! 📸 FOTO EOD WAJIB DIUPLOAD UNTUK SHIFT 2 (CLOSING AKHIR HARI)!"); btn.disabled=false; return; }
 
-        tampilLoading("MENYIMPAN LAPORAN KE CLOUD..."); 
+        if (!fotoBuku) { alert("🚨 FOTO BUKU PICKUP KASIRAN WAJIB DIUPLOAD!"); btn1.disabled = false; return; }
+        if (shiftLapor === 's2' && !fotoEOD) { alert("🚨 FOTO REPORT EOD WAJIB DIUPLOAD (SHIFT 2)!"); btn1.disabled = false; return; }
+
+        tampilLoading("MENYIMPAN KE CLOUD...");
 
         let t = document.getElementById('kodeToko').value.toUpperCase();
-        let tgl = parseInt(document.getElementById('inTgl').value)||tglSkrg;
+        let tgl = parseInt(document.getElementById('inTgl').value) || tglSkrg;
         let yK = Number(document.getElementById('thnKini').value);
         let mK = Number(document.getElementById('blnKini').value);
-        let yL = yK; let mL = mK - 1;
-        if(mL < 1){ mL = 12; yL--; }
 
         let tGM = getRawDecimal(document.getElementById('tgtGM').value);
-        
-        let rGM = (shiftLapor === 's2') ? getRawDecimal(document.getElementById('realGM').value) : 0;
-        let rAPC = (shiftLapor === 's2') ? getRawRupiah(document.getElementById('dailyAPC').value) : 0;
-        let rNSB = (shiftLapor === 's2') ? getRawRupiah(document.getElementById('koreksiSO').value) : 0;
+        let rGM = (shiftLapor === 's2') ? getRawDecimal(gmIn) : 0;
+        let rAPC = (shiftLapor === 's2') ? getRawRupiah(apcIn) : 0;
+        let rNSB = (shiftLapor === 's2') ? getRawRupiah(soIn) : 0;
 
-        let tipeOperasional = document.getElementById('tipeToko').value;
-        
-        let dataLama = (db[t] && db[t][yK] && db[t][yK][mK] && db[t][yK][mK].harianKini) ? db[t][yK][mK].harianKini[tgl] : null;
-        if (!dataLama) dataLama = {};
+        // --- PERBAIKAN FATAL BUG (ANTI CRASH HARI KOSONG) ---
+        let dataLama = db[t]?.[yK]?.[mK]?.harianKini?.[tgl] || {};
 
-        // TARIK INPUTAN MENTAH
-        let valS3 = getRawRupiah(document.getElementById('s3').value);
-        let valS1 = getRawRupiah(document.getElementById('s1').value);
-        let valS2 = getRawRupiah(document.getElementById('s2').value);
+        let valS3 = getRawRupiah(s3In);
+        let valS1 = getRawRupiah(s1In);
+        let valS2 = getRawRupiah(s2In);
 
-        // AMBIL HISTORI JIKA INPUTAN KOSONG
         let inS3 = valS3 > 0 ? valS3 : (dataLama.s3 || 0);
         let inS1 = valS1 > 0 ? valS1 : (dataLama.s1 || 0);
         let inS2 = valS2 > 0 ? valS2 : (dataLama.s2 || 0);
 
-        if (tipeOperasional === 'non24') inS3 = 0; 
+        if (tipeOperasional === 'non24') { inS3 = 0; }
 
         let murniS3 = inS3;
         let murniS1 = inS1 > 0 ? (inS1 - inS3) : 0;
         let murniS2 = inS2 > 0 ? (inS2 - inS1) : 0;
-        if(murniS1 < 0) murniS1 = 0; if(murniS2 < 0) murniS2 = 0;
+
+        if (murniS1 < 0) murniS1 = 0;
+        if (murniS2 < 0) murniS2 = 0;
 
         let totalHariIni = inS2 > 0 ? inS2 : (inS1 > 0 ? inS1 : inS3);
-
-        let rSTD = parseInt(document.getElementById('realSTD').value) || 0;
-        let sRet = parseInt(document.getElementById('strukRetail').value) || 0;
-        let sMem = parseInt(document.getElementById('strukMember').value) || 0;
+        let rSTD = parseInt(stdIn) || 0;
+        let sRet = parseInt(sRetIn) || 0;
+        let sMem = parseInt(sMemIn) || 0;
         let pctMem = sRet > 0 ? (sMem / sRet * 100) : 0;
 
-        if (!db[t]) db[t] = {}; if (!db[t][yK]) db[t][yK] = {}; 
+        if (!db[t]) db[t] = {};
+        if (!db[t][yK]) db[t][yK] = {};
         if (!db[t][yK][mK]) db[t][yK][mK] = { target: 0, harianKini: {}, targetGM: 0 };
-        
-        if(shiftLapor !== 's2') {
+
+        if (shiftLapor !== 's2') {
             rGM = rGM || dataLama.gm_persen || 0;
             rAPC = rAPC || dataLama.apc || 0;
             rNSB = rNSB || dataLama.nsb || 0;
         }
 
-        db[t][yK][mK].harianKini[tgl] = { 
-            s1: inS1, s2: inS2, s3: inS3, 
-            m_s1: murniS1, m_s2: murniS2, m_s3: murniS3, 
-            total: totalHariIni, gm_persen: rGM, 
-            std: rSTD, apc: rAPC, nsb: rNSB, 
+        db[t][yK][mK].harianKini[tgl] = {
+            s1: inS1, s2: inS2, s3: inS3,
+            m_s1: murniS1, m_s2: murniS2, m_s3: murniS3,
+            total: totalHariIni, gm_persen: rGM, std: rSTD, apc: rAPC, nsb: rNSB,
             struk_retail: sRet, struk_member: sMem, pct_member: pctMem
         };
         db[t][yK][mK].target = targetBulanan;
         db[t][yK][mK].targetGM = tGM;
 
-        let payload = { 
+        let payload = {
             action: "save", toko: t, bulan: Number(mK), tahun: Number(yK), key: tgl, target: targetBulanan, tipe: tipeOperasional,
-            payload: { 
-                s1: inS1, s2: inS2, s3: inS3, m_s1: murniS1, m_s2: murniS2, m_s3: murniS3, 
-                total: totalHariIni, gm_persen: rGM, target_gm: tGM,
-                std: rSTD, apc: rAPC, nsb: rNSB, struk_retail: sRet, struk_member: sMem, pct_member: pctMem 
-            } 
+            payload: {
+                s1: inS1, s2: inS2, s3: inS3, m_s1: murniS1, m_s2: murniS2, m_s3: murniS3,
+                total: totalHariIni, gm_persen: rGM, target_gm: tGM, std: rSTD, apc: rAPC, nsb: rNSB,
+                struk_retail: sRet, struk_member: sMem, pct_member: pctMem
+            }
         };
+
         localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
         renderAll();
 
         try {
-            await fetch(scriptURL,{ method:'POST', mode:'no-cors', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(payload) });
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
         } catch(e) {}
 
-        // ==========================================
-        // PROSES CANVAS DOWNLOAD & WATERMARK (SEBELUM FORM DIKOSONGKAN!)
-        // ==========================================
+        // --- 3. PROSES CANVAS FOTO WATERMARK ---
         const cnv = document.getElementById('canvasJoin');
         const ctx = cnv.getContext('2d');
         const imgBukuEl = document.getElementById('img_bukuPreview');
@@ -806,511 +1417,814 @@
         let fotoTerdownload = false;
 
         try {
-            if(shiftLapor === 's2' && imgBukuEl && imgEodEl) {
-                cnv.width = 1200; cnv.height = 600;
-                ctx.fillStyle = "white"; ctx.fillRect(0,0,1200,600);
-                ctx.drawImage(imgBukuEl, 0, 0, 600, 600);
-                ctx.drawImage(imgEodEl, 600, 0, 600, 600);
+            if (shiftLapor === 's2' && imgBukuEl && imgEodEl) {
+                cnv.width = 1200; cnv.height = 600; ctx.fillStyle = "white"; ctx.fillRect(0,0,1200,600);
+                ctx.drawImage(imgBukuEl, 0, 0, 600, 600); ctx.drawImage(imgEodEl, 600, 0, 600, 600);
                 applyWatermark(ctx, 1200, 600, t, tgl, mK, yK, shiftLapor);
-                const link = document.createElement('a'); 
-                link.download = `LAPORAN_${t}_TGL${tgl}_S2_CLOSING.jpg`; 
+
+                const link = document.createElement('a');
+                link.download = `LAPORAN_${t}_TGL${tgl}_S2_CLOSING.jpg`;
                 link.href = cnv.toDataURL("image/jpeg", 0.9);
                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
                 fotoTerdownload = true;
             } else if (imgBukuEl) {
-                cnv.width = 600; cnv.height = 600;
-                ctx.fillStyle = "white"; ctx.fillRect(0,0,600,600);
-                ctx.drawImage(imgBukuEl, 0, 0, 600, 600);
-                applyWatermark(ctx, 600, 600, t, tgl, mK, yK, shiftLapor);
-                const link = document.createElement('a'); 
-                link.download = `LAPORAN_${t}_TGL${tgl}_${shiftLapor.toUpperCase()}.jpg`; 
+                cnv.width = 600; cnv.height = 600; ctx.fillStyle = "white"; ctx.fillRect(0,0,600,600);
+                ctx.drawImage(imgBukuEl, 0, 0, 600, 600); applyWatermark(ctx, 600, 600, t, tgl, mK, yK, shiftLapor);
+
+                const link = document.createElement('a');
+                link.download = `LAPORAN_${t}_TGL${tgl}_${shiftLapor.toUpperCase()}.jpg`;
                 link.href = cnv.toDataURL("image/jpeg", 0.9);
                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
                 fotoTerdownload = true;
             }
-        } catch(err) {
-            console.error("Gagal buat foto:", err);
-        }
+        } catch(err) {}
 
-        // ==========================================
-        // KOSONGKAN FORM SETELAH FOTO BERHASIL DIDOWNLOAD
-        // ==========================================
-        document.getElementById('s1').value=""; document.getElementById('s2').value=""; document.getElementById('s3').value=""; 
-        document.getElementById('realGM').value=""; document.getElementById('dailyAPC').value=""; 
-        document.getElementById('koreksiSO').value=""; document.getElementById('realSTD').value="";
-        document.getElementById('strukRetail').value=""; document.getElementById('strukMember').value="";
-        
-        document.getElementById('bukuPhoto').value=""; document.getElementById('bukuPreview').innerHTML="Belum ada foto Buku";
-        document.getElementById('eodPhoto').value=""; document.getElementById('eodPreview').innerHTML="Belum ada foto EOD";
-        
-        // Panggil form agar menampilkan ulang data dari histori sesuai shift yg aktif
-        loadFormShift();
-
-        tampilLoading("MENGINTIP ABSEN CLOUD & MENYIAPKAN WA...");
-        
-        // ==========================================
-        // PROSES MATA-MATA CLOUD (CEK ABSEN TOKO)
-        // ==========================================
-        let areaCeklisTxt = `🌐 *ABSEN LAPORAN SHIFT AREA* (Tgl ${tgl} - SHIFT ${shiftLapor.replace('s', '')}):\n`;
-        try {
-            const antiNgeyel = new Date().getTime();
-            const resArea = await fetch(`${scriptURL}?action=getKorwil&yr=${yK}&mn=${mK}&tahun=${yK}&bulan=${mK}&_ts=${antiNgeyel}`).then(r => r.json());
-            
-            if (resArea && resArea.status === "success") {
-                let mapTokoLapor = {};
-                if(resArea.master_toko) { resArea.master_toko.forEach(m => { mapTokoLapor[m.toko] = false; }); }
-                if(resArea.target_toko) { resArea.target_toko.forEach(ta => { mapTokoLapor[ta.toko] = false; }); }
-                
-                if (resArea.laporan_area) {
-                    resArea.laporan_area.forEach(h => {
-                        if (parseInt(h.tgl) === tgl) {
-                            if (shiftLapor === 's1' && parseFloat(h.m_s1) > 0) mapTokoLapor[h.toko] = true;
-                            if (shiftLapor === 's2' && parseFloat(h.m_s2) > 0) mapTokoLapor[h.toko] = true;
-                            if (shiftLapor === 's3' && parseFloat(h.m_s3) > 0) mapTokoLapor[h.toko] = true;
-                        }
-                    });
-                }
-                
-                mapTokoLapor[t] = true;
-
-                let sortedToko = Object.keys(mapTokoLapor).sort();
-                let txtLunas = "", txtKusut = "";
-                sortedToko.forEach(kode => {
-                    if (mapTokoLapor[kode]) txtLunas += `✅ ${kode}\n`;
-                    else txtKusut += `❌ ${kode} (Belum Lapor)\n`;
-                });
-                areaCeklisTxt += `\n*YANG SUDAH LAPOR:*\n${txtLunas || '-(Belum ada)-\n'}\n*YANG KUSUT / BELUM LAPOR:*\n${txtKusut || '-(Lunas Semua)-\n'}`;
-            } else {
-                areaCeklisTxt += "_(Gagal sinkron data absensi area)_\n";
-            }
-        } catch(err) {
-            areaCeklisTxt += "_(Sinyal lambat: Gagal membaca pantauan area)_\n";
-        }
-
-        let dL = db[t]?.[yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
-        let dK = db[t]?.[yK]?.[mK] || { target: 0, targetGM: 0, harianKini: {} };
-        let vL_Now = dL.harianLalu[tgl] || 0;
-        let pL_Now = 0;
-        let targetBulananUI = dK.target || 0;
-
-        if (dL.totalLalu > 0 && vL_Now > 0) {
-            pL_Now = vL_Now / dL.totalLalu;
-        } else {
-            let jmlH = new Date(yK, mK, 0).getDate();
-            pL_Now = 1 / jmlH; 
-        }
-        
-        let tH_Now = Math.round(pL_Now * targetBulananUI);
-        let d = dK.harianKini[tgl] || { total: 0, m_s1: 0, m_s2: 0, m_s3: 0, gm_persen: 0, std: 0, apc: 0, nsb: 0, pct_member: 0 };
-        
-        let tsMTD = 0, tgmMTD = 0, jmlH = new Date(yK, mK, 0).getDate();
-        Object.keys(dK.harianKini).forEach(tg => { 
-            let data = dK.harianKini[tg]; 
-            if(data.total > 0 && tg != "99"){ tsMTD += data.total; tgmMTD += (data.total * (data.gm_persen/100)); }
-        });
-
-        let ach = targetBulananUI > 0 ? ((tsMTD / targetBulananUI) * 100).toFixed(1) : 0;
-        let tfP = ((tgl / jmlH) * 100).toFixed(1); 
-        let speed = (ach - tfP).toFixed(1);
-        let rgmMTD = tsMTD > 0 ? (tgmMTD / tsMTD * 100).toFixed(2) : 0;
-        let gapGMRp = Math.round(tgmMTD - (tsMTD * (dK.targetGM/100)));
-
-        let statusSpeed = speed >= 0 ? "🟢 AMAN (SPEED POSITIF)" : "🔴 OVER (SPEED NEGATIF)";
-        let statusGM = gapGMRp >= 0 ? "😇 NABUNG MARGIN" : "💀 HUTANG MARGIN";
-
-        let namaShiftStr = shiftLapor === 's1' ? 'SHIFT 1 (PAGI)' : (shiftLapor === 's3' ? 'SHIFT 3 (MALAM)' : 'SHIFT 2 (AKHIR HARI)');
-
-        let pesan = `🚀 *MONITORING SALES TOKO [${t}]* 🚀%0A━━━━━━━━━━━━━━━━━━━%0A%0A`;
-        pesan += `📅 Tgl: ${tgl}/${mK}/${yK}%0A🕒 Laporan: *${namaShiftStr}*%0A%0A`;
-        
-        pesan += `💰 *SALES MURNI SHIFT INI:*%0A`;
-        if (shiftLapor === 's3' || tipeOperasional === "24jam") pesan += `• Sales S3: Rp ${d.m_s3.toLocaleString('id-ID')}%0A`;
-        if (shiftLapor === 's1' || shiftLapor === 's2') pesan += `• Sales S1: Rp ${d.m_s1.toLocaleString('id-ID')}%0A`;
-        if (shiftLapor === 's2') pesan += `• Sales S2: Rp ${d.m_s2.toLocaleString('id-ID')}%0A`;
-        
-        pesan += `• *TOTAL HARI INI: Rp ${d.total.toLocaleString('id-ID')}*%0A%0A`;
-
-        if (shiftLapor === 's2') {
-            pesan += `📊 *DAILY PERFORMANCE:*%0A• STD: ${d.std} Struk%0A• APC: Rp ${d.apc.toLocaleString('id-ID')}%0A• Koreksi SO: Rp ${d.nsb.toLocaleString('id-ID')}%0A• GM Real: ${d.gm_persen}%25%0A%0A`;
-        } else {
-            pesan += `📊 *DAILY PERFORMANCE:*%0A• STD: ${d.std} Struk%0A%0A`;
-        }
-
-        pesan += `👥 *KONTRIBUSI MEMBER:*%0A• Member Real: ${d.pct_member.toFixed(2)}%25%0A%0A`;
-        
-        if (shiftLapor === 's2') {
-            pesan += `📈 *PROGRESS IKT BULANAN (MTD):*%0A• Sales MTD: Rp ${tsMTD.toLocaleString('id-ID')} (${ach}%25)%0A• Target Bulan Ini: Rp ${targetBulananUI.toLocaleString('id-ID')}%0A• Speed Sales: ${speed >= 0 ? '+' : ''}${speed}%25%0A• Status GM: ${statusGM}%0A%0A`;
-        }
-
-        pesan += `━━━━━━━━━━━━━━━━━━━%0A${encodeURIComponent(areaCeklisTxt)}%0A━━━━━━━━━━━━━━━━━━━%0A_Sent via Monitoring Sales App_`;
-
-        // ==========================================
-        // NOTIFIKASI PINTAR UNTUK MENCEGAH BUG DOWNLOAD
-        // ==========================================
         tutupLoading();
-
-        if (fotoTerdownload) {
-            alert("✅ LAPORAN TERSIMPAN!\n\n📸 Foto Laporan ber-Watermark SUKSES didownload ke HP Anda.\n\n👉 Klik OK, maka WhatsApp akan otomatis terbuka. Jangan lupa lampirkan fotonya!");
+        btn1.disabled = false;
+        
+        // Transisi ke Tahap 2
+        document.getElementById('btnSave1').style.display = "none";
+        document.getElementById('btnSave2').style.display = "block";
+        
+        if(fotoTerdownload) {
+            alert("✅ TAHAP 1 BERHASIL!\n\nData tersimpan di Cloud dan Foto Ber-Watermark sudah diunduh.\n👉 Silakan klik tombol '2. KIRIM LAPORAN WA' untuk melanjutkan.");
         } else {
-            alert("✅ LAPORAN TERSIMPAN!\n\n👉 Klik OK untuk membuka WhatsApp.");
+            alert("✅ TAHAP 1 BERHASIL!\n\nData tersimpan di Cloud.\n👉 Silakan klik tombol '2. KIRIM LAPORAN WA' untuk melanjutkan.");
         }
-
-        window.open(`https://api.whatsapp.com/send?text=${pesan}`, '_blank');
-        btn.disabled = false;
     }
 
+function tahapDuaWA() {
+        tampilLoading("MENYIAPKAN FORMAT WA...");
+
+        setTimeout(() => {
+            let t = document.getElementById('kodeToko').value.toUpperCase();
+            let tgl = parseInt(document.getElementById('inTgl').value) || tglSkrg;
+            let yK = Number(document.getElementById('thnKini').value);
+            let mK = Number(document.getElementById('blnKini').value);
+            let yL = yK; let mL = mK - 1; if (mL < 1) { mL = 12; yL--; }
+
+            let shiftLapor = document.getElementById('shiftLapor').value;
+            let tipeOperasional = document.getElementById('tipeToko').value;
+            
+            let ses = JSON.parse(sessionStorage.getItem("userArea")) || JSON.parse(sessionStorage.getItem("userAreaJawahir")) || {};
+            let namaPelapor = ses.namaLengkap || ses.nama || "Admin Toko";
+
+            let dL = db[t]?.[yL]?.[mL] || { totalLalu: 0, harianLalu: {} };
+            let dK = db[t]?.[yK]?.[mK] || { target: 0, targetGM: 0, harianKini: {} };
+            let vL_Now = dL.harianLalu[tgl] || 0;
+            
+            // PERBAIKAN: Baca Target Langsung Dari Layar agar tidak 0
+            let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target || 0;
+            let targetGMUI = getRawDecimal(document.getElementById('tgtGM').value) || dK.targetGM || 0;
+            
+            let d = dK.harianKini[tgl] || {};
+
+            let safe_m_s3 = Number(d.m_s3) || 0;
+            let safe_m_s1 = Number(d.m_s1) || 0;
+            let safe_m_s2 = Number(d.m_s2) || 0;
+            let safe_total = Number(d.total) || 0;
+            let safe_std = Number(d.std) || 0;
+            let safe_apc = Number(d.apc) || 0;
+            let safe_nsb = Number(d.nsb) || 0;
+            let safe_gm = Number(d.gm_persen) || 0;
+            let safe_pct_member = Number(d.pct_member) || 0;
+
+            let pL_Now = (dL.totalLalu > 0 && vL_Now > 0) ? (vL_Now / dL.totalLalu) : 0;
+            let tH_Now = Math.round(pL_Now * targetBulananUI);
+
+            let tsMTD = 0, tgmMTD = 0, tStdMTD = 0, tRetMTD = 0, tMemMTD = 0, jmlH = new Date(yK, mK, 0).getDate();
+            Object.keys(dK.harianKini).forEach(tg => {
+                let data = dK.harianKini[tg];
+                if (data.total > 0 && tg != "99") {
+                    tsMTD += data.total;
+                    tgmMTD += (data.total * ((Number(data.gm_persen)||0)/100));
+                    tStdMTD += (Number(data.std) || 0);
+                    tRetMTD += (Number(data.struk_retail) || 0);
+                    tMemMTD += (Number(data.struk_member) || 0);
+                }
+            });
+
+            let ach = targetBulananUI > 0 ? ((tsMTD / targetBulananUI) * 100).toFixed(1) : 0;
+            let tfP = ((tgl / jmlH) * 100).toFixed(1);
+            let speed = (ach - tfP).toFixed(1);
+            let rgmMTD = tsMTD > 0 ? (tgmMTD / tsMTD * 100).toFixed(2) : 0;
+            let pctMemMTD = tRetMTD > 0 ? (tMemMTD / tRetMTD * 100) : 0;
+            let gapGMRp = Math.round(tgmMTD - (tsMTD * (targetGMUI / 100)));
+
+            let statusSpeed = speed >= 0 ? "🟢 *AMAN (SPEED POSITIF)*" : "🔴 *OVER (SPEED NEGATIF)*";
+            let statusGM = gapGMRp >= 0 ? "😇 *NABUNG MARGIN*" : "💀 *HUTANG MARGIN*";
+            let sindiran = speed >= 0 ? "Pertahankan! Kasir gass terus jangan kasih kendor!" : "🔥 *KERJA WOY! JANGAN JUALAN BARANG PROMO DOANG!*";
+            let namaShiftStr = shiftLapor === 's1' ? 'SHIFT 1 (PAGI)' : (shiftLapor === 's3' ? 'SHIFT 3 (MALAM)' : 'SHIFT 2 (AKHIR HARI)');
+
+            let pesan = `🚀 *MONITORING SALES [${t}]* 🚀%0A━━━━━━━━━━━━━━━━━━━%0A%0A`;
+            pesan += `👤 *PELAPOR:* ${namaPelapor}%0A`;
+            pesan += `📅 *INFO KOMPARASI:*%0A• Hari Ini: ${tgl}/${mK}/${yK}%0A• *Bulan Lalu: Rp ${vL_Now.toLocaleString('id-ID')}*%0A• *Target Harian: Rp ${tH_Now.toLocaleString('id-ID')}*%0A• Kontribusi: ${(pL_Now * 100).toFixed(2)}%25%0A%0A`;
+
+            pesan += `🕒 *REALISASI MURNI (${namaShiftStr}):*%0A`;
+            if (shiftLapor === 's3' || tipeOperasional === "24jam") pesan += `• S3 (Malam): Rp ${safe_m_s3.toLocaleString('id-ID')}%0A`;
+            if (shiftLapor === 's1' || shiftLapor === 's2') pesan += `• S1 (Pagi): Rp ${safe_m_s1.toLocaleString('id-ID')}%0A`;
+            if (shiftLapor === 's2') pesan += `• S2 (Siang): Rp ${safe_m_s2.toLocaleString('id-ID')}%0A`;
+            pesan += `• *TOTAL HARI INI: Rp ${safe_total.toLocaleString('id-ID')}*%0A%0A`;
+
+            if (shiftLapor === 's2') {
+                pesan += `📊 *DAILY PERFORMANCE:*%0A• STD Hari Ini: ${safe_std} Struk%0A• APC: Rp ${safe_apc.toLocaleString('id-ID')}%0A• Koreksi SO: Rp ${safe_nsb.toLocaleString('id-ID')}%0A• GM Real: ${safe_gm}%25%0A%0A`;
+            } else {
+                pesan += `📊 *DAILY PERFORMANCE:*%0A• STD Hari Ini: ${safe_std} Struk%0A%0A`;
+            }
+
+            pesan += `👥 *KONTRIBUSI MEMBER:*%0A• Member Hari Ini: ${safe_pct_member.toFixed(2)}%25%0A%0A`;
+
+            if (shiftLapor === 's2') {
+                pesan += `🏆 *DASHBOARD PERFORMANCE (MTD):*%0A• *ACTUAL MTD:* Rp ${tsMTD.toLocaleString('id-ID')}%0A• *ACHIEVEMENT:* ${ach}%25%0A• *TIME FACTOR:* ${tfP}%25%0A• *SPEED:* ${speed >= 0 ? '📈 +' : '📉 '}${speed}%25%0A• *STATUS:* ${statusSpeed}%0A%0A`;
+                pesan += `📈 *PERFORMA GM:*%0A• *REAL GM:* ${rgmMTD}%25 (Tgt: ${targetGMUI}%25)%0A• *GAP GM:* Rp ${gapGMRp.toLocaleString('id-ID')}%0A• *KONDISI:* ${statusGM}%0A%0A`;
+                // PERBAIKAN: Karakter & diubah jadi DAN agar link WA tidak putus/error
+                pesan += `🏷️ *MEMBER DAN STD (MTD):*%0A• *Member MTD: ${pctMemMTD.toFixed(2)}%25*%0A• *Total STD MTD: ${tStdMTD.toLocaleString('id-ID')} Struk*%0A%0A`;
+                pesan += `⚠️ *PESAN UNTUK TEAM:*%0A_${sindiran}_%0A`;
+            } else {
+                // PERBAIKAN: Karakter & diubah jadi DAN agar link WA tidak putus/error
+                pesan += `🏷️ *MEMBER DAN STD (MTD):*%0A• *Member MTD: ${pctMemMTD.toFixed(2)}%25*%0A• *Total STD MTD: ${tStdMTD.toLocaleString('id-ID')} Struk*%0A%0A`;
+            }
+
+            pesan += `━━━━━━━━━━━━━━━━━━━%0A_Sent via Monitoring Sales App_`;
+
+            // Reset UI and Forms
+            ['s1','s2','s3','realGM','dailyAPC','koreksiSO','realSTD','strukRetail','strukMember','bukuPhoto','eodPhoto'].forEach(id => {
+                let el = document.getElementById(id); if(el) el.value = "";
+            });
+            document.getElementById('bukuPreview').innerHTML = "Belum ada foto Buku";
+            document.getElementById('eodPreview').innerHTML = "Belum ada foto EOD";
+            loadFormShift();
+
+            document.getElementById('btnSave1').style.display = "block";
+            document.getElementById('btnSave2').style.display = "none";
+            
+            tutupLoading();
+            window.open(`https://api.whatsapp.com/send?text=${pesan}`, '_blank');
+        }, 800);
+    }
+
+
+    // ==========================================
+    // BAGIAN 7: RENDER TABEL & DASHBOARD UI
+    // ==========================================
     function renderAll() {
-        let t = document.getElementById('kodeToko').value.toUpperCase(), tb = document.querySelector("#mainTable tbody");
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
+        let tb = document.querySelector("#mainTable tbody"); 
+        
         tb.innerHTML = "";
+        
         if (!t || !db[t]) return;
-        let yK = Number(document.getElementById('thnKini').value);
+        
+        let yK = Number(document.getElementById('thnKini').value); 
         let mK = Number(document.getElementById('blnKini').value);
-        let yL = yK; let mL = mK - 1;
-        if(mL < 1){ mL = 12; yL--; }
+        let yL = yK; 
+        let mL = mK - 1; 
+        
+        if (mL < 1) { 
+            mL = 12; 
+            yL--; 
+        }
 
-        let dL = db[t]?.[yL]?.[mL] || { totalLalu:0, harianLalu:{} };
+        let dL = db[t]?.[yL]?.[mL] || { totalLalu:0, harianLalu:{} }; 
         let dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 };
-        let ak = 0; let tk = 0;
-
+        let ak = 0; 
+        let tk = 0;
+        
         let hariData = Object.keys(dK.harianKini || {}).filter(x => Number(x) > 0 && x != "99").map(Number);
         let tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
 
-        let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target;
-        let tGM_UI = getRawDecimal(document.getElementById('tgtGM').value) || dK.targetGM;
+        let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target || 0; 
+        let tGM_UI = getRawDecimal(document.getElementById('tgtGM').value) || dK.targetGM || 0;
+        
+        let totalSalesMTD = 0; 
+        let totalGMRpMTD = 0; 
+        let totalStdMTD = 0;
+        let totalRetMTD = 0;
+        let totalMemMTD = 0;
+        let totalHari = new Date(yK, mK, 0).getDate();
 
-        let totalSalesMTD = 0; let totalGMRpMTD = 0;
-        let totalHari=new Date(yK,mK,0).getDate();
-
-        for(let i=1;i<=totalHari;i++) {
+        for (let i = 1; i <= totalHari; i++) {
             let vL = (dL && dL.harianLalu && dL.harianLalu[i]) ? Number(dL.harianLalu[i]) : 0;
-            let rK = (dK && dK.harianKini && dK.harianKini[i]) ? dK.harianKini[i] : { total:0, gm_persen:0 };
-            let totalAcuan = dL.totalLalu || 0;
-            let hariAcuan = Object.keys(dL.harianLalu || {}).length;
-
-            if(hariAcuan > totalHari){
-                let carryOver = 0;
-                for(let x = totalHari + 1; x <= hariAcuan; x++){ carryOver += Number(dL.harianLalu[x]) || 0; }
-                totalAcuan = totalAcuan - carryOver;
-            }
-
-            let pL = 0;
-            if (totalAcuan > 0 && vL > 0) {
-                pL = vL / totalAcuan;
-            } else {
-                pL = 1 / totalHari;
-            }
+            let rK = (dK && dK.harianKini && dK.harianKini[i]) ? dK.harianKini[i] : { total:0, gm_persen:0, std:0, pct_member:0 };
             
-            tH = Math.round(pL * targetBulananUI), dtK = new Date(yK, mK - 1, i), dtL = new Date(yL, mL - 1, i);
+            let totalAcuan = dL.totalLalu || 0; 
+            let hariAcuan = Object.keys(dL.harianLalu || {}).length;
+            
+            if (hariAcuan > totalHari) { 
+                let carryOver = 0; 
+                for(let x = totalHari + 1; x <= hariAcuan; x++) { 
+                    carryOver += Number(dL.harianLalu[x]) || 0; 
+                } 
+                totalAcuan = totalAcuan - carryOver; 
+            }
+
+            let pL = (totalAcuan > 0 && vL > 0) ? (vL / totalAcuan) : (1 / totalHari);
+            let tH = Math.round(pL * targetBulananUI);
+            let dtK = new Date(yK, mK - 1, i); 
+            let dtL = new Date(yL, mL - 1, i);
+            
             if (dtK.getMonth() !== mK - 1) continue;
             
-            let hL = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtL.getDay()], hK = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtK.getDay()], jK = [0, 5, 6].includes(dtK.getDay()), jL = [0, 5, 6].includes(dtL.getDay());
+            let hL = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtL.getDay()];
+            let hK = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"][dtK.getDay()];
+            let jK = [0, 5, 6].includes(dtK.getDay()); 
+            let jL = [0, 5, 6].includes(dtL.getDay());
             
-            if(i <= tglIn && rK.total > 0 && tH > 0){ ak += (rK.total - tH); } 
-            if(i<=tglIn){ tk += rK.total; }
-            if (i <= tglIn && rK.total > 0) { totalSalesMTD += rK.total; totalGMRpMTD += (rK.total * (rK.gm_persen / 100)); }
+            if (i <= tglIn && rK.total > 0 && tH > 0) { 
+                ak += (rK.total - tH); 
+            } 
+            if (i <= tglIn) { 
+                tk += rK.total; 
+            }
+            if (i <= tglIn && rK.total > 0) { 
+                totalSalesMTD += rK.total; 
+                totalGMRpMTD += (rK.total * (rK.gm_persen / 100)); 
+                totalStdMTD += (Number(rK.std) || 0);
+                totalRetMTD += (Number(rK.struk_retail) || 0);
+                totalMemMTD += (Number(rK.struk_member) || 0);
+            }
 
-            tb.innerHTML += `<tr class="${jK ? 'jsm-row' : ''}"><td>${i}</td><td>${hL} ${jL?'<span class="tag-jsm-lalu">JSM</span>':''}</td><td>${hK} ${jK?'<span class="tag-jsm">JSM</span>':''}</td><td>${vL.toLocaleString('id-ID')}</td><td>${(pL*100).toFixed(2)}%</td><td>${tH.toLocaleString('id-ID')}</td><td>${rK.total.toLocaleString('id-ID')}</td><td style="background:#e8f8f5">${rK.total.toLocaleString('id-ID')}</td><td style="color:${ak>=0?'green':'red'}">${ak.toLocaleString('id-ID')}</td></tr>`;
+            tb.innerHTML += `
+                <tr class="${jK ? 'jsm-row' : ''}">
+                    <td>${i}</td>
+                    <td>${hL} ${jL ? '<span class="tag-jsm-lalu">JSM</span>' : ''}</td>
+                    <td>${hK} ${jK ? '<span class="tag-jsm">JSM</span>' : ''}</td>
+                    <td>${vL.toLocaleString('id-ID')}</td>
+                    <td>${(pL*100).toFixed(2)}%</td>
+                    <td>${tH.toLocaleString('id-ID')}</td>
+                    <td>${rK.total.toLocaleString('id-ID')}</td>
+                    <td style="background:#e8f8f5">${rK.total.toLocaleString('id-ID')}</td>
+                    <td style="color:${ak >= 0 ? 'green' : 'red'}">${ak.toLocaleString('id-ID')}</td>
+                    <td style="font-weight:bold;">${rK.std || 0}</td>
+                    <td style="color:#8e44ad; font-weight:bold;">${(rK.pct_member || 0).toFixed(1)}%</td>
+                </tr>
+            `;
         }
 
-        let aB = targetBulananUI > 0 ? ((tk / targetBulananUI) * 100) : 0;
-        let jmlH = new Date(yK,mK,0).getDate();
-        let tfP = ((tglIn/jmlH)*100);
+        let aB = targetBulananUI > 0 ? ((tk / targetBulananUI) * 100) : 0; 
+        let tfP = totalHari > 0 ? ((tglIn / totalHari) * 100) : 0; 
         let gapSales = tk - targetBulananUI;
-        let rGM_MTD = totalSalesMTD > 0 ? (totalGMRpMTD / totalSalesMTD) * 100 : 0;
-        let actGMRp_MTD = totalGMRpMTD;
-        let tgtGMRp_MTD = totalSalesMTD * (tGM_UI / 100);
-        let gapGMRp_MTD = actGMRp_MTD - tgtGMRp_MTD;
+        
+        let rGM_MTD = totalSalesMTD > 0 ? (totalGMRpMTD / totalSalesMTD) * 100 : 0; 
+        let gapGMRp_MTD = totalGMRpMTD - (totalSalesMTD * (tGM_UI / 100));
+        let pctMemMTD = totalRetMTD > 0 ? (totalMemMTD / totalRetMTD * 100) : 0;
 
         document.getElementById('summaryDashboard').innerHTML = `
             <div style="background:#fff; padding:12px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;">
                 <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
-                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="${ak>=0?'#27ae60':'#e74c3c'}" stroke-width="3" stroke-dasharray="${aB}, 100"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${aB.toFixed(1)}%</text></svg><div style="font-size:7px; font-weight:bold; color:#27ae60;">SALES</div></div>
-                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${tk.toLocaleString('id-ID')}</b><br>TGT: Rp ${targetBulananUI.toLocaleString('id-ID')}<br><span style="color:${gapSales>=0?'green':'red'}">GAP: Rp ${gapSales.toLocaleString('id-ID')}</span></div>
+                    <div style="text-align:center; width:70px;">
+                        <svg width="55" height="55" viewBox="0 0 36 36">
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/>
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="${ak >= 0 ? '#27ae60' : '#e74c3c'}" stroke-width="3" stroke-dasharray="${aB}, 100"/>
+                            <text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${aB.toFixed(1)}%</text>
+                        </svg>
+                        <div style="font-size:7px; font-weight:bold; color:#27ae60;">SALES</div>
+                    </div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;">
+                        <b>ACT: Rp ${tk.toLocaleString('id-ID')}</b><br>
+                        TGT: Rp ${targetBulananUI.toLocaleString('id-ID')}<br>
+                        <span style="color:${gapSales >= 0 ? 'green' : 'red'}">GAP: Rp ${gapSales.toLocaleString('id-ID')}</span>
+                    </div>
                 </div>
+                
                 <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
-                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#3498db" stroke-width="3" stroke-dasharray="${tfP}, 100"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${tfP.toFixed(1)}%</text></svg><div style="font-size:7px; font-weight:bold; color:#3498db;">WAKTU</div></div>
-                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>H-KE ${tglIn} DARI ${jmlH}</b><br>SPEED: <span style="color:${(aB-tfP)>=0?'green':'red'}">${(aB-tfP).toFixed(1)}%</span></div>
+                    <div style="text-align:center; width:70px;">
+                        <svg width="55" height="55" viewBox="0 0 36 36">
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/>
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#3498db" stroke-width="3" stroke-dasharray="${tfP}, 100"/>
+                            <text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">${tfP.toFixed(1)}%</text>
+                        </svg>
+                        <div style="font-size:7px; font-weight:bold; color:#3498db;">WAKTU</div>
+                    </div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;">
+                        <b>H-KE ${tglIn} DARI ${totalHari}</b><br>
+                        SPEED: <span style="color:${(aB - tfP) >= 0 ? 'green' : 'red'}">${(aB - tfP).toFixed(1)}%</span>
+                    </div>
                 </div>
+                
                 <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
-                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/><path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#9b59b6" stroke-width="3" stroke-dasharray="${tGM_UI>0?(rGM_MTD/tGM_UI*100):0},100"/><text x="18" y="21" text-anchor="middle" font-size="7" font-weight="bold">${rGM_MTD.toFixed(2)}%</text></svg><div style="font-size:7px; font-weight:bold; color:#9b59b6;">GM %</div></div>
-                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>REAL MTD: ${rGM_MTD.toFixed(2)}%</b><br>TGT: ${tGM_UI}%<br><span style="color:${rGM_MTD>=tGM_UI?'green':'red'}">${rGM_MTD>=tGM_UI?'NABUNG GM':'HUTANG GM'}</span></div>
+                    <div style="text-align:center; width:70px;">
+                        <svg width="55" height="55" viewBox="0 0 36 36">
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/>
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#9b59b6" stroke-width="3" stroke-dasharray="${tGM_UI > 0 ? (rGM_MTD / tGM_UI * 100) : 0},100"/>
+                            <text x="18" y="21" text-anchor="middle" font-size="7" font-weight="bold">${rGM_MTD.toFixed(2)}%</text>
+                        </svg>
+                        <div style="font-size:7px; font-weight:bold; color:#9b59b6;">GM %</div>
+                    </div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;">
+                        <b>REAL MTD: ${rGM_MTD.toFixed(2)}%</b><br>
+                        TGT: ${tGM_UI}%<br>
+                        <span style="color:${rGM_MTD >= tGM_UI ? 'green' : 'red'}">${rGM_MTD >= tGM_UI ? 'NABUNG GM' : 'HUTANG GM'}</span>
+                    </div>
                 </div>
+
+                <div style="display:flex; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
+                    <div style="text-align:center; width:70px;">
+                        <svg width="55" height="55" viewBox="0 0 36 36">
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#eee" stroke-width="3"/>
+                            <path d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32" fill="none" stroke="#8e44ad" stroke-width="3" stroke-dasharray="${pctMemMTD}, 100"/>
+                            <text x="18" y="21" text-anchor="middle" font-size="7" font-weight="bold">${pctMemMTD.toFixed(1)}%</text>
+                        </svg>
+                        <div style="font-size:7px; font-weight:bold; color:#8e44ad;">MEMBER</div>
+                    </div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;">
+                        <b>MEMBER MTD: ${pctMemMTD.toFixed(2)}%</b><br>
+                        TOTAL STD MTD: ${totalStdMTD.toLocaleString('id-ID')} Struk<br>
+                        <span style="color:#555">Jml Struk Member: ${totalMemMTD.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+                
                 <div style="display:flex; align-items:center;">
-                    <div style="text-align:center; width:70px;"><svg width="55" height="55" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="#e67e22" stroke-width="3"/><text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">Rp</text></svg><div style="font-size:7px; font-weight:bold; color:#e67e22;">GM RP</div></div>
-                    <div style="flex-grow:1; padding-left:12px; font-size:10px;"><b>ACT: Rp ${Math.round(actGMRp_MTD).toLocaleString('id-ID')}</b><br>TGT MTD: Rp ${Math.round(tgtGMRp_MTD).toLocaleString('id-ID')}<br><span style="color:${gapGMRp_MTD>=0?'green':'red'}">GAP: Rp ${Math.round(gapGMRp_MTD).toLocaleString('id-ID')}</span></div>
+                    <div style="text-align:center; width:70px;">
+                        <svg width="55" height="55" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="#e67e22" stroke-width="3"/>
+                            <text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold">Rp</text>
+                        </svg>
+                        <div style="font-size:7px; font-weight:bold; color:#e67e22;">GM RP</div>
+                    </div>
+                    <div style="flex-grow:1; padding-left:12px; font-size:10px;">
+                        <b>ACT: Rp ${Math.round(totalGMRpMTD).toLocaleString('id-ID')}</b><br>
+                        TGT MTD: Rp ${Math.round(totalSalesMTD * (tGM_UI / 100)).toLocaleString('id-ID')}<br>
+                        <span style="color:${gapGMRp_MTD >= 0 ? 'green' : 'red'}">GAP: Rp ${Math.round(gapGMRp_MTD).toLocaleString('id-ID')}</span>
+                    </div>
                 </div>
             </div>`;
+            
         updateAIPrediction(); 
     }
 
+    // ==========================================
+    // BAGIAN 8: KONEKSI DATA & STARTUP APP
+    // ==========================================
     async function tarikDataCloud() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
         if (!t) return;
-        let bulan = Number(document.getElementById('blnKini').value);
+        
+        let bulan = Number(document.getElementById('blnKini').value); 
         let tahun = Number(document.getElementById('thnKini').value);
+        
         tampilLoading("SINKRONISASI DATA CLOUD..."); 
+        
         try {
-            let res = await fetch(`${scriptURL}?action=get&toko=${t}&bulan=${bulan}&tahun=${tahun}`);
+            let res = await fetch(`${scriptURL}?action=get&toko=${t}&bulan=${bulan}&tahun=${tahun}`); 
             let cloudData = await res.json();
+            
             if (cloudData.status !== "success") return;
-            if (!db[t]) db[t] = {}; if (!db[t][tahun]) db[t][tahun] = {};
+            
+            if(cloudData.data.personil) renderPersonil(cloudData.data.personil);
+
+            if (!db[t]) db[t] = {}; 
+            if (!db[t][tahun]) db[t][tahun] = {};
+            
             db[t][tahun][bulan] = { target: cloudData.data.target || 0, targetGM: cloudData.data.targetGM || 0, harianKini: {} };
+            
             if (cloudData.data.harianKini) {
                 Object.keys(cloudData.data.harianKini).forEach(tgl => {
                     let d = cloudData.data.harianKini[tgl];
                     db[t][tahun][bulan].harianKini[tgl] = { 
-                        s1: (Number(d.m_s3)||0) + (Number(d.m_s1)||0), 
-                        s2: (Number(d.m_s3)||0) + (Number(d.m_s1)||0) + (Number(d.m_s2)||0), 
-                        s3: Number(d.m_s3)||0, 
-                        m_s1: Number(d.m_s1)||0, m_s2: Number(d.m_s2)||0, m_s3: Number(d.m_s3)||0, 
-                        total: Number(d.total)||0, gm_persen: Number(d.gm_persen)||0,
-                        std: Number(d.std)||0, apc: Number(d.apc)||0, nsb: Number(d.nsb)||0,
-                        struk_retail: Number(d.struk_retail)||0, struk_member: Number(d.struk_member)||0, pct_member: Number(d.pct_member)||0
+                        s1: d.s1||0, 
+                        s2: d.s2||0, 
+                        s3: d.s3||0, 
+                        m_s1: d.m_s1||0, 
+                        m_s2: d.m_s2||0, 
+                        m_s3: d.m_s3||0, 
+                        total: d.total||0, 
+                        gm_persen: d.gm_persen||0, 
+                        std: d.std||0, 
+                        apc: d.apc||0, 
+                        nsb: d.nsb||0, 
+                        struk_retail: d.struk_retail||0, 
+                        struk_member: d.struk_member||0, 
+                        pct_member: d.pct_member||0
                     };
                 });
             }
-            let mL = bulan - 1; let yL = tahun;
-            if (mL < 1) { mL = 12; yL--; }
-            if (!db[t][yL]) db[t][yL] = {};
+            
+            let mL = bulan - 1; 
+            let yL = tahun; 
+            if (mL < 1) { 
+                mL = 12; 
+                yL--; 
+            }
+            
+            if (!db[t][yL]) db[t][yL] = {}; 
             db[t][yL][mL] = db[t][yL][mL] || {};
             
-            let cloudTotalLalu = Number(cloudData.data.totalLalu) || 0;
+            let cloudTotalLalu = Number(cloudData.data.totalLalu) || 0; 
             let existingTotalLalu = db[t][yL][mL].totalLalu || 0;
-            db[t][yL][mL].totalLalu = existingTotalLalu > cloudTotalLalu ? existingTotalLalu : cloudTotalLalu;
             
+            db[t][yL][mL].totalLalu = existingTotalLalu > cloudTotalLalu ? existingTotalLalu : cloudTotalLalu;
             db[t][yL][mL].harianLalu = cloudData.data.harianLalu || {};
+            
             localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db));
-        } catch(e) { console.error("Gagal tarik dari cloud", e); } 
-        finally { tutupLoading(); }
+        } catch(e) {
+            // Silently pass
+        } finally { 
+            tutupLoading(); 
+        }
     }
 
     window.onload = async function() {
         tampilLoading("MEMUAT DASHBOARD...");
-        const ses = JSON.parse(sessionStorage.getItem("userAreaJawahir")) || {};
-        const paramUrl = new URLSearchParams(window.location.search);
-        if(paramUrl.get('toko')) {
-            ses.kodeToko = paramUrl.get('toko');
-            ses.namaLengkap = paramUrl.get('nama');
-            ses.jabatan = paramUrl.get('jabatan');
-            sessionStorage.setItem("userAreaJawahir", JSON.stringify(ses));
-        }
-
-        if (!ses.kodeToko) { window.location.href = "index.html"; return; }
-        document.getElementById("kodeToko").value = ses.kodeToko || ""; 
         
-        const jab = String(ses.jabatan || "").toUpperCase();
+        let ses = JSON.parse(sessionStorage.getItem("userArea")) || JSON.parse(sessionStorage.getItem("userAreaJawahir")) || {};
+        
+        const paramUrl = new URLSearchParams(window.location.search);
+        if(paramUrl.get('toko')) { 
+            ses.kodeToko = paramUrl.get('toko'); 
+            ses.namaLengkap = paramUrl.get('nama'); 
+            ses.jabatan = paramUrl.get('jabatan'); 
+            sessionStorage.setItem("userArea", JSON.stringify(ses)); 
+        }
+        
+        if (!ses.kodeToko && !ses.toko) { 
+            window.location.href = "index.html"; 
+            return; 
+        }
+        
+        document.getElementById("kodeToko").value = ses.kodeToko || ses.toko || ""; 
+        
+        const jab = String(ses.jabatan || ses.role || "").toUpperCase();
         
         let isACOS = jab === 'ACOS' || jab.includes('ASST') || jab.includes('ASSISTANT');
         let isKORWIL = jab.includes('KORWIL') || jab.includes('AREA') || jab.includes('AM');
-        let isCOS = (jab.includes('COS') || jab.includes('KT') || jab.includes('KEPALA')) && !isACOS;
-        let isAdminToko = isKORWIL || isCOS;
+        let isCOS = (jab.includes('COS') || jab.includes('KT') || jab.includes('KEPALA') || jab === 'ADMIN') && !isACOS;
+        let isAdminToko = isKORWIL || isCOS || jab === 'ADMIN';
         
         if (!isAdminToko) {
-            let profilFields = ['kodeToko', 'tipeToko', 'targetKini', 'tgtGM', 'totalLalu'];
-            profilFields.forEach(id => {
-                let el = document.getElementById(id);
-                if(el) {
-                    el.disabled = true;
-                    el.readOnly = true;
-                    el.style.backgroundColor = "#e0e0e0";
-                    el.style.color = "#666";
-                    el.style.border = "1px solid #ccc";
-                    el.style.cursor = "not-allowed";
+            ['kodeToko', 'tipeToko', 'targetKini', 'tgtGM', 'totalLalu'].forEach(id => {
+                let el = document.getElementById(id); 
+                if(el) { 
+                    el.disabled = true; 
+                    el.readOnly = true; 
+                    el.style.backgroundColor = "#e0e0e0"; 
+                    el.style.cursor = "not-allowed"; 
                 }
-            });
+            }); 
             document.querySelectorAll('.btn-admin-only').forEach(el => el.style.display = 'none');
         }
 
-        const isCrew = (!isACOS && !isAdminToko);
-        
+        const isCrew = (!isACOS && !isAdminToko && jab !== "USER");
         document.getElementById('inTgl').value = tglSkrg;
         
-        if (isCrew) {
+        if (isCrew || jab === "LOCKED") {
             document.body.classList.add('locked-mode');
         }
-        await loadData();
-        cekKunci();
         
+        let namaLogin = ses.namaLengkap || ses.nama || "";
+        if (namaLogin && (ses.kodeToko || ses.toko)) {
+            fetch(scriptURL, {
+                method: 'POST', 
+                mode: 'no-cors', 
+                headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                body: JSON.stringify({
+                    action: "syncPersonil", 
+                    toko: ses.kodeToko || ses.toko, 
+                    nama: namaLogin
+                })
+            }); 
+        }
+
+        await loadData();
+        cekKunci(); 
         aturInputShift();
         
-        ['s3','s1','s2','strukRetail','strukMember'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',hitungPreviewMurni); });
+        setInterval(() => { cekKunci(); }, 10000);
+
+        ['s3','s1','s2','strukRetail','strukMember'].forEach(id => { 
+            const el = document.getElementById(id); 
+            if(el) el.addEventListener('input', hitungPreviewMurni); 
+        });
         
-        const bp=document.getElementById('bukuPhoto'); 
-        if(bp) bp.addEventListener('change',function(){ previewImg(this, 'bukuPreview'); });
+        const bp = document.getElementById('bukuPhoto'); 
+        if(bp) bp.addEventListener('change', function() { previewImg(this, 'bukuPreview'); });
         
-        const ep=document.getElementById('eodPhoto'); 
-        if(ep) ep.addEventListener('change',function(){ previewImg(this, 'eodPreview'); });
+        const ep = document.getElementById('eodPhoto'); 
+        if(ep) ep.addEventListener('change', function() { previewImg(this, 'eodPreview'); });
         
         tutupLoading();
     };
 
     async function loadData() {
-        let t = document.getElementById('kodeToko').value.toUpperCase();
+        let t = document.getElementById('kodeToko').value.toUpperCase(); 
         if(!t) return;
-        let yK = document.getElementById('thnKini').value;
+        
+        let yK = document.getElementById('thnKini').value; 
         let mK = document.getElementById('blnKini').value;
-
+        
         await tarikDataCloud();
-
-        if(!db[t]) db[t] = {}; if(!db[t][yK]) db[t][yK] = {};
-        if(!db[t][yK][mK]){ db[t][yK][mK] = { target:0, harianKini:{}, targetGM:0 }; }
-
-        setFormattedValue('targetKini', db[t][yK][mK].target, true);
+        
+        if(!db[t]) db[t] = {}; 
+        if(!db[t][yK]) db[t][yK] = {}; 
+        if(!db[t][yK][mK]) { 
+            db[t][yK][mK] = { target:0, harianKini:{}, targetGM:0 }; 
+        }
+        
+        setFormattedValue('targetKini', db[t][yK][mK].target, true); 
         setFormattedValue('tgtGM', db[t][yK][mK].targetGM, false);
-
-        let yL = Number(yK); let mL = Number(mK) - 1;
-        if(mL < 1){ mL = 12; yL--; }
+        
+        let yL = Number(yK); 
+        let mL = Number(mK) - 1; 
+        if(mL < 1) { 
+            mL = 12; 
+            yL--; 
+        }
+        
         setFormattedValue('totalLalu', db[t]?.[yL]?.[mL]?.totalLalu, true);
-
-        loadFormShift();
-
-        renderAll();
-        updateAIPrediction();
+        
+        loadFormShift(); 
+        renderAll(); 
+        updateAIPrediction(); 
         cekKunci();
     }
 
-    function save() { localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); renderAll(); }
-    setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString('id-ID'); }, 1000);
+    function save() { 
+        localStorage.setItem('alfaSalesPaten_v10', JSON.stringify(db)); 
+        renderAll(); 
+    }
     
-    function resetDb(){ if(confirm("RESET SEMUA DATA LOKAL?")){ tampilLoading("MERESET DATA..."); setTimeout(() => { localStorage.removeItem('alfaSalesPaten_v10'); location.reload(); }, 1000); } }
+    setInterval(() => { 
+        document.getElementById('liveClock').innerText = new Date().toLocaleString('id-ID'); 
+    }, 1000);
+    
+    function resetDb() { 
+        if (confirm("RESET SEMUA DATA LOKAL?")) { 
+            tampilLoading("MERESET DATA..."); 
+            setTimeout(() => { 
+                localStorage.removeItem('alfaSalesPaten_v10'); 
+                location.reload(); 
+            }, 1000); 
+        } 
+    }
 
-   function bukaModalAI() {
+    // ==========================================
+    // BAGIAN 9: MODAL & ANALISIS AI
+    // ==========================================
+    function bukaModalAI() {
         tampilLoading("MEMUAT LAPORAN AI..."); 
+        
         setTimeout(() => {
             const t = document.getElementById('kodeToko').value.toUpperCase();
-            const yK = document.getElementById('thnKini').value;
+            const yK = document.getElementById('thnKini').value; 
             const mK = document.getElementById('blnKini').value;
             const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
             
-            let hariData = Object.keys(dK.harianKini).filter(x => dK.harianKini[x] && dK.harianKini[x].total > 0).map(Number);
-            let tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
-            let tk = 0; let tgmMTD = 0;
+            let hariData = Object.keys(dK.harianKini).filter(x => dK.harianKini[x] && dK.harianKini[x].total > 0 && x != "99").map(Number);
+            let tglIn = hariData.length > 0 ? Math.max(...hariData) : 0; 
+            let tk = 0; 
+            let tgmMTD = 0;
 
-            Object.keys(dK.harianKini).forEach(tg => {
-                let data = dK.harianKini[tg];
-                if(parseInt(tg) <= tglIn && data && data.total > 0 && tg != "99"){ tk += data.total; tgmMTD += (data.total*(data.gm_persen/100)); }
+            Object.keys(dK.harianKini).forEach(tg => { 
+                let data = dK.harianKini[tg]; 
+                if (parseInt(tg) <= tglIn && data && data.total > 0 && tg != "99") { 
+                    tk += Number(data.total) || 0; 
+                    tgmMTD += (Number(data.total) || 0) * ((Number(data.gm_persen) || 0) / 100); 
+                } 
             });
 
-            let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target;
-            let aB = targetBulananUI > 0 ? (tk / targetBulananUI * 100) : 0;
+            let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target || 0;
+            let tGM_UI = getRawDecimal(document.getElementById('tgtGM').value) || dK.targetGM || 0;
+
+            let aB = targetBulananUI > 0 ? (tk / targetBulananUI * 100) : 0; 
             let rGM = tk > 0 ? (tgmMTD / tk * 100) : 0;
-            let actGMRp = tgmMTD;
-            let tgtGMRp = tk * (dK.targetGM / 100);
+            let actGMRp = tgmMTD; 
+            let tgtGMRp = tk * (tGM_UI / 100); 
             let gapGMRp = actGMRp - tgtGMRp;
             let jmlH = new Date(yK, mK, 0).getDate(); 
-            let tfP=(tglIn/jmlH*100);
-            let gapSales=tk-targetBulananUI;
+            let tfP = (tglIn / jmlH * 100); 
+            let gapSales = tk - targetBulananUI;
 
             let htmlContent = `
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px;">
                     <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #27ae60;">
-                        <b style="color: #27ae60;">📊 SALES (ACT vs TGT)</b><br>Actual: Rp ${tk.toLocaleString('id-ID')}<br>Target: Rp ${targetBulananUI.toLocaleString('id-ID')}<br>Gap:<span style="color:${gapSales>=0?'green':'red'}">Rp ${gapSales.toLocaleString('id-ID')}</span>
+                        <b style="color: #27ae60;">📊 SALES (ACT vs TGT)</b><br>
+                        Actual: Rp ${tk.toLocaleString('id-ID')}<br>
+                        Target: Rp ${targetBulananUI.toLocaleString('id-ID')}<br>
+                        Gap:<span style="color:${gapSales >= 0 ? 'green' : 'red'}">Rp ${gapSales.toLocaleString('id-ID')}</span>
                     </div>
                     <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #3498db;">
-                        <b style="color: #3498db;">📅 TIME FACTOR</b><br>Hari ke: ${tglIn} dari ${jmlH}<br>Progress Waktu: ${tfP.toFixed(1)}%<br>Speed Sales: <span style="color: ${aB >= tfP ? 'green' : 'red'}">${(aB - tfP).toFixed(1)}%</span>
+                        <b style="color: #3498db;">📅 TIME FACTOR</b><br>
+                        Hari ke: ${tglIn} dari ${jmlH}<br>
+                        Progress Waktu: ${tfP.toFixed(1)}%<br>
+                        Speed Sales: <span style="color: ${aB >= tfP ? 'green' : 'red'}">${(aB - tfP).toFixed(1)}%</span>
                     </div>
                     <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #9b59b6;">
-                        <b style="color: #9b59b6;">💰 GM % (MTD)</b><br>Actual: ${rGM.toFixed(2)}%<br>Target: ${dK.targetGM}%<br>Status: <b>${rGM >= dK.targetGM ? 'NABUNG GM' : 'HUTANG GM'}</b>
+                        <b style="color: #9b59b6;">💰 GM % (MTD)</b><br>
+                        Actual: ${rGM.toFixed(2)}%<br>
+                        Target: ${tGM_UI}%<br>
+                        Status: <b>${rGM >= tGM_UI ? 'NABUNG GM' : 'HUTANG GM'}</b>
                     </div>
                     <div style="background: #eef2f3; padding: 15px; border-radius: 10px; border-left: 5px solid #e67e22;">
-                        <b style="color: #e67e22;">💵 GM RUPIAH</b><br>Actual: Rp ${Math.round(actGMRp).toLocaleString('id-ID')}<br>Target MTD: Rp ${Math.round(tgtGMRp).toLocaleString('id-ID')}<br>Surplus: <span style="color: ${gapGMRp >= 0 ? 'green' : 'red'}">Rp ${Math.round(gapGMRp).toLocaleString('id-ID')}</span>
+                        <b style="color: #e67e22;">💵 GM RUPIAH</b><br>
+                        Actual: Rp ${Math.round(actGMRp).toLocaleString('id-ID')}<br>
+                        Target MTD: Rp ${Math.round(tgtGMRp).toLocaleString('id-ID')}<br>
+                        Surplus: <span style="color: ${gapGMRp >= 0 ? 'green' : 'red'}">Rp ${Math.round(gapGMRp).toLocaleString('id-ID')}</span>
                     </div>
                 </div>
             `;
 
-            let decision = ""; let color = ""; let motivasi = "";
-
-            if (aB >= 100 && rGM >= dK.targetGM) { decision = "🏆 PREDIKSI: TARGET IKT TERCAPAI"; color = "#27ae60"; motivasi = `✅ Sales sudah mencapai target\n✅ GM % sudah mencapai target\n✅ GM Rupiah aman\n\nSeluruh indikator utama IKT sudah terpenuhi.\nTahap berikutnya tinggal menunggu hasil perhitungan Net Profit dari sistem pusat untuk menentukan hasil akhir IKT bulan berjalan.`; } 
-            else if (aB >= 100 && gapGMRp > 0) { decision = "🥇 PREDIKSI: TINGGAL MENUNGGU NET PROFIT"; color = "#f1c40f"; motivasi = `✅ Sales sudah mencapai target\n✅ GM Rupiah masih surplus\n\nGM % belum mencapai target, namun masih tertolong oleh pencapaian GM Rupiah.\nPeluang menang IKT masih terbuka dan hasil akhir akan ditentukan oleh pencapaian Net Profit bulan berjalan.`; } 
-            else if (aB >= 95 && gapGMRp > 0) { decision = "🟢 PREDIKSI: BERPELUANG BESAR MENANG IKT"; color = "#27ae60"; motivasi = `Sales tinggal sedikit lagi menuju target.\n✅ GM % sudah aman\n✅ GM Rupiah surplus\n✅ Posisi toko sangat kompetitif\n\nFokus utama adalah menutup gap sales sebesar Rp ${Math.abs(gapSales).toLocaleString('id-ID')} sebelum closing.\nJika target sales berhasil tercapai maka peluang menang IKT sangat besar dan tahap berikutnya tinggal menunggu hasil Net Profit.`; } 
-            else if (aB >= 90) { decision = "🟡 PREDIKSI: MASIH BISA DIKEJAR"; color = "#f39c12"; motivasi = `Achievement sales masih cukup baik namun belum aman.\nMasih terdapat kekurangan sales sebesar Rp ${Math.abs(gapSales).toLocaleString('id-ID')}.\n\nDiperlukan percepatan transaksi, peningkatan basket size, serta fokus pada program penjualan untuk mengejar target sebelum closing.`; } 
-            else { decision = "🔴 PREDIKSI: TERANCAM GAGAL IKT"; color = "#e74c3c"; motivasi = `Gap sales masih cukup besar terhadap target bulanan.\nKecepatan sales tertinggal dari progress waktu sehingga dibutuhkan recovery yang signifikan.\n\nFokus pada peningkatan transaksi, keranjang belanja, tebus murah, dan item margin tinggi untuk memperkecil ketertinggalan.`; }
+            let decision = ""; 
+            let color = ""; 
+            let motivasi = "";
+            
+            if (tk === 0) {
+                decision = "⚪ BELUM ADA DATA SALES"; 
+                color = "#7f8c8d"; 
+                motivasi = "Silakan input laporan harian terlebih dahulu.";
+            } else if (aB >= 100 && rGM >= tGM_UI) { 
+                decision = "🏆 PREDIKSI: TARGET IKT TERCAPAI"; 
+                color = "#27ae60"; 
+                motivasi = `✅ Sales sudah mencapai target\n✅ GM % sudah mencapai target\n✅ GM Rupiah aman\n\nSeluruh indikator utama IKT sudah terpenuhi.\nTahap berikutnya tinggal menunggu hasil perhitungan Net Profit dari sistem pusat untuk menentukan hasil akhir IKT bulan berjalan.`; 
+            } else if (aB >= 100 && gapGMRp > 0) { 
+                decision = "🥇 PREDIKSI: TINGGAL MENUNGGU NET PROFIT"; 
+                color = "#f1c40f"; 
+                motivasi = `✅ Sales sudah mencapai target\n✅ GM Rupiah masih surplus\n\nGM % belum mencapai target, namun masih tertolong oleh pencapaian GM Rupiah.\nPeluang menang IKT masih terbuka dan hasil akhir akan ditentukan oleh pencapaian Net Profit bulan berjalan.`; 
+            } else if (aB >= 95 && gapGMRp > 0) { 
+                decision = "🟢 PREDIKSI: BERPELUANG BESAR MENANG IKT"; 
+                color = "#27ae60"; 
+                motivasi = `Sales tinggal sedikit lagi menuju target.\n✅ GM % sudah aman\n✅ GM Rupiah surplus\n✅ Posisi toko sangat kompetitif\n\nFokus utama adalah menutup gap sales sebesar Rp ${Math.abs(gapSales).toLocaleString('id-ID')} sebelum closing.\nJika target sales berhasil tercapai maka peluang menang IKT sangat besar dan tahap berikutnya tinggal menunggu hasil Net Profit.`; 
+            } else if (aB >= 90) { 
+                decision = "🟡 PREDIKSI: MASIH BISA DIKEJAR"; 
+                color = "#f39c12"; 
+                motivasi = `Achievement sales masih cukup baik namun belum aman.\nMasih terdapat kekurangan sales sebesar Rp ${Math.abs(gapSales).toLocaleString('id-ID')}.\n\nDiperlukan percepatan transaksi, peningkatan basket size, serta fokus pada program penjualan untuk mengejar target sebelum closing.`; 
+            } else { 
+                decision = "🔴 PREDIKSI: TERANCAM GAGAL IKT"; 
+                color = "#e74c3c"; 
+                motivasi = `Gap sales masih cukup besar terhadap target bulanan.\nKecepatan sales tertinggal dari progress waktu sehingga dibutuhkan recovery yang signifikan.\n\nFokus pada peningkatan transaksi, keranjang belanja, tebus murah, dan item margin tinggi untuk memperkecil ketertinggalan.`; 
+            }
 
             document.getElementById('aiAnalysisContent').innerHTML = `<div style="margin-bottom:10px;">${htmlContent}</div>`;
-            const decEl = document.getElementById('aiDecision');
+            const decEl = document.getElementById('aiDecision'); 
             decEl.style.background = color;
             decEl.innerHTML = `<div class="status-badge">${decision}</div><p style="margin-top:15px; font-size:15px; line-height:1.7;">${motivasi}</p>`;
-            document.getElementById('aiModal').style.display = "block";
+            document.getElementById('aiModal').style.display = "block"; 
+            
             tutupLoading();
         }, 800);
     }
+    
+    function tutupModalAI() { 
+        document.getElementById('aiModal').style.display = "none"; 
+    }
+    
+    function bukaPanduan() { 
+        document.getElementById('modalPanduan').style.display = "block"; 
+    }
+    
+    function tutupPanduan() { 
+        document.getElementById('modalPanduan').style.display = "none"; 
+    }
 
-    function tutupModalAI() { document.getElementById('aiModal').style.display = "none"; }
-    window.onclick=function(event){ let modal=document.getElementById('aiModal'); if(event.target==modal){ modal.style.display="none"; } }
+    // UPDATE FUNGSI KLIK DILUAR KOTAK AGAR BISA MENUTUP KEDUA MODAL
+    window.onclick = function(event) { 
+        let modalAI = document.getElementById('aiModal'); 
+        let modalPanduan = document.getElementById('modalPanduan');
+        if (event.target == modalAI) { modalAI.style.display = "none"; } 
+        if (event.target == modalPanduan) { modalPanduan.style.display = "none"; } 
+    }
 
     function updateAIPrediction() {
-        const t = document.getElementById('kodeToko').value.toUpperCase();
-        const yK = Number(document.getElementById('thnKini').value);
+        const t = document.getElementById('kodeToko').value.toUpperCase(); 
+        const yK = Number(document.getElementById('thnKini').value); 
         const mK = Number(document.getElementById('blnKini').value);
-        const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 };
+        const dK = db[t]?.[yK]?.[mK] || { target: 0, harianKini: {}, targetGM: 0 }; 
+        
         let tk = 0, tgmMTD = 0;
-        Object.keys(dK.harianKini || {}).forEach(tg => {
-            if(isNaN(tg)) return;
-            const data = dK.harianKini[tg];
-            if(data && data.total > 0 && tg != "99"){ tk += Number(data.total) || 0; tgmMTD += (Number(data.total) || 0) * ((Number(data.gm_persen) || 0)/100); }
+        let hariData = Object.keys(dK.harianKini || {}).filter(x => Number(x) > 0 && x != "99").map(Number);
+        let tglIn = hariData.length > 0 ? Math.max(...hariData) : 0;
+
+        Object.keys(dK.harianKini || {}).forEach(tg => { 
+            if(isNaN(tg)) return; 
+            const data = dK.harianKini[tg]; 
+            if(data && data.total > 0 && tg != "99") { 
+                tk += Number(data.total) || 0; 
+                tgmMTD += (Number(data.total) || 0) * ((Number(data.gm_persen) || 0) / 100); 
+            } 
         });
 
-        let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target;
-        const aB = targetBulananUI > 0 ? (tk / targetBulananUI) * 100 : 0;
+        let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target || 0;
+        let tGM_UI = getRawDecimal(document.getElementById('tgtGM').value) || dK.targetGM || 0;
+
+        const aB = targetBulananUI > 0 ? (tk / targetBulananUI) * 100 : 0; 
         const rGM_MTD = tk > 0 ? (tgmMTD / tk) * 100 : 0;
+        const gapGMRp = tgmMTD - (tk * (tGM_UI/100));
+        
+        const jmlH = new Date(yK, mK, 0).getDate();
+        const tfP = jmlH > 0 ? (tglIn/jmlH)*100 : 0;
 
-        let status = "", warna = "", saran = "";
-        if(aB >= 100 && rGM_MTD >= dK.targetGM){ status = "🏆 TARGET IKT TERCAPAI"; warna = "#27ae60"; saran = "✅ Sales mencapai target<br>✅ GM% mencapai target<br>✅ GM Rupiah aman<br><br>Seluruh indikator utama IKT telah terpenuhi. Tinggal menunggu hasil perhitungan Net Profit dari sistem pusat."; } 
-        else if(aB >= 100 && (tgmMTD - (tk * (dK.targetGM/100))) > 0){ status = "🥇 TINGGAL MENUNGGU NET PROFIT"; warna = "#f1c40f"; saran = "✅ Sales mencapai target<br>✅ GM Rupiah surplus<br><br>GM% belum mencapai target namun masih tertolong GM Rupiah. Hasil akhir akan ditentukan oleh Net Profit."; } 
-        else if(aB >= 95 && (tgmMTD - (tk * (dK.targetGM/100))) > 0){ status = "🟢 BERPELUANG BESAR MENANG IKT"; warna = "#27ae60"; saran = "✅ GM% aman<br>✅ GM Rupiah surplus<br>✅ Posisi toko kompetitif<br><br>Tutup kekurangan sales Rp " + Math.abs(targetBulananUI - tk).toLocaleString('id-ID') + " sebelum closing. Jika target sales tercapai maka peluang menang IKT sangat besar."; } 
-        else if(aB >= 90){ status = "🟡 MASIH BISA DIKEJAR"; warna = "#f39c12"; saran = "Achievement masih cukup baik namun belum aman. Fokus percepatan transaksi, basket size, dan program promo untuk mengejar target."; } 
-        else { status = "🔴 TERANCAM GAGAL IKT"; warna = "#e74c3c"; saran = "Gap sales masih cukup besar. Dibutuhkan recovery signifikan melalui transaksi besar, keranjang belanja, dan tebus murah."; }
+        let status = ""; 
+        let warna = ""; 
+        let saran = "";
+        
+        if (tk === 0) {
+            status = "⚪ BELUM ADA DATA SALES"; 
+            warna = "#7f8c8d"; 
+            saran = "Silakan input laporan harian terlebih dahulu.";
+        } else if (aB >= 100 && rGM_MTD >= tGM_UI) { 
+            status = "🏆 TARGET IKT TERCAPAI"; 
+            warna = "#27ae60"; 
+            saran = "✅ Sales mencapai target<br>✅ GM% mencapai target<br>✅ GM Rupiah aman<br><br>Seluruh indikator utama IKT telah terpenuhi. Tinggal menunggu hasil perhitungan Net Profit dari sistem pusat."; 
+        } else if(aB >= 100 && gapGMRp > 0) { 
+            status = "🥇 TINGGAL MENUNGGU NET PROFIT"; 
+            warna = "#f1c40f"; 
+            saran = "✅ Sales mencapai target<br>✅ GM Rupiah surplus<br><br>GM% belum mencapai target namun masih tertolong GM Rupiah. Hasil akhir akan ditentukan oleh Net Profit."; 
+        } else if(aB >= 95 && gapGMRp > 0) { 
+            status = "🟢 BERPELUANG BESAR MENANG IKT"; 
+            warna = "#27ae60"; 
+            saran = `✅ GM% aman<br>✅ GM Rupiah surplus<br>✅ Posisi toko kompetitif<br><br>Tutup kekurangan sales Rp ${Math.abs(targetBulananUI - tk).toLocaleString('id-ID')} sebelum closing. Jika target sales tercapai maka peluang menang IKT sangat besar.`; 
+        } else if(aB >= 90) { 
+            status = "🟡 MASIH BISA DIKEJAR"; 
+            warna = "#f39c12"; 
+            saran = "Achievement masih cukup baik namun belum aman. Fokus percepatan transaksi, basket size, dan program promo untuk mengejar target."; 
+        } else { 
+            status = "🔴 TERANCAM GAGAL IKT"; 
+            warna = "#e74c3c"; 
+            saran = "Gap sales masih cukup besar. Dibutuhkan recovery signifikan melalui transaksi besar, keranjang belanja, dan tebus murah."; 
+        }
 
-        const stEl = document.getElementById('aiStatusIKT'); const ntEl = document.getElementById('aiNote'); const tgEl = document.getElementById('aiTargetKejar');
-        if(stEl && ntEl && tgEl){ stEl.innerHTML = status; stEl.style.color = warna; ntEl.innerHTML = "Sales: " + aB.toFixed(1) + "% | GM: " + rGM_MTD.toFixed(2) + "%"; tgEl.innerHTML = "<b>💡 CATATAN IA:</b><br>" + saran; }
+        const stEl = document.getElementById('aiStatusIKT'); 
+        const ntEl = document.getElementById('aiNote'); 
+        const tgEl = document.getElementById('aiTargetKejar');
+        
+        if (stEl && ntEl && tgEl) { 
+            stEl.innerHTML = status; 
+            stEl.style.color = warna; 
+            ntEl.innerHTML = `Sales: ${aB.toFixed(1)}% | Waktu: ${tfP.toFixed(1)}% | GM: ${rGM_MTD.toFixed(2)}%`; 
+            tgEl.innerHTML = "<b>💡 CATATAN IA:</b><br>" + saran; 
+        }
     }
 
     function jawabAI(){
-        const q = document.getElementById("pilihanAI").value;
+        const q = document.getElementById("pilihanAI").value; 
         const box = document.getElementById("jawabanAI");
-        if(!q){ box.style.display="block"; box.innerHTML="⚠️ Pilih pertanyaan terlebih dahulu"; return; }
-
+        
+        if (!q) { 
+            box.style.display = "block"; 
+            box.innerHTML = "⚠️ Pilih pertanyaan terlebih dahulu"; 
+            return; 
+        }
+        
         tampilLoading("IA SEDANG MENGANALISA..."); 
+        
         setTimeout(() => {
-            const t = document.getElementById('kodeToko').value.toUpperCase();
-            const yK = document.getElementById('thnKini').value;
+            const t = document.getElementById('kodeToko').value.toUpperCase(); 
+            const yK = document.getElementById('thnKini').value; 
             const mK = document.getElementById('blnKini').value;
-            const dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 };
-            let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target;
-            let total=0;
-            let tglIn = parseInt(document.getElementById('inTgl').value)||tglSkrg;
+            const dK = db[t]?.[yK]?.[mK] || { target:0, harianKini:{}, targetGM:0 }; 
+            
+            let targetBulananUI = getRawRupiah(document.getElementById('targetKini').value) || dK.target || 0;
+            let total = 0; 
+            let tglIn = parseInt(document.getElementById('inTgl').value) || tglSkrg;
+            
+            Object.keys(dK.harianKini).forEach(tg => { 
+                let x = dK.harianKini[tg]; 
+                if(parseInt(tg) <= tglIn && tg != "99") { 
+                    total += x.total || 0; 
+                } 
+            });
 
-            Object.keys(dK.harianKini).forEach(tg=>{ let x = dK.harianKini[tg]; if(parseInt(tg)<=tglIn && tg!="99"){ total += x.total||0; } });
+            let ach = targetBulananUI > 0 ? (total / targetBulananUI) * 100 : 0; 
+            let sisa = Math.max(1, new Date(yK, mK, 0).getDate() - tglIn + 1); 
+            let gap = Math.max(0, targetBulananUI - total);
+            let isi = ""; 
+            
+            if (targetBulananUI <= 0) { 
+                box.style.display = "block"; 
+                box.innerHTML = "⚠️ Isi target bulanan terlebih dahulu"; 
+                tutupLoading(); 
+                return; 
+            }
 
-            let ach = targetBulananUI>0 ? (total/targetBulananUI)*100 : 0;
-            let sisa = Math.max(1, new Date(yK,mK,0).getDate()-tglIn+1);
-            let gap = Math.max(0, targetBulananUI-total);
-            let isi="";
-
-            if(targetBulananUI<=0){ box.style.display="block"; box.innerHTML="⚠️ Isi target bulanan terlebih dahulu"; tutupLoading(); return; }
-
-            switch(q){
+            switch(q) {
                 case "harapan":
                     let perHari = Math.ceil(gap / Math.max(1,sisa));
-                    if(ach>=95){ isi=`🏆 PELUANG MENANG SANGAT BESAR.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nKebutuhan sales sekitar: Rp ${perHari.toLocaleString('id-ID')} per hari.\nPosisi toko sudah sangat dekat dengan target. Fokus menjaga speed sales dan konsistensi transaksi sampai closing akhir bulan.`; }
-                    else if(ach>=85){ isi=`✅ MASIH ADA HARAPAN MENANG.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nUntuk mencapai target dibutuhkan sekitar: Rp ${perHari.toLocaleString('id-ID')} per hari.\nPosisi memang tertinggal, namun peluang masih terbuka. Fokus pada keranjang belanja, tebus murah, dan transaksi bernilai besar.`; }
+                    if(ach >= 95){ isi=`🏆 PELUANG MENANG SANGAT BESAR.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nKebutuhan sales sekitar: Rp ${perHari.toLocaleString('id-ID')} per hari.\nPosisi toko sudah sangat dekat dengan target. Fokus menjaga speed sales dan konsistensi transaksi sampai closing akhir bulan.`; }
+                    else if(ach >= 85){ isi=`✅ MASIH ADA HARAPAN MENANG.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nUntuk mencapai target dibutuhkan sekitar: Rp ${perHari.toLocaleString('id-ID')} per hari.\nPosisi memang tertinggal, namun peluang masih terbuka. Fokus pada keranjang belanja, tebus murah, dan transaksi bernilai besar.`; }
                     else{ isi=`⚠️ PELUANG MASIH ADA NAMUN BERAT.\nAchievement saat ini: ${ach.toFixed(1)}%\nMasih ada ${sisa} hari kerja aktif.\nKebutuhan sales mencapai: Rp ${perHari.toLocaleString('id-ID')} per hari.\nDiperlukan percepatan sales yang cukup tinggi agar toko kembali ke jalur target.`; }
                 break;
                 case "strategi":
-                    isi=`🎯 STRATEGI UTAMA SAAT INI\n• Push Tebus Murah\n• Naikkan basket size pelanggan\n• Fokus item kebutuhan harian\n• Maksimalkan transaksi member\n• Recovery jam sepi`;
+                    if(ach >= 90){ isi=`🎯 STRATEGI UTAMA SAAT INI\n• Pertahankan speed sales harian\n• Jaga GM tetap di atas target\n• Push keranjang belanja\n• Maksimalkan attach selling kasir\n• Hindari penurunan transaksi di akhir bulan\nFokus menjaga momentum karena posisi toko sudah cukup baik.`; }
+                    else if(ach >= 75){ isi=`🎯 STRATEGI YANG HARUS DIFOKUSKAN\n• Push Tebus Murah\n• Naikkan basket size pelanggan\n• Fokus item kebutuhan harian\n• Maksimalkan transaksi member\n• Recovery jam sepi\nTarget masih realistis jika speed sales meningkat pada sisa hari.`; }
+                    else{ isi=`🚨 STRATEGI PENYELAMATAN TARGET\n• Kejar transaksi bernilai besar\n• Push seluruh program promo\n• Fokus item fast moving\n• Tingkatkan attach selling kasir\n• Recovery setiap jam operasional\nDibutuhkan percepatan sales yang signifikan untuk mengejar target.`; }
                 break;
                 case "prediksi":
-                    let prediksi = Math.round((total/Math.max(1,tglIn-1))*new Date(yK,mK,0).getDate());
-                    let selisih = prediksi-targetBulananUI;
-                    if(prediksi>=targetBulananUI){ isi=`📈 PROYEKSI MENANG.\nPrediksi akhir bulan: Rp ${prediksi.toLocaleString('id-ID')}\nTarget: Rp ${targetBulananUI.toLocaleString('id-ID')}\nPotensi surplus: Rp ${selisih.toLocaleString('id-ID')}`; }
-                    else{ isi=`📊 PROYEKSI BELUM TERCAPAI.\nPrediksi akhir bulan: Rp ${prediksi.toLocaleString('id-ID')}\nPotensi kekurangan: Rp ${Math.abs(selisih).toLocaleString('id-ID')}`; }
+                    let prediksi = Math.round((total / Math.max(1, tglIn - 1)) * new Date(yK, mK, 0).getDate()); 
+                    let selisih = prediksi - targetBulananUI;
+                    if(prediksi >= targetBulananUI){ isi=`📈 PROYEKSI MENANG.\nPrediksi akhir bulan: Rp ${prediksi.toLocaleString('id-ID')}\nTarget: Rp ${targetBulananUI.toLocaleString('id-ID')}\nPotensi surplus: Rp ${selisih.toLocaleString('id-ID')}\nJika kecepatan sales tetap terjaga sampai closing maka target berpotensi tercapai.`; }
+                    else{ isi=`📊 PROYEKSI BELUM TERCAPAI.\nPrediksi akhir bulan: Rp ${prediksi.toLocaleString('id-ID')}\nTarget: Rp ${targetBulananUI.toLocaleString('id-ID')}\nPotensi kekurangan: Rp ${Math.abs(selisih).toLocaleString('id-ID')}\nDiperlukan percepatan sales pada sisa hari operasional.`; }
                 break;
-                default: isi="Silakan pilih pertanyaan terlebih dahulu.";
+                case "kenapa":
+                    isi=`📉 ANALISA POSISI SAAT INI\nTarget sales belum tercapai.\nAchievement saat ini: ${ach.toFixed(1)}%\nKekurangan target: Rp ${gap.toLocaleString('id-ID')}\nKecepatan sales masih berada di bawah progress waktu.\n\nNamun peluang belum sepenuhnya tertutup karena:\n• Masih ada ${sisa} hari operasional\n• Pastikan GM % dan GM Rupiah tetap surplus\n\nFokus utama adalah menutup kekurangan sales sebelum closing akhir bulan.`;
+                break;
+                case "faktor":
+                    isi=`🔍 FAKTOR YANG PALING MEMPENGARUHI IKT\n• Gap sales terhadap target masih tinggi\n• Achievement saat ini: ${ach.toFixed(1)}%\n• Waktu tersisa: ${sisa} hari\n• Kecepatan sales perlu ditingkatkan\n• Pencapaian Net Profit dari pusat\nFaktor dominan saat ini adalah pencapaian sales terhadap target bulanan.`;
+                break;
             }
-
-            box.style.display = "block";
-            box.innerHTML = isi;
+            
+            box.style.display = "block"; 
+            box.innerHTML = isi; 
             tutupLoading();
+            
         }, 1200);
     }
 </script>
