@@ -361,6 +361,8 @@
             📈 VS BULAN LALU</button>
             <button onclick="bukaRanking()" style="width:100%;background:#f39c12;color:white;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;font-weight:bold;">
             🏆 RANKING PENJUALAN</button>
+            <button onclick="bukaBreakdown()" style="width:100%; background:#e84393; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+            ⚖️ BREAKDOWN TARGET KASIR (%)</button>
         </div>
 
 
@@ -425,35 +427,80 @@
 
 <!-- WADAH MODAL PANDUAN PENGGUNAAN -->
     <div id="modalPanduan" class="modal-rapor" style="display:none;">
-        <div class="modal-content" style="max-width: 850px; height: auto; max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 15px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #3498db; padding-bottom:10px; margin-bottom:15px; position:sticky; top:0; background:linear-gradient(135deg,#ffffff,#f4f8ff); z-index:10;">
-                <b style="font-size:18px; color:#2c3e50;">📖 SOP & CARA PENGGUNAAN APLIKASI</b>
+        <div class="modal-content" style="max-width: 900px; height: auto; max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 15px; background:#f8f9fa;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #3498db; padding-bottom:10px; margin-bottom:15px; position:sticky; top:0; background:#f8f9fa; z-index:10;">
+                <b style="font-size:18px; color:#2c3e50;">📖 BUKU PANDUAN & SOP APLIKASI (UPDATED)</b>
                 <span onclick="tutupPanduan()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#e74c3c;">&times;</span>
             </div>
             
             <div style="font-size:13px; color:#333; line-height:1.6;">
                 
-                <!-- BAGIAN 1: PERBEDAAN HAK AKSES -->
-                <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #34495e;">
-                    <b style="color:#2c3e50; font-size:14px;">1. HAK AKSES: COS/KT vs ACOS/CREW</b><br>
-                    Sistem ini punya kasta pengamanan ketat layaknya CCTV:
+                <!-- BAGIAN 1: AKSES & INPUT -->
+                <div style="background:#fff; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #34495e; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                    <b style="color:#2c3e50; font-size:14px;">1. ATURAN AKSES & INPUT HARIAN</b>
                     <ul style="margin-top:5px; padding-left:20px;">
-                        <li>👑 <b>Pejabat Toko (Admin/COS/KT):</b> Memegang kendali penuh. Bisa buka gembok tanggal jika ada yang lupa lapor, bisa setting Target & Syarat %, bisa tambah/hapus personil, dan bisa input laporan di jam berapa saja bebas hambatan.</li>
-                        <li>👷 <b>ACOS / Crew:</b> Hanya bisa input hasil penjualan di jam operasional shift masing-masing. Tidak bisa merubah target, tidak bisa ganti tanggal mundur/maju. Nama otomatis terekam dari data login (anti titip absen!).</li>
+                        <li>👑 <b>Pejabat Toko (COS/KT):</b> Memegang kunci penuh. Bisa setting target awal bulan, merubah porsi beban kasir, dan membuka "Gembok Tanggal" jika ada kasir yang telat lapor.</li>
+                        <li>👷 <b>ACOS / Crew:</b> Hanya bisa lapor sesuai jam operasional shift masing-masing (S3: 06-09, S1: 14-17, S2: 21-23.55). Nama otomatis ditarik dari login, tidak bisa titip absen!</li>
+                        <li>📸 <b>Wajib Input:</b> Setiap shift <b>WAJIB mengisi QTY STD</b> (Total struk di shift tersebut) dan upload 2 bukti foto (Report PPS & Buku Monitoring).</li>
                     </ul>
                 </div>
 
-                <!-- BAGIAN 2: CARA INPUT TARGET -->
-                <div style="background:#e8f4f8; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #3498db;">
-                    <b style="color:#2980b9; font-size:14px;">2. CARA SETTING TARGET (KHUSUS COS/KT)</b><br>
-                    Lakukan ini di Menu <b>"1. SETUP ADMIN & TARGET"</b> pada awal periode:
-                    <ol style="margin-top:5px; padding-left:20px;">
-                        <li>Pilih <b>Periode/Week</b> di dropdown (Contoh: Periode 1 untuk tgl 1-15, dst).</li>
-                        <li>Isi <b>Target Pcs</b> sesuai data dari cabang untuk masing-masing item.</li>
-                        <li>Isi <b>Syarat STD (%)</b>. Ini adalah persentase minimal struk yang harus tembus jual barang promo (Contoh: PWP wajib 5% dari total struk harian).</li>
-                        <li>Klik <b>💾 SIMPAN TARGET & SYARAT</b>. Jangan lupa tunggu sampai muncul notif "Berhasil Sinkron Cloud!". Lakukan untuk semua periode (P1, W2, P2, W4).</li>
-                    </ol>
+                <!-- BAGIAN 2: RUMUS RAHASIA -->
+                <div style="background:#e8f4f8; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #3498db; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                    <b style="color:#2980b9; font-size:14px;">2. MEMBACA RAPOR: %TGT, %SYR & %TF</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>%TGT (Kuantitas):</b> Pencapaian jumlah Pcs. (Total Jual ÷ Target Toko) x 100%.</li>
+                        <li><b>%SYR (Kualitas Nawarin):</b> Dihitung dari QTY STD (Struk). Misal syarat PWP 5%, artinya 5% dari pelanggan hari itu wajib tembus. Kalau %SYR di bawah 50%, berarti kasir <b>pasif & tebang pilih</b>!</li>
+                        <li><b>%TF (Time Factor / Waktu):</b> Indikator balapan dengan waktu. Jika persentase pencapaian (%TGT) kalian lebih kecil dari %TF, tulisan %TF akan berwarna 🔴 <b>MERAH</b> (Artinya ketinggalan!). Kalau berwarna 🟢 <b>HIJAU</b>, kecepatan jualan kalian aman.</li>
+                    </ul>
                 </div>
+
+                <!-- BAGIAN 3: TARGET ESTAFET -->
+                <div style="background:#fff3cd; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #f1c40f; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                    <b style="color:#856404; font-size:14px;">3. HUKUM TARGET ESTAFET (BEBAN SHIFT)</b><br>
+                    Target harian di aplikasi ini <b>DINAMIS</b> dan saling terhubung antar shift!
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Sisa Minus Digulung:</b> Jika Shift 3 gagal mencapai target murninya (Minus), sisa minus akan <b>ditambahkan ke target Shift 1</b>. Jika Shift 1 gagal juga, akumulasi dosanya ditumpuk ke <b>Shift 2 (Closing)</b>. Jangan jadi beban shift lain!</li>
+                    </ul>
+                </div>
+
+                <!-- BAGIAN 4: MENU DETEKTIF -->
+                <div style="background:#e9f7ef; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #27ae60; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                    <b style="color:#27ae60; font-size:14px;">4. FITUR DETEKTIF: FILTER & BREAKDOWN KASIR</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>⚖️ BREAKDOWN TARGET (%):</b> COS bisa mengatur beban target yang <i>tidak rata</i> (Misal: Crew 40%, COS 20%). Sistem otomatis menghitung siapa yang lunas/kusut berdasarkan persenan tersebut.</li>
+                        <li><b>🔍 FILTER HARIAN BY TARGET / SYARAT:</b> Lacak performa tiap kasir di tanggal tertentu.</li>
+                        <li><b>📊 MESIN WAKTU AKUMULASI:</b> COS bisa memutar mundur tanggal (Filter S.D Tanggal) untuk melihat <i>Time Factor</i> di hari-hari sebelumnya.</li>
+                    </ul>
+                </div>
+
+                <!-- BAGIAN 5: WA OTOMATIS -->
+                <div style="background:#fadbd8; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #e74c3c; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                    <b style="color:#c0392b; font-size:14px;">5. BROADCAST WA & SCREENSHOT OTOMATIS</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Awal Shift:</b> Wajib klik <b>Briefing Target Harian -> Kirim WA</b>. Sistem akan memotret rincian estafet dan sisa gap.</li>
+                        <li><b>Akhir Shift:</b> Klik <b>Kirim Laporan WA</b>. Aplikasi menyatukan 2 foto bukti & mengirim rangkuman pencapaian ke grup.</li>
+                    </ul>
+                </div>
+
+                <!-- BAGIAN 6: KEUNGGULAN APLIKASI (BARU) -->
+                <div style="background:#e8f8f5; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #16a085; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                    <b style="color:#16a085; font-size:14px;">6. 🔥 KEUNGGULAN SISTEM MONITORING PPS INI</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Keunggulan Monitoring Per Kasir:</b> <br><i>Transparansi 100%</i>. Ketahuan jelas siapa "Tulang Punggung" toko dan siapa "Juru Kunci/Beban Toko". Kasir tidak bisa lagi sembunyi di balik pencapaian shift, karena data ditarik per individu lengkap dengan status Gacor/Kusut.</li>
+                        <li style="margin-top:6px;"><b>Keunggulan Filter Laporan Harian & Bulanan:</b> <br><i>Evaluasi Instan (Paperless)</i>. Kepala Toko tidak perlu pusing rekap manual/kalkulator. Sekali klik "Pop Up Full" atau "Akumulasi", seluruh tren data 1 bulan langsung tersaji lengkap dengan <i>Time Factor</i>. Sangat mempermudah pembuatan bahan evaluasi/meeting mingguan.</li>
+                        <li style="margin-top:6px;"><b>Keunggulan Filter Spesifik Item PPS:</b> <br><i>Pelacakan Mendalam (Micro-Tracking)</i>. Kasir yang jago jual PWP belum tentu jago jual PSM. Dengan filter item, COS bisa membedah penyakit toko. Ketahuan langsung di tanggal berapa, shift mana, dan item apa yang luput ditawarkan ke konsumen!</li>
+                    </ul>
+                </div>
+
+            </div>
+            
+            <button onclick="tutupPanduan()" style="width:100%; background:#2c3e50; color:white; padding:15px; border:none; border-radius:8px; margin-top:10px; font-weight:bold; font-size:14px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2);">
+                ✅ SAYA MENGERTI, TUTUP PANDUAN INI
+            </button>
+        </div>
+    </div>
 
                 <!-- BAGIAN 3: CARA INPUT LAPORAN SHIFT -->
                 <div style="background:#fff3cd; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #f1c40f;">
@@ -631,8 +678,13 @@ function tutupAkumulasi() {
 }
 
 function bukaAkumulasi() {
-    const areaAsli = document.getElementById('akumulasiArea');
-    if(!areaAsli) return;
+    const k = getK(); if(!k.tk) return;
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    
+    // Siapkan dropdown tanggal
+    let tglOptions = "";
+    for(let i = 1; i <= dM; i++){ tglOptions += `<option value="${i}">S.D Tanggal ${i}</option>`; }
+
     let modal = document.getElementById('modalAkumulasi');
     if(!modal){
         modal = document.createElement('div');
@@ -643,18 +695,118 @@ function bukaAkumulasi() {
     modal.style.display = 'block';
     modal.style.pointerEvents = 'auto';
     document.body.style.overflow = 'hidden';
+    
     modal.innerHTML = `
         <div class="modal-content" id="ssAkumulasiArea" style="position:relative; max-height:90vh; overflow-y:auto; background:white; margin:5% auto; width:90%; border-radius:10px; padding:0;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd; background:#eee;">
-                <b style="font-size:18px;">📊 AKUMULASI TOKO</b>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <b style="font-size:18px;">📊 AKUMULASI TOKO</b>
+                    <div style="display:flex; gap:5px; align-items:center; background:#f39c12; padding:4px 8px; border-radius:6px;">
+                        <span style="font-size:12px; color:white; font-weight:bold;">Filter Mesin Waktu/timefaktor ⏰ :</span>
+                        <select id="filterTglAkumulasi" onchange="renderTabelAkumulasi()" style="padding:2px; font-weight:bold; border-radius:4px; border:none; cursor:pointer;">${tglOptions}</select>
+                    </div>
+                </div>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <button onclick="kirimWAPopupCustom('ssAkumulasiArea', 'AKUMULASI_TOKO')" style="background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">📲 KIRIM WA</button>
-                    <span onclick="tutupAkumulasi()" style="font-size:30px; cursor:pointer;">&times;</span>
+                    <span onclick="tutupAkumulasi()" style="font-size:30px; cursor:pointer; color:#e74c3c;">&times;</span>
                 </div>
             </div>
-            <div style="padding:15px; background:#e9ecef;">${areaAsli.innerHTML}</div>
+            <div id="wadahTabelAkumulasi" style="padding:15px; background:#e9ecef;">
+                <!-- Tabel akan digenerate otomatis ke sini -->
+            </div>
         </div>
     `;
+    
+    // Setel otomatis ke tanggal hari ini (atau tgl terakhir di bulan tsb)
+    let today = new Date();
+    let isCurrMonth = (k.yr == today.getFullYear() && k.mn == (today.getMonth() + 1));
+    let currDay = isCurrMonth ? today.getDate() : dM;
+    if(currDay > dM) currDay = dM;
+    
+    document.getElementById('filterTglAkumulasi').value = currDay;
+    renderTabelAkumulasi(); // Jalankan render perdana
+}
+
+// === FUNGSI BARU: MESIN WAKTU AKUMULASI ===
+function renderTabelAkumulasi() {
+    const k = getK(); if(!k.tk) return;
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    const tglBatas = parseInt(document.getElementById('filterTglAkumulasi').value) || dM;
+    const harianData = db[k.yr][k.mn][k.tk].harian || {};
+
+    let akHtml = `<div style="font-size:14px; color:#2c3e50; margin-bottom:8px;">🎯 <b>PENCAPAIAN S.D TANGGAL: <span style="color:#e74c3c;">${tglBatas}</span></b></div><table class="rapor-table"><tr><th style="background:#34495e;">ITEM</th><th style="background:#2980b9;">REAL</th><th style="background:#2c3e50;">TGT</th><th style="background:#e67e22;">% TGT</th><th style="background:#16a085;">% TF</th></tr>`;
+
+    [['PWP','PWP'], ['SERBA_GRATIS','SERBA'], ['SUGER','SUGER'], ['CEBAN','CEBAN']].forEach(([key,label]) => {
+        for(let p=1; p<=2; p++) {
+            let real=0, target=0;
+            // Menjumlahkan realisasi DARI TANGGAL 1 SAMPAI TANGGAL BATAS FILTER
+            for(let tgl=1; tgl<=tglBatas; tgl++) {
+                const periode = (tgl<=15)?1:2;
+                if(periode!==p) continue;
+                const h = harianData[tgl] || {};
+                Object.keys(h).forEach(k_ => {
+                    if(!k_.endsWith('_nama') && !k_.endsWith('_note') && !k_.endsWith('_jam') && h[k_])
+                        real += parseFloat(h[k_][key]) || 0;
+                });
+            }
+            if(p===1) target = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[key])||0);
+            else target = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[key])||0);
+            const pct = target>0 ? (real/target)*100 : 0;
+            
+            // HITUNG TIME FACTOR KHUSUS BERDASARKAN TANGGAL FILTER
+            let tfAcc = 0;
+            if (p === 1) {
+                if (tglBatas > 15) tfAcc = 100;
+                else tfAcc = Math.round((tglBatas / 15) * 100);
+            } else {
+                if (tglBatas <= 15) tfAcc = 0;
+                else tfAcc = Math.round(((tglBatas - 15) / (dM - 15)) * 100);
+            }
+            let tfColorAcc = pct >= tfAcc ? "#27ae60" : "#e74c3c"; // Hijau kalau ngalahin waktu, merah kalau kalah
+
+            akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td style="font-weight:bold; color:#2980b9; font-size:12px;">${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td><td style="color:${tfColorAcc}; font-weight:bold; font-size:12px;">${tfAcc}%</td></tr>`;
+        }
+    });
+
+    for(let w=1; w<=4; w++) {
+        let real = 0;
+        // Menjumlahkan realisasi DARI TANGGAL 1 SAMPAI TANGGAL BATAS FILTER
+        for(let tgl=1; tgl<=tglBatas; tgl++) {
+            const log = getLogic(tgl,'PSM',k.yr,k.mn);
+            if(log.wk !== w) continue;
+            const h = harianData[tgl] || {};
+            Object.keys(h).forEach(key => {
+                if(!key.endsWith('_nama') && !key.endsWith('_note') && !key.endsWith('_jam') && h[key])
+                    real += parseFloat(h[key].PSM) || 0;
+            });
+        }
+        const target = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.PSM) || 0;
+        const pct = target > 0 ? (real/target)*100 : 0;
+        
+        // HITUNG TIME FACTOR PSM KHUSUS BERDASARKAN TANGGAL FILTER
+        let tfAccPSM = 0;
+        if (w === 1) {
+            if (tglBatas > 7) tfAccPSM = 100;
+            else tfAccPSM = Math.round((tglBatas / 7) * 100);
+        } else if (w === 2) {
+            if (tglBatas < 8) tfAccPSM = 0;
+            else if (tglBatas > 15) tfAccPSM = 100;
+            else tfAccPSM = Math.round(((tglBatas - 7) / 8) * 100);
+        } else if (w === 3) {
+            if (tglBatas < 16) tfAccPSM = 0;
+            else if (tglBatas > 23) tfAccPSM = 100;
+            else tfAccPSM = Math.round(((tglBatas - 15) / 8) * 100);
+        } else if (w === 4) {
+            if (tglBatas < 24) tfAccPSM = 0;
+            else tfAccPSM = Math.round(((tglBatas - 23) / (dM - 23)) * 100);
+        }
+        let tfColorPSM = pct >= tfAccPSM ? "#27ae60" : "#e74c3c";
+
+        akHtml += `<tr><td>PSM WEEK ${w}</td><td style="font-weight:bold; color:#2980b9; font-size:12px;">${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td><td style="color:${tfColorPSM}; font-weight:bold; font-size:12px;">${tfAccPSM}%</td></tr>`;
+    }
+
+    akHtml += "</table>";
+    document.getElementById('wadahTabelAkumulasi').innerHTML = akHtml;
 }
 
 function tutupVSBulan(){
@@ -1537,11 +1689,12 @@ function updateUI() {
         
         const body = document.getElementById('bodyPPS'); 
         
-        // --- 1. HEADER TABEL BARU (TAMBAH STD, % TGT, % SYR) ---
+        // --- 1. HEADER TABEL BARU (TAMBAH %TF, STD, % TGT, % SYR) ---
         if(document.getElementById('headPPS')) {
             document.getElementById('headPPS').innerHTML = `
             <tr style="background:#34495e; color:white;">
                 <th>Tgl</th>
+                <th style="background:#16a085;">%TF</th>
                 <th style="background:#f39c12;">STD</th>
                 <th style="background:#2980b9;">%TGT</th>
                 <th style="background:#8e44ad;">%SYR</th>
@@ -1595,8 +1748,11 @@ function updateUI() {
             // --- HITUNG PERSENTASE KESELURUHAN ITEM HARI INI ---
             let pctTgt = totTgt > 0 ? Math.round((totReal/totTgt)*100) : 0;
             let pctSyr = totSyr > 0 ? Math.round((totReal/totSyr)*100) : (totReal>0?100:0);
+            
+            // --- HITUNG TIME FACTOR BULANAN UNTUK BARIS INI ---
+            let tfHarian = Math.round((i / dM) * 100);
 
-            // --- PEWARNAAN OTOMATIS (SUNTIKAN BARU) ---
+            // --- PEWARNAAN OTOMATIS ---
             function getWarna(pct) {
                 if (pct >= 100) return "background:#27ae60; color:white;"; 
                 if (pct >= 75) return "background:#f1c40f; color:black;";  
@@ -1610,6 +1766,7 @@ function updateUI() {
 
             let rowPref = `
                 <td><b>${i}</b></td>
+                <td style="color:#16a085; font-weight:bold; background:#e8f8f5;">${tfHarian}%</td>
                 <td style="${styleStd} font-weight:bold;">${maxStd}</td>
                 <td style="${styleTgt} font-weight:bold;">${pctTgt}%</td>
                 <td style="${styleSyr} font-weight:bold;">${pctSyr}%</td>`;
@@ -1760,7 +1917,8 @@ function updateUI() {
         vsHtml += barisVS("CEBAN (16-AKHIR)", bulanLaluDetail.CEBAN_P2, bulanIniDetail.CEBAN_P2, targetVS.CEBAN_P2);
         vsHtml += `</table></div>`;
 
-        let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>%</th></tr>`;
+        // --- TAMBAH %TF DI HEADER AKUMULASI ---
+        let akHtml = `<b>📊 AKUMULASI TOKO</b><table class="rapor-table"><tr><th>ITEM</th><th>REAL</th><th>TGT</th><th>% TGT</th><th>% TF</th></tr>`;
 
         [['PWP','PWP'], ['SERBA_GRATIS','SERBA'], ['SUGER','SUGER'], ['CEBAN','CEBAN']].forEach(([key,label]) => {
             for(let p=1; p<=2; p++) {
@@ -1769,15 +1927,30 @@ function updateUI() {
                     const periode = (tgl<=15)?1:2;
                     if(periode!==p) continue;
                     const h = harianData[tgl] || {};
-                    Object.keys(h).forEach(k => {
-                        if(!k.endsWith('_nama') && !k.endsWith('_note') && !k.endsWith('_jam') && h[k])
-                            real += parseFloat(h[k][key]) || 0;
+                    Object.keys(h).forEach(k_ => {
+                        if(!k_.endsWith('_nama') && !k_.endsWith('_note') && !k_.endsWith('_jam') && h[k_])
+                            real += parseFloat(h[k_][key]) || 0;
                     });
                 }
                 if(p===1) target = (parseFloat(db[k.yr][k.mn][k.tk].target[1]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[2]?.[key])||0);
                 else target = (parseFloat(db[k.yr][k.mn][k.tk].target[3]?.[key])||0) + (parseFloat(db[k.yr][k.mn][k.tk].target[4]?.[key])||0);
                 const pct = target>0 ? (real/target)*100 : 0;
-                akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
+                
+                // --- HITUNG TIME FACTOR KHUSUS PERIODE 1 & 2 ---
+                let todayDate = new Date();
+                let isCurrMonth = (k.yr == todayDate.getFullYear() && k.mn == (todayDate.getMonth() + 1));
+                let currDayAcc = isCurrMonth ? todayDate.getDate() : dM;
+                let tfAcc = 0;
+                if (p === 1) {
+                    if (currDayAcc > 15) tfAcc = 100;
+                    else tfAcc = Math.round((currDayAcc / 15) * 100);
+                } else {
+                    if (currDayAcc <= 15) tfAcc = 0;
+                    else tfAcc = Math.round(((currDayAcc - 15) / (dM - 15)) * 100);
+                }
+                let tfColorAcc = pct >= tfAcc ? "#27ae60" : "#e74c3c"; // Hijau kalau on-track, Merah kalau tertinggal
+
+                akHtml += `<tr><td>${label} (${p==1?'01-15':'16-AKHIR'})</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-pwp" style="width:${Math.min(100,pct)}%"></div></div></td><td style="color:${tfColorAcc}; font-weight:bold; font-size:12px;">${tfAcc}%</td></tr>`;
             }
         });
 
@@ -1794,7 +1967,30 @@ function updateUI() {
             }
             const target = parseFloat(db[k.yr][k.mn][k.tk].target[w]?.PSM) || 0;
             const pct = target > 0 ? (real/target)*100 : 0;
-            akHtml += `<tr><td>PSM WEEK ${w}</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td></tr>`;
+            
+            // --- HITUNG TIME FACTOR KHUSUS PSM W1-W4 ---
+            let todayDate = new Date();
+            let isCurrMonth = (k.yr == todayDate.getFullYear() && k.mn == (todayDate.getMonth() + 1));
+            let currDayAcc = isCurrMonth ? todayDate.getDate() : dM;
+            let tfAccPSM = 0;
+            if (w === 1) {
+                if (currDayAcc > 7) tfAccPSM = 100;
+                else tfAccPSM = Math.round((currDayAcc / 7) * 100);
+            } else if (w === 2) {
+                if (currDayAcc < 8) tfAccPSM = 0;
+                else if (currDayAcc > 15) tfAccPSM = 100;
+                else tfAccPSM = Math.round(((currDayAcc - 7) / 8) * 100);
+            } else if (w === 3) {
+                if (currDayAcc < 16) tfAccPSM = 0;
+                else if (currDayAcc > 23) tfAccPSM = 100;
+                else tfAccPSM = Math.round(((currDayAcc - 15) / 8) * 100);
+            } else if (w === 4) {
+                if (currDayAcc < 24) tfAccPSM = 0;
+                else tfAccPSM = Math.round(((currDayAcc - 23) / (dM - 23)) * 100);
+            }
+            let tfColorPSM = pct >= tfAccPSM ? "#27ae60" : "#e74c3c";
+
+            akHtml += `<tr><td>PSM WEEK ${w}</td><td>${real}</td><td>${target}</td><td><b>${Math.round(pct)}%</b><div class="progress-container"><div class="progress-bar bg-psm" style="width:${Math.min(100,pct)}%"></div></div></td><td style="color:${tfColorPSM}; font-weight:bold; font-size:12px;">${tfAccPSM}%</td></tr>`;
         }
 
         akHtml += "</table>";
@@ -1970,6 +2166,7 @@ function updateUI() {
         renderLaporanHarian(); 
     }
 
+    
 function pctVS(real,target){ return target>0 ? Math.round((real/target)*100) : 0; }
 function warnaPctVS(pct){ if(pct>=100) return "#27ae60"; if(pct>=50) return "#f1c40f"; return "#e74c3c"; }
 function renderPctVS(real,target){ const pct = pctVS(real,target); return `<span style="font-weight:bold; color:${warnaPctVS(pct)};">${pct}%</span>`; }
@@ -3030,6 +3227,225 @@ async function kirimWABriefing() {
         document.getElementById('modalPanduan').style.display = 'none';
         document.body.style.overflow = 'auto'; // Lepas scroll layar belakang
     }
+
+// ==========================================
+// FITUR BARU: BREAKDOWN BEBAN TARGET (%)
+// ==========================================
+function tutupBreakdown() {
+    const modal = document.getElementById('modalBreakdown');
+    if (modal) modal.remove();
+}
+
+function bukaBreakdown() {
+    const k = getK();
+    if(!db[k.yr][k.mn][k.tk].bebanKasir) db[k.yr][k.mn][k.tk].bebanKasir = {};
+    let bebanDb = db[k.yr][k.mn][k.tk].bebanKasir;
+    
+    let kruRaw = (document.getElementById('listKru').value || '').split(',').map(x=>x.trim()).filter(Boolean);
+    
+    // Kalau belum pernah disetting, sistem bagi rata otomatis dulu
+    let defBeban = kruRaw.length > 0 ? Math.floor(100 / kruRaw.length) : 0;
+    
+    let inputHtml = '';
+    kruRaw.forEach(n => {
+        let b = bebanDb[n] !== undefined ? bebanDb[n] : defBeban;
+        inputHtml += `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px 12px; border-radius:5px; margin-bottom:6px; border:1px solid #ddd; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <b style="font-size:13px; color:#2c3e50;">👤 ${n}</b>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <input type="number" id="beban_${n.replace(/\s+/g,'_')}" value="${b}" style="width:60px; padding:6px; text-align:center; font-weight:bold; border:2px solid #3498db; border-radius:5px; color:#2980b9;" oninput="cekTotalBeban()">
+                <b style="font-size:14px;">%</b>
+            </div>
+        </div>`;
+    });
+
+    const html = `
+    <div class="modal-rapor" id="modalBreakdown" style="display:block;">
+        <!-- PERBAIKAN: overflow-y:auto ditambahkan agar bisa di-scroll di HP -->
+        <div class="modal-content" style="max-width: 95%; max-height:90vh; overflow-y:auto; padding:15px; background:#f4f7f6;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed #ccc; padding-bottom:10px; margin-bottom:10px; position:sticky; top:0; background:#f4f7f6; z-index:10;">
+                <b style="font-size:16px; color:#e84393;">⚖️ BREAKDOWN TARGET (%)</b>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button id="btnWABreakdown" onclick="kirimWAPopupCustom('areaHasilBreakdown', 'BREAKDOWN_TARGET_KASIR')" style="display:none; background:#25d366; color:white; border:1px solid #128c7e; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:11px;">📲 KIRIM WA</button>
+                    <span class="btn-tutup" onclick="tutupBreakdown()" style="font-size:24px; color:#e74c3c; cursor:pointer;">×</span>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                <select id="breakItem" style="flex:1; padding:8px; font-weight:bold;">
+                    <option value="PWP">PWP</option>
+                    <option value="PSM">PSM</option>
+                    <option value="SERBA_GRATIS">SERBA GRATIS</option>
+                    <option value="SUGER">SUGER</option>
+                    <option value="CEBAN">CEBAN</option>
+                </select>
+                <select id="breakPeriode" style="flex:1; padding:8px; font-weight:bold;">
+                    <option value="1">PERIODE 1 (01-15)</option>
+                    <option value="2">PERIODE 2 (16-AKHIR)</option>
+                </select>
+            </div>
+
+            <div style="background:#e8f4f8; padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid #b3d4fc;">
+                <div style="font-size:12px; color:#2980b9; font-weight:bold; margin-bottom:8px;">🎯 ATUR PEMBAGIAN TARGET (BEBAS):</div>
+                ${inputHtml}
+                <div style="text-align:right; font-weight:bold; font-size:15px; margin-top:10px; color:#2c3e50; padding-top:8px; border-top:1px dashed #b3d4fc;">
+                    TOTAL: <span id="totalBebanTxt" style="background:#fff; padding:2px 8px; border-radius:4px;">0</span>%
+                </div>
+            </div>
+
+            <button onclick="hitungBreakdown()" style="width:100%; background:#e84393; color:white; padding:12px; border-radius:6px; font-weight:bold; border:none; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">⚙️ SIMPAN & TAMPILKAN HASIL</button>
+
+            <!-- WADAH HASIL (Sudah diberi ruang napas di bawahnya biar nggak mentok) -->
+            <div id="areaHasilBreakdown" style="margin-top:15px; padding-bottom:30px;"></div>
+            
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    
+    // Ganti dropdown periode otomatis kalau pilih PSM
+    document.getElementById('breakItem').onchange = function(){
+        const p = document.getElementById('breakPeriode');
+        if(this.value === 'PSM'){
+            p.innerHTML = `<option value="3">PSM W1</option><option value="4">PSM W2</option><option value="5">PSM W3</option><option value="6">PSM W4</option>`;
+        }else{
+            p.innerHTML = `<option value="1">PERIODE 1 (01-15)</option><option value="2">PERIODE 2 (16-AKHIR)</option>`;
+        }
+    };
+    cekTotalBeban();
+}
+
+function cekTotalBeban() {
+    let total = 0;
+    let kruRaw = (document.getElementById('listKru').value || '').split(',').map(x=>x.trim()).filter(Boolean);
+    kruRaw.forEach(n => {
+        let el = document.getElementById(`beban_${n.replace(/\s+/g,'_')}`);
+        if(el) total += parseFloat(el.value) || 0;
+    });
+    let txt = document.getElementById('totalBebanTxt');
+    if(txt) {
+        txt.innerText = total;
+        txt.style.color = total === 100 ? "#27ae60" : "#e74c3c";
+    }
+}
+
+function hitungBreakdown() {
+    const k = getK();
+    if(!db[k.yr][k.mn][k.tk].bebanKasir) db[k.yr][k.mn][k.tk].bebanKasir = {};
+    
+    let kruRaw = (document.getElementById('listKru').value || '').split(',').map(x=>x.trim()).filter(Boolean);
+    let totalPct = 0;
+    
+    // Tarik nilai persen yang baru diketik dan simpan permanen
+    kruRaw.forEach(n => {
+        let el = document.getElementById(`beban_${n.replace(/\s+/g,'_')}`);
+        let val = parseFloat(el?.value) || 0;
+        db[k.yr][k.mn][k.tk].bebanKasir[n] = val;
+        totalPct += val;
+    });
+
+    if(totalPct !== 100 && totalPct !== 0) {
+        if(!confirm(`Total persen saat ini ${totalPct}%, bukan 100%. Apakah Bapak yakin mau lanjut? (Nanti target tokonya nggak klop loh!)`)) return;
+    }
+    saveDisk(); // Simpan settingan persen ke lokal memori
+
+    // Mulai Tarik Data Real
+    const item = document.getElementById('breakItem').value;
+    const periode = document.getElementById('breakPeriode').value;
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    const harian = db[k.yr][k.mn][k.tk].harian || {};
+
+    let hasilReal = {};
+    kruRaw.forEach(n => hasilReal[n] = 0);
+
+    // Sedot data dari mesin lapor
+    for(let tgl=1; tgl<=dM; tgl++){
+        const h = harian[tgl] || {};
+        Object.keys(h).forEach(key => {
+            if(!key.endsWith('_nama')) return;
+            const nama = h[key].toUpperCase();
+            if(!hasilReal.hasOwnProperty(nama)) return; 
+            
+            const dataRow = h[key.replace('_nama','')];
+            if(!dataRow) return;
+
+            let masuk = false;
+            if(item !== "PSM"){
+                if(periode == "1" && tgl <= 15) masuk = true;
+                if(periode == "2" && tgl > 15) masuk = true;
+            } else {
+                const log = getLogic(tgl, 'PSM', k.yr, k.mn);
+                if(periode == "3" && log.wk == 1) masuk = true;
+                if(periode == "4" && log.wk == 2) masuk = true;
+                if(periode == "5" && log.wk == 3) masuk = true;
+                if(periode == "6" && log.wk == 4) masuk = true;
+            }
+            
+            if(masuk) hasilReal[nama] += (parseFloat(dataRow[item]) || 0);
+        });
+    }
+
+    // Ambil Target Toko
+    let targetToko = 0;
+    if(item !== "PSM"){
+        const p = (periode == "1") ? 1 : 2;
+        targetToko = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[item]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[item]) || 0);
+    } else {
+        const wk = parseInt(periode) - 2;
+        targetToko = parseFloat(db[k.yr][k.mn][k.tk].target[wk]?.PSM) || 0;
+    }
+
+    // Cetak Rapor Gacor / Kusut
+    let htmlCards = `
+    <div style="background:white; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-top:4px solid #e84393;">
+        <div style="font-size:15px; font-weight:bold; color:#2c3e50;">📊 RAPOR BREAKDOWN ${item.replace('_',' ')}</div>
+        <div style="font-size:13px; color:#7f8c8d; margin-top:5px;">Target Toko Periode Ini: <b style="color:#e84393; font-size:15px;">${targetToko} Pcs</b></div>
+    </div>`;
+
+    kruRaw.forEach(n => {
+        let bebanPct = db[k.yr][k.mn][k.tk].bebanKasir[n] || 0;
+        let targetPersonal = Math.ceil(targetToko * (bebanPct / 100)); // Rumus Pembagian Target
+        let real = hasilReal[n] || 0;
+        let pencapaian = targetPersonal > 0 ? (real / targetPersonal) * 100 : (real > 0 ? 100 : 0);
+        let gap = Math.max(0, targetPersonal - real);
+
+        let color = ""; let statusTxt = "";
+        if (pencapaian >= 100) { color = "#27ae60"; statusTxt = "🔥 GACOR (LUNAS)"; }
+        else if (pencapaian >= 75) { color = "#f39c12"; statusTxt = "⚠️ AMAN (DIKIT LAGI)"; }
+        else if (pencapaian >= 50) { color = "#e67e22"; statusTxt = "🚨 WARNING (KETINGGALAN)"; }
+        else { color = "#e74c3c"; statusTxt = "🐌 KUSUT PARAH"; }
+
+        if(bebanPct === 0 && real === 0) { color = "#95a5a6"; statusTxt = "💤 TIDAK ADA TARGET"; }
+        if(bebanPct === 0 && real > 0) { color = "#3498db"; statusTxt = "🎁 BONUS KONTRIBUSI"; } // COS yg 0% tapi bantu jualan
+
+        htmlCards += `
+        <div style="background:#fff; padding:12px; border-radius:8px; margin-bottom:10px; border-left:6px solid ${color}; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #eee; padding-bottom:6px; margin-bottom:6px;">
+                <b style="font-size:14px; color:#2c3e50;">👤 ${n}</b>
+                <span style="font-size:11px; font-weight:bold; background:#e8f4f8; padding:3px 8px; border-radius:5px; color:#2980b9;">Beban: ${bebanPct}%</span>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:8px; color:#555;">
+                <div>Target:<br><b style="font-size:15px; color:#34495e;">${targetPersonal}</b></div>
+                <div>Real:<br><b style="font-size:15px; color:${color};">${real}</b></div>
+                <div>Gap/Sisa:<br><b style="font-size:15px; color:#c0392b;">${gap}</b></div>
+            </div>
+
+            <div style="height:10px; background:#ecf0f1; border-radius:5px; overflow:hidden; margin-bottom:6px;">
+                <div style="height:100%; width:${Math.min(100, pencapaian)}%; background:${color}; transition:0.5s;"></div>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:bold; color:${color};">
+                <span>${statusTxt}</span>
+                <span>${Math.round(pencapaian)}%</span>
+            </div>
+        </div>`;
+    });
+
+    document.getElementById('areaHasilBreakdown').innerHTML = htmlCards;
+    document.getElementById('btnWABreakdown').style.display = 'inline-block';
+}
 
 </script>
 </body>
