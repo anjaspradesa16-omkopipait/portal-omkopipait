@@ -353,6 +353,23 @@
                 <img id="pSIS" src="" alt="SIS">
             </div>
             <button id="btnSimpanShift" class="btn-save" onclick="simpanReal()">✅ SIMPAN DATA SHIFT</button>
+        </div>
+
+
+        <!-- ================================== -->
+        <!-- KARTU 3: ANALISA & BROADCAST -->
+        <!-- ================================== -->
+            <div class="card">
+            <h3 style="color:#27ae60;">3. ANALISA & BROADCAST</h3>
+            </button>
+            
+            <button class="btn-wa" id="btnWA" onclick="kirimWA()">🚀 KIRIM LAPORAN WA</button>
+            <div id="labelWarning" class="warning-label"></div>
+            <textarea id="noteWA" placeholder="Alasan jika item tidak target..." rows="2" style="margin-top:5px;"></textarea>
+            <hr>
+            
+            <button onclick="bukaBriefingHarian()" style="background:#f39c12; color:white; padding:12px; border-radius:6px; margin-bottom:10px; font-weight:bold; border:none; width:100%; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2);">
+            🌅 BRIEFING TARGET HARIAN (WA)
             <button onclick="bukaRapor()" style="width:100%; background:#8e44ad; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
             🔍 PERBESAR ANALISA KASIR</button>
             <button onclick="bukaAkumulasi()" style="width:100%; background:#16a085; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold;">
@@ -363,23 +380,6 @@
             🏆 RANKING PENJUALAN</button>
             <button onclick="bukaBreakdown()" style="width:100%; background:#e84393; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
             ⚖️ BREAKDOWN TARGET KASIR (%)</button>
-        </div>
-
-
-        <!-- ================================== -->
-        <!-- KARTU 3: ANALISA & BROADCAST -->
-        <!-- ================================== -->
-            <div class="card">
-            <h3 style="color:#27ae60;">3. ANALISA & BROADCAST</h3>
-            <!-- FITUR BARU: BRIEFING PAGI -->
-            <button onclick="bukaBriefingHarian()" style="background:#f39c12; color:white; padding:12px; border-radius:6px; margin-bottom:10px; font-weight:bold; border:none; width:100%; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2);">
-                🌅 BRIEFING TARGET HARIAN (WA)
-            </button>
-            
-            <button class="btn-wa" id="btnWA" onclick="kirimWA()">🚀 KIRIM LAPORAN WA</button>
-            <div id="labelWarning" class="warning-label"></div>
-            <textarea id="noteWA" placeholder="Alasan jika item tidak target..." rows="2" style="margin-top:5px;"></textarea>
-            <hr>
 
             <div id="alertKasirArea"></div>
             <div id="vsBulanArea" hidden></div>
@@ -501,58 +501,6 @@
             </button>
         </div>
     </div>
-
-                <!-- BAGIAN 3: CARA INPUT LAPORAN SHIFT -->
-                <div style="background:#fff3cd; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #f1c40f;">
-                    <b style="color:#856404; font-size:14px;">3. CARA INPUT LAPORAN SHIFT (UNTUK SEMUA KASIR)</b><br>
-                    Lakukan ini di Menu <b>"2. INPUT HASIL SHIFT"</b> setiap mau closing:
-                    <ol style="margin-top:5px; padding-left:20px;">
-                        <li>Pastikan nama kalian muncul otomatis di "Kasir Bertugas".</li>
-                        <li>Pilih <b>Shift Lapor</b>. Ingat, tombol hanya terbuka di jam: <b>S3 (06:00-09:00), S1 (14:00-17:00), S2 (21:00-23:55)</b>.</li>
-                        <li>Input angka penjualan real kalian di kolom PWP, PSM, dll. Angka target akan muncul otomatis di bawah kolom untuk panduan kalian.</li>
-                        <li><b>WAJIB:</b> Isi QTY STD (Total Struk khusus di shift kalian saja).</li>
-                        <li><b>WAJIB:</b> Upload 2 bukti foto (Buku Monitoring & Report PPS dari mesin).</li>
-                        <li>Jika kalian <b>TIDAK CAPAI TARGET</b>, wajib isi kolom <b>Catatan/Alasan</b> di Menu ke-3 sebelum menyimpan data.</li>
-                        <li>Klik <b>✅ SIMPAN DATA SHIFT</b>. Setelah sukses, klik 🚀 KIRIM LAPORAN WA ke grup toko!</li>
-                    </ol>
-                </div>
-
-                <!-- BAGIAN 4: ATURAN & RUMUS RAHASIA -->
-                <div style="background:#f4ebf9; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #8e44ad;">
-                    <b style="color:#8e44ad; font-size:14px;">4. MEMBACA RAPOR: %TGT vs %SYR & TARGET DINAMIS</b><br>
-                    <ul style="margin-top:5px; padding-left:20px;">
-                        <li><b>Target Dinamis:</b> Target harian BUKAN ANGKA TETAP. Rumusnya: <code>(Sisa Target ÷ Sisa Hari)</code>. Kalau kalian hari ini minus, minusnya akan digulung ke besok! Beban target besok akan makin bengkak!</li>
-                        <li style="margin-top:5px;"><b>%TGT (Progress Kuantitas):</b> Mengukur apakah target <i>Pcs</i> harian sudah lunas.</li>
-                        <li style="margin-top:5px;"><b>%SYR (Progress Kualitas):</b> Mengukur kegigihan kasir menawarkan promo. Dihitung murni dari jumlah struk yang masuk. Di bawah 50% berarti kasir pasif/tebang pilih!</li>
-                    </ul>
-                </div>
-
-                <!-- BAGIAN 5: BRIEFING & BROADCAST -->
-                <div style="background:#fadbd8; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #e74c3c;">
-                    <b style="color:#c0392b; font-size:14px;">5. FITUR BRIEFING PAGI & SCREENSHOT</b><br>
-                    Di Menu <b>"3. ANALISA & BROADCAST"</b>, terdapat tombol <b>🌅 BRIEFING TARGET HARIAN</b>.<br>
-                    Tugas PIC Pagi: Buka fitur ini, pastikan tanggal sudah benar, lalu klik <b>📲 KIRIM WA</b>. Sistem akan otomatis memotret target hari itu (beserta sisa hutang dari hari kemarin) dan mem-forward ke grup WhatsApp sebagai pemacu semangat sebelum operasional!
-                </div>
-
-                <!-- BAGIAN 6: KEUNGGULAN FILTER & ANALISA KASIR (BARU) -->
-                <div style="background:#e9f7ef; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #27ae60;">
-                    <b style="color:#27ae60; font-size:14px;">6. KEUNGGULAN FILTER & ANALISA PERFORMA KASIR</b><br>
-                    Aplikasi ini dilengkapi dengan fitur detektif untuk membedah performa toko secara instan:
-                    <ul style="margin-top:5px; padding-left:20px;">
-                        <li><b>Rapor & Ranking Kasir:</b> Sistem otomatis melacak kontribusi penjualan individu. Klik <b>🏆 RANKING PENJUALAN</b> atau <b>🔍 PERBESAR ANALISA KASIR</b>. Ketahuan jelas siapa tulang punggung toko (Top Seller) dan siapa yang jadi beban (Juru Kunci / Nol Penjualan).</li>
-                        <li style="margin-top:5px;"><b>Filter Laporan Harian & Bulanan:</b> Gunakan tombol <b>📸 POP UP FULL (SS)</b> untuk melihat seluruh rekapan shift atau laporan harian dalam sebulan penuh secara rapi. Klik <b>📊 LIHAT AKUMULASI TOKO</b> untuk memantau progres total bulan berjalan.</li>
-                        <li style="margin-top:5px;"><b>Filter Spesifik Item PPS:</b> Klik tombol <b>🔍 FILTER HARIAN BY TARGET / SYARAT</b>. Fitur ini sangat sakti untuk membedah penjualan kasir per item (PWP, PSM, dll). Kalian bisa memfilternya berdasarkan <b>Target Kuota (Pcs)</b> atau <b>Syarat STD (%)</b> untuk melihat performa murni tiap kasir di hari/shift tersebut!</li>
-                    </ul>
-                </div>
-
-            </div>
-            
-            <button onclick="tutupPanduan()" style="width:100%; background:#2c3e50; color:white; padding:12px; border:none; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2);">
-                ✅ SAYA MENGERTI, TUTUP PANDUAN INI
-            </button>
-        </div>
-    </div>
-
 
 <!-- WADAH UNTUK MODAL POP UP SS -->
     <div id="modalHarian" class="modal-rapor" style="display:none;">
@@ -702,7 +650,7 @@ function bukaAkumulasi() {
                 <div style="display:flex; flex-direction:column; gap:5px;">
                     <b style="font-size:18px;">📊 AKUMULASI TOKO</b>
                     <div style="display:flex; gap:5px; align-items:center; background:#f39c12; padding:4px 8px; border-radius:6px;">
-                        <span style="font-size:12px; color:white; font-weight:bold;">Filter Mesin Waktu/timefaktor ⏰ :</span>
+                        <span style="font-size:12px; color:white; font-weight:bold;">Filter TimeFaktor ⏰ :</span>
                         <select id="filterTglAkumulasi" onchange="renderTabelAkumulasi()" style="padding:2px; font-weight:bold; border-radius:4px; border:none; cursor:pointer;">${tglOptions}</select>
                     </div>
                 </div>
@@ -3241,9 +3189,8 @@ async function bukaBreakdown() {
     let kruRaw = (document.getElementById('listKru').value || '').split(',').map(x=>x.trim()).filter(Boolean);
     if(kruRaw.length === 0) return alert("Personil kosong!");
 
-    // 🔒 SISTEM OTORITAS ANTI-PRANK:
-    let userLogin = (localStorage.getItem('pps_user') || '').toUpperCase().trim();
-    let isCOS = (userLogin === "" || userLogin === kruRaw[0]); 
+    // 🔒 SISTEM OTORITAS YANG BENAR (BACA ROLE DARI PORTAL LOGIN)
+    let isCOS = isUserAdmin();
 
     // Tampilkan Layar Loading
     const htmlLoading = `
@@ -3258,22 +3205,22 @@ async function bukaBreakdown() {
     // ☁️ SEDOT DATA PERSENTASE DARI CLOUD GOOGLE SHEETS
     let bebanDb = {};
     try {
-        let resp = await fetch(scriptURL, {
+        let resp = await fetch(urlRaportGlobal, {
+            redirect: "follow",
             method: 'POST',
+            headers: { "Content-Type": "text/plain;charset=utf-8" }, // SURAT IZIN MASUK
             body: JSON.stringify({ tipeData: "LOAD_BEBAN", toko: k.tk, yr: k.yr, mn: k.mn })
         });
         let result = await resp.json();
         if(result.bebanKasir) {
             bebanDb = JSON.parse(result.bebanKasir);
             if(!db[k.yr][k.mn][k.tk].bebanKasir) db[k.yr][k.mn][k.tk].bebanKasir = {};
-            db[k.yr][k.mn][k.tk].bebanKasir = bebanDb; // Sinkronkan ke lokal HP
+            db[k.yr][k.mn][k.tk].bebanKasir = bebanDb;
         }
     } catch(e) {
         console.log("Gagal konek cloud, pakai memori lokal");
         bebanDb = db[k.yr][k.mn][k.tk].bebanKasir || {};
     } finally {
-        // 🪂 PENERJUN PAYUNG DARURAT: 
-        // Apapun yang terjadi (sukses atau gagal), LAYAR LOADING WAJIB DIHAPUS!
         let modalLoad = document.getElementById('modalBreakdown');
         if(modalLoad) modalLoad.remove();
     }
@@ -3393,7 +3340,6 @@ async function simpanBreakdownCloud() {
         bebanData[n] = parseFloat(el?.value) || 0;
     });
 
-    // Kunci ke HP Lokal dulu
     if(!db[k.yr][k.mn][k.tk].bebanKasir) db[k.yr][k.mn][k.tk].bebanKasir = {};
     db[k.yr][k.mn][k.tk].bebanKasir = bebanData;
     saveDisk();
@@ -3404,8 +3350,11 @@ async function simpanBreakdownCloud() {
     btn.disabled = true;
 
     try {
-        await fetch(scriptURL, {
+        // 🔥 TAMBAHAN SURAT IZIN (HEADERS & REDIRECT) AGAR LOLOS SENSOR CLOUD
+        await fetch(urlRaportGlobal, {
+            redirect: "follow",
             method: 'POST',
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({ 
                 tipeData: "SAVE_BEBAN", 
                 toko: k.tk, yr: k.yr, mn: k.mn,
@@ -3413,12 +3362,12 @@ async function simpanBreakdownCloud() {
             })
         });
     } catch(e) {
+        console.error(e);
         alert("Gagal kirim ke Cloud. Tapi data sementara tersimpan di HP ini.");
     }
 
     btn.innerHTML = prevText;
     btn.disabled = false;
-    
     hitungBreakdown();
 }
 
