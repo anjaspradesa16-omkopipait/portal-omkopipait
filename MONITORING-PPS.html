@@ -343,6 +343,42 @@
                 <input type="number" id="r_STD" placeholder="Wajib Diisi... Contoh: 150" oninput="checkTargetStatus()" style="border-color:#ffc107;">
             </div>
 
+<!-- KONTRIBUSI MEMBER VISUAL ESTAFET & DIAGRAM LINGKARAN -->
+    <div style="background:#e8f4f8; padding:12px; border-radius:10px; margin-top:10px; border:1px solid #b3d4fc; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+        <label style="color:#2980b9; font-size:12px; font-weight:bold; display:block; text-align:center; margin-bottom:8px;">
+            🎫 KONTRIBUSI MEMBER (ESTAFET SHIFT)
+        </label>
+        
+        <div style="display:flex; gap:8px;">
+            <div style="flex:1;">
+                <label style="font-size:10px; color:#555;">Struk Ritel (Shift Ini)</label>
+                <input type="number" id="r_Ritel" placeholder="0" oninput="hitungMemberShift()" style="border-color:#3498db; text-align:center; font-weight:bold;">
+            </div>
+            <div style="flex:1;">
+                <label style="font-size:10px; color:#555;">Struk Member (Shift Ini)</label>
+                <input type="number" id="r_Member" placeholder="0" oninput="hitungMemberShift()" style="border-color:#3498db; text-align:center; font-weight:bold;">
+            </div>
+        </div>
+
+        <!-- WADAH DIAGRAM LINGKARAN & METRIK ESTAFET -->
+        <div style="display:flex; align-items:center; justify-content:space-around; margin-top:12px; background:#fff; padding:10px; border-radius:8px; border:1px dashed #3498db;">
+            <!-- DIAGRAM LINGKARAN CSS -->
+            <div id="chartPieMember" style="width:70px; height:70px; border-radius:50%; background:conic-gradient(#e74c3c 0% 100%); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.15); transition: background 0.4s ease;">
+                <div style="width:50px; height:50px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px; color:#2c3e50;" id="txtPiePct">
+                    0%
+                </div>
+            </div>
+
+            <!-- RINCIAN ESTAFET SHIFT -->
+            <div style="font-size:11px; color:#333; line-height:1.6;">
+                <div>🎯 Target Member: <b style="color:#2980b9;">100%</b></div>
+                <div>✅ Real Shift Ini: <b id="txtRealMemberShift" style="color:#27ae60;">0 Struk</b></div>
+                <div>🔥 Beban Lolos (Ritel): <b id="txtGapMemberShift" style="color:#e74c3c;">0 Struk</b></div>
+                <div style="font-size:10px; color:#7f8c8d; margin-top:3px;" id="txtEstafetInfo"><i>S3 ➔ S1 ➔ S2 (Kawal terus!)</i></div>
+            </div>
+        </div>
+    </div>
+
             <label>📸 Upload 2 Bukti Foto (REPORT PPS&BUKU MONITORING PPS)</label>
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <input type="file" id="imgBuku" accept="image/*" onchange="previewImg(this, 'pBuku')">
@@ -372,6 +408,8 @@
             🌅 BRIEFING TARGET HARIAN (WA)
             <button onclick="bukaBreakdown()" style="width:100%; background:#e84393; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
             ⚖️ BREAKDOWN TARGET KASIR (%)</button>
+            <button onclick="bukaMemberMonitoring()" style="width:100%; background:#9b59b6; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+            🎫 MONITORING KONTRIBUSI MEMBER</button>
             <button onclick="bukaRanking()" style="width:100%;background:#f39c12;color:white;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;font-weight:bold;">
             🏆 RANKING PENJUALAN</button>
             <button onclick="bukaRapor()" style="width:100%; background:#8e44ad; color:white; padding:12px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
@@ -538,7 +576,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwmhlf9bFzVmgBA4mfmNBlNebr6nW2CcE0lB2zT2-TbRh8oXIXzeGhaK49s492XnI9WLw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbztIYUAPWR06Uk7CSiaFnmfi2HF2j-6uCfkMdA0Ci1dHQD8srmEFnDje_EKIfrGd6GKSg/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -1278,6 +1316,13 @@ function getLogic(tgl, it, yr, mn) {
         const elSTD = document.getElementById('r_STD');
         if(elSTD) elSTD.value = (hS[shfKey] && hS[shfKey]['STD'] !== undefined) ? hS[shfKey]['STD'] : "";
         
+        // BARU: Load Ritel & Member
+        const elRitel = document.getElementById('r_Ritel');
+        const elMember = document.getElementById('r_Member');
+        if(elRitel) elRitel.value = (hS[shfKey] && hS[shfKey]['ritel'] !== undefined) ? hS[shfKey]['ritel'] : "";
+        if(elMember) elMember.value = (hS[shfKey] && hS[shfKey]['member'] !== undefined) ? hS[shfKey]['member'] : "";
+        hitungMemberShift();
+
         document.getElementById('noteWA').value = hS[shfKey+'_note'] || "";
         checkTargetStatus();
         cekStatusGembok();
@@ -1454,6 +1499,11 @@ function simpanReal() {
         
         // --- TAMBAHAN BARU 2: SIMPAN QTY STD KE DATABASE LOKAL ---
         hS[shfKey]['STD'] = stdVal;
+
+        let ritelVal = parseFloat(document.getElementById('r_Ritel').value) || 0;
+        let memberVal = parseFloat(document.getElementById('r_Member').value) || 0;
+        hS[shfKey]['ritel'] = ritelVal;
+        hS[shfKey]['member'] = memberVal;
         
         hS[shfKey+'_nama'] = ksr; 
         hS[shfKey+'_note'] = note;
@@ -1466,7 +1516,9 @@ function simpanReal() {
         const payload = { 
             toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
             namaPersonil: ksr, note: note, 
-            std: stdVal, // --- TAMBAHAN BARU 3: KIRIM QTY STD KE CLOUD ---
+            std: stdVal,
+            ritel: ritelVal,
+            member: memberVal,
             pwp: document.getElementById('r_PWP').value || 0, 
             psm: document.getElementById('r_PSM').value || 0, 
             serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
@@ -2246,6 +2298,8 @@ async function kirimWA() {
                 toko: k.tk, yr: k.yr, mn: k.mn, tgl: tgl, shift: shf, 
                 namaPersonil: ksr, note: note, 
                 std: stdValCum, // <--- ANTI 0 DI CLOUD! 🔥
+                ritel: ritelVal,    // <--- TAMBAHKAN BARIS INI
+                member: memberVal,  // <--- TAMBAHKAN BARIS INI
                 pwp: document.getElementById('r_PWP').value || 0, 
                 psm: document.getElementById('r_PSM').value || 0, 
                 serba: document.getElementById('r_SERBA_GRATIS').value || 0, 
@@ -3482,6 +3536,213 @@ function hitungBreakdown() {
 
     document.getElementById('areaHasilBreakdown').innerHTML = htmlCards;
     document.getElementById('btnWABreakdown').style.display = 'inline-block';
+}
+
+// FUNGSI HITUNG KONTRIBUSI MEMBER ESTAFET & DIAGRAM LINGKARAN
+function hitungMemberShift() {
+    const k = getK();
+    const tgl = parseInt(document.getElementById('tglInput').value) || new Date().getDate();
+    const shfAktif = document.getElementById('shfInput').value;
+    const tipeToko = parseInt(db[k.yr]?.[k.mn]?.[k.tk]?.tipe) || 3;
+
+    let ritelInput = parseFloat(document.getElementById('r_Ritel').value) || 0;
+    let memberInput = parseFloat(document.getElementById('r_Member').value) || 0;
+
+    const harianObj = db[k.yr]?.[k.mn]?.[k.tk]?.harian?.[tgl] || {};
+
+    // --- LOGIKA ESTAFET KUMULATIF AKUMULASI DOSA (RITEL LOLOS) ---
+    let shiftOrder = (tipeToko === 3) ? ['s3', 's1', 's2'] : ['s1', 's2'];
+    let prevDosaRitel = 0; // Sisa ritel lolos dari shift sebelumnya
+
+    for (let shCode of shiftOrder) {
+        if (shCode === shfAktif) break; // Berhenti jika sudah sampai shift aktif sekarang
+
+        let rShift = 0, mShift = 0;
+        Object.keys(harianObj).forEach(key => {
+            if (key.startsWith(shCode + '_') && key.endsWith('_nama')) {
+                let actualKey = key.replace('_nama', '');
+                let dRow = harianObj[actualKey] || {};
+                rShift += parseFloat(dRow.ritel) || 0;
+                mShift += parseFloat(dRow.member) || 0;
+            }
+        });
+        prevDosaRitel += rShift; // Akumulasi transaksi ritel (beban lolos) dari shift lalu
+    }
+
+    let totalStrukShift = ritelInput + memberInput;
+    let totalStrukKumulatif = totalStrukShift + prevDosaRitel;
+
+    let pctMemberShift = totalStrukShift > 0 ? Math.round((memberInput / totalStrukShift) * 100) : 0;
+    let pctEstafetToko = totalStrukKumulatif > 0 ? Math.round((memberInput / totalStrukKumulatif) * 100) : 0;
+
+    // --- UPDATE DIAGRAM LINGKARAN (CONIC GRADIENT) ---
+    const chartPie = document.getElementById('chartPieMember');
+    const txtPie = document.getElementById('txtPiePct');
+    if (chartPie && txtPie) {
+        let colorPie = pctMemberShift >= 85 ? "#27ae60" : (pctMemberShift >= 50 ? "#f39c12" : "#e74c3c");
+        chartPie.style.background = `conic-gradient(${colorPie} 0% ${pctMemberShift}%, #e74c3c ${pctMemberShift}% 100%)`;
+        txtPie.innerText = pctMemberShift + "%";
+        txtPie.style.color = colorPie;
+    }
+
+    // --- UPDATE METRIK TEXT ---
+    const elReal = document.getElementById('txtRealMemberShift');
+    const elGap = document.getElementById('txtGapMemberShift');
+    const elInfo = document.getElementById('txtEstafetInfo');
+
+    if (elReal) elReal.innerText = `${memberInput} / ${totalStrukShift} Struk`;
+    if (elGap) elGap.innerText = `${ritelInput} Struk Lolos`;
+    
+    if (elInfo) {
+        if (prevDosaRitel > 0) {
+            elInfo.innerHTML = `⚠️ Operan Beban Shift Lalu: <b style="color:#e74c3c">${prevDosaRitel} Ritel</b>`;
+        } else {
+            elInfo.innerHTML = `<i>Aman! Tidak ada beban dari shift sebelumnya</i>`;
+        }
+    }
+}
+
+// --- POP-UP MONITORING KONTRIBUSI MEMBER & FILTER HARIAN ---
+function tutupMemberMonitoring() {
+    const m = document.getElementById('modalMemberMonitoring');
+    if(m) m.remove();
+}
+
+function bukaMemberMonitoring() {
+    const k = getK();
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+    let tglOptions = `<option value="all">📅 SEMUA TANGGAL (01 - ${dM})</option>`;
+    for(let i=1; i<=dM; i++) {
+        tglOptions += `<option value="${i}">Tanggal ${i}</option>`;
+    }
+
+    const html = `
+    <div class="modal-rapor" id="modalMemberMonitoring" style="display:block;">
+        <div class="modal-content" style="max-width: 95%; max-height:90vh; display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="margin:0; font-size:16px; color:#8e44ad;">🎫 MONITORING KONTRIBUSI MEMBER</h3>
+                <span class="btn-tutup" onclick="tutupMemberMonitoring()">×</span>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-bottom:10px; background:#f4f7f6; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <select id="filterTglMember" onchange="renderMemberMonitoringData()" style="flex:1; padding:8px; font-weight:bold; border-radius:5px;">
+                    ${tglOptions}
+                </select>
+            </div>
+
+            <div style="overflow-y:auto; flex:1; background:#e9ecef; padding:10px; border-radius:8px;" id="kontenMemberMonitoring">
+                <!-- Rendered here -->
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+    renderMemberMonitoringData();
+}
+
+function renderMemberMonitoringData() {
+    const k = getK();
+    const filterVal = document.getElementById('filterTglMember').value;
+    const harianData = db[k.yr]?.[k.mn]?.[k.tk]?.harian || {};
+    const kru = (document.getElementById('listKru').value || '').split(',').map(x=>x.trim()).filter(Boolean);
+
+    let dataPersonil = {};
+    kru.forEach(n => { dataPersonil[n] = { ritel: 0, member: 0 }; });
+
+    let dataHarianTable = {};
+    const dM = new Date(k.yr, k.mn, 0).getDate();
+
+    let startTgl = (filterVal === 'all') ? 1 : parseInt(filterVal);
+    let endTgl = (filterVal === 'all') ? dM : parseInt(filterVal);
+
+    for(let tgl = startTgl; tgl <= endTgl; tgl++) {
+        const h = harianData[tgl] || {};
+        Object.keys(h).forEach(key => {
+            if(key.endsWith('_nama')) {
+                let nama = h[key].toUpperCase();
+                let shfKey = key.replace('_nama', '');
+                let row = h[shfKey] || {};
+                let ritel = parseFloat(row.ritel) || 0;
+                let member = parseFloat(row.member) || 0;
+
+                if(!dataPersonil[nama]) {
+                    dataPersonil[nama] = { ritel: 0, member: 0 };
+                }
+                dataPersonil[nama].ritel += ritel;
+                dataPersonil[nama].member += member;
+
+                if(!dataHarianTable[tgl]) dataHarianTable[tgl] = { ritel: 0, member: 0 };
+                dataHarianTable[tgl].ritel += ritel;
+                dataHarianTable[tgl].member += member;
+            }
+        });
+    }
+
+    let html = `<b style="font-size:14px; color:#2c3e50;">👤 REKAP KONTRIBUSI MEMBER PER PERSONIL</b><br><br>`;
+    
+    let arrPersonil = Object.entries(dataPersonil).map(([nama, d]) => {
+        let total = d.ritel + d.member;
+        let pct = total > 0 ? Math.round((d.member / total) * 100) : 0;
+        return { nama, ritel: d.ritel, member: d.member, total, pct };
+    }).sort((a,b) => b.pct - a.pct);
+
+    arrPersonil.forEach(p => {
+        let statusColor = p.pct >= 45 ? "#27ae60" : "#e74c3c";
+        let statusText = p.pct >= 45 ? "🟢 GACOR (DI ATAS 45%)" : "🚨 KUSUT (DI BAWAH 45%)";
+        html += `
+        <div style="background:white; padding:10px; border-radius:8px; margin-bottom:8px; border-left:5px solid ${statusColor}; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span>👤 ${p.nama}</span>
+                <span style="color:${statusColor};">${p.pct}%</span>
+            </div>
+            <div style="font-size:12px; color:#555; margin-top:4px;">
+                Struk Ritel: <b>${p.ritel}</b> | Struk Member: <b>${p.member}</b> | Total: <b>${p.total}</b>
+            </div>
+            <div style="font-size:11px; margin-top:2px; font-weight:bold; color:${statusColor};">${statusText}</div>
+        </div>`;
+    });
+
+    if(filterVal === 'all') {
+        html += `<br><b style="font-size:14px; color:#2c3e50;">📅 EVALUASI HARIAN (TANGGAL 1 - ${dM})</b><br><br>`;
+        for(let tgl = 1; tgl <= dM; tgl++) {
+            let d = dataHarianTable[tgl] || { ritel: 0, member: 0 };
+            let total = d.ritel + d.member;
+            if(total === 0) continue; 
+            let pct = Math.round((d.member / total) * 100);
+            let color = pct >= 45 ? "#27ae60" : "#e74c3c";
+            html += `
+            <div style="background:white; padding:8px 12px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd;">
+                <div><b>Tanggal ${tgl}</b><br><span style="font-size:11px; color:#666;">Ritel: ${d.ritel} | Member: ${d.member}</span></div>
+                <div style="font-weight:bold; color:${color}; font-size:14px;">${pct}% ${pct < 45 ? '🚨 KUSUT' : '✅'}</div>
+            </div>`;
+        }
+    } else {
+        html += `<br><b style="font-size:14px; color:#2c3e50;">🔍 RINCIAN SHIFT DI TANGGAL ${filterVal} (KENAPA KUSUT?)</b><br><br>`;
+        const h = harianData[filterVal] || {};
+        let adaShift = false;
+        Object.keys(h).forEach(key => {
+            if(key.endsWith('_nama')) {
+                adaShift = true;
+                let nama = h[key];
+                let shfKey = key.replace('_nama', '');
+                let row = h[shfKey] || {};
+                let ritel = parseFloat(row.ritel) || 0;
+                let member = parseFloat(row.member) || 0;
+                let total = ritel + member;
+                let pct = total > 0 ? Math.round((member / total) * 100) : 0;
+                let color = pct >= 45 ? "#27ae60" : "#e74c3c";
+                html += `
+                <div style="background:white; padding:8px 12px; border-radius:6px; margin-bottom:6px; border-left:4px solid ${color};">
+                    <b>Shift: ${shfKey.toUpperCase()} (${nama})</b><br>
+                    <span style="font-size:12px; color:#555;">Struk Ritel: ${ritel} | Struk Member: ${member} | % Member: <b style="color:${color};">${pct}%</b></span>
+                </div>`;
+            }
+        });
+        if(!adaShift) {
+            html += `<div style="text-align:center; color:#777; font-style:italic;">Belum ada data shift di tanggal ini.</div>`;
+        }
+    }
+
+    document.getElementById('kontenMemberMonitoring').innerHTML = html;
 }
 
 </script>
