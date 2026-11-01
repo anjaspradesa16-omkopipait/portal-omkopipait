@@ -280,6 +280,12 @@
                         <div style="flex:1;"><label>Target CEBAN (Pcs)</label><input type="number" id="t_CEBAN"></div>
                         <div style="flex:1;"><label>Syarat CEBAN (%)</label><input type="number" id="p_CEBAN" placeholder="Contoh: 1.5"></div>
                     </div>
+
+                    <!-- TAMBAHAN INPUT TARGET & SYARAT MEMBER 1 BULAN -->
+                    <div id="boxMEMBER" style="display:flex; gap:5px; margin-bottom:5px; background:#f0f8ff; padding:5px; border-radius:5px; border:1px solid #b8daff;">
+                        <div style="flex:1;"><label style="color:#004085;">Target Member (%) / Struk</label><input type="number" id="t_MEMBER" placeholder="Contoh: 45"></div>
+                        <div style="flex:1;"><label style="color:#004085;">Syarat Min Member (%)</label><input type="number" id="p_MEMBER" placeholder="Contoh: 45"></div>
+                    </div>
                 </div>
 
                 <button class="btn-save" onclick="simpanTarget()" style="margin-top:15px;">💾 SIMPAN TARGET & SYARAT</button>
@@ -576,7 +582,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbztIYUAPWR06Uk7CSiaFnmfi2HF2j-6uCfkMdA0Ci1dHQD8srmEFnDje_EKIfrGd6GKSg/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwNJrFbQUYH3dSbkh0CqX-LciQTtR7wrYXmedFmMDSHaWBGT3kCzVUqfvj02CLvpw-BmQ/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -2247,6 +2253,11 @@ async function kirimWA() {
             const stdValCum = parseFloat(document.getElementById('r_STD').value) || 0;
             const stdMurni = getStdMurni(harianSkrg, shf, stdValCum, tipe);
             
+            // --- VARIABEL KONTRIBUSI MEMBER YANG TADI KURANG ---
+            const ritelVal = parseFloat(document.getElementById('r_Ritel').value) || 0;
+            const memberVal = parseFloat(document.getElementById('r_Member').value) || 0;
+            // ---------------------------------------------------
+            
             pDetail += `🧾 QTY STD (Kumulatif): *${stdValCum}*\n`;
             pDetail += `🔥 QTY STD (Murni Shift Ini): *${stdMurni}*\n\n`;
 
@@ -3656,28 +3667,71 @@ function renderMemberMonitoringData() {
 
     for(let tgl = startTgl; tgl <= endTgl; tgl++) {
         const h = harianData[tgl] || {};
+        
+        // --- MESIN PEMISAH SELISIH ELEGAN (SIS KOMPUTER TOKO) ---
+        let cumS3 = { ritel: 0, member: 0 };
+        let cumS1 = { ritel: 0, member: 0 };
+        let cumS2 = { ritel: 0, member: 0 };
+        
+        let namaS3 = "", namaS1 = "", namaS2 = "";
+
         Object.keys(h).forEach(key => {
             if(key.endsWith('_nama')) {
+                let shf = key.split('_')[0].toLowerCase();
                 let nama = h[key].toUpperCase();
                 let shfKey = key.replace('_nama', '');
                 let row = h[shfKey] || {};
-                let ritel = parseFloat(row.ritel) || 0;
-                let member = parseFloat(row.member) || 0;
+                let r = parseFloat(row.ritel) || 0;
+                let m = parseFloat(row.member) || 0;
 
-                if(!dataPersonil[nama]) {
-                    dataPersonil[nama] = { ritel: 0, member: 0 };
-                }
-                dataPersonil[nama].ritel += ritel;
-                dataPersonil[nama].member += member;
-
-                if(!dataHarianTable[tgl]) dataHarianTable[tgl] = { ritel: 0, member: 0 };
-                dataHarianTable[tgl].ritel += ritel;
-                dataHarianTable[tgl].member += member;
+                if(shf === 's3') { cumS3 = {ritel: r, member: m}; namaS3 = nama; }
+                if(shf === 's1') { cumS1 = {ritel: r, member: m}; namaS1 = nama; }
+                if(shf === 's2') { cumS2 = {ritel: r, member: m}; namaS2 = nama; }
             }
+        });
+
+        // HITUNG REKAP MURNI MANDIRI PER SHIFT:
+        // S3 = Murni S3
+        // S1 = S1 - S3 (Jika S1 diisi)
+        // S2 = S2 - S1 (atau S2 - S3 jika S1 kosong)
+        let murniShift = [];
+
+        if(namaS3) {
+            murniShift.push({ nama: namaS3, ritel: cumS3.ritel, member: cumS3.member, shf: 'S3' });
+        }
+        if(namaS1) {
+            let rMurni1 = Math.max(0, cumS1.ritel - cumS3.ritel);
+            let mMurni1 = Math.max(0, cumS1.member - cumS3.member);
+            murniShift.push({ nama: namaS1, ritel: rMurni1, member: mMurni1, shf: 'S1' });
+        }
+        if(namaS2) {
+            let prevRitel = cumS1.ritel > 0 ? cumS1.ritel : cumS3.ritel;
+            let prevMember = cumS1.member > 0 ? cumS1.member : cumS3.member;
+            let rMurni2 = Math.max(0, cumS2.ritel - prevRitel);
+            let mMurni2 = Math.max(0, cumS2.member - prevMember);
+            murniShift.push({ nama: namaS2, ritel: rMurni2, member: mMurni2, shf: 'S2' });
+        }
+
+        // AKUMULASI HARIAN TOKO MENGGUNAKAN ANCHOR SHIFT TERAKHIR (CLOSING S2)
+        let totalHariIni = { ritel: 0, member: 0 };
+        if(cumS2.ritel > 0 || cumS2.member > 0) totalHariIni = cumS2;
+        else if(cumS1.ritel > 0 || cumS1.member > 0) totalHariIni = cumS1;
+        else totalHariIni = cumS3;
+
+        dataHarianTable[tgl] = totalHariIni;
+
+        // MASUKKAN HASIL MURNI KE PERSONIL
+        murniShift.forEach(m => {
+            if(!dataPersonil[m.nama]) dataPersonil[m.nama] = { ritel: 0, member: 0 };
+            dataPersonil[m.nama].ritel += m.ritel;
+            dataPersonil[m.nama].member += m.member;
         });
     }
 
-    let html = `<b style="font-size:14px; color:#2c3e50;">👤 REKAP KONTRIBUSI MEMBER PER PERSONIL</b><br><br>`;
+    // AMBIL TARGET MEMBER DARI SETUP ADMIN (DEFAULT 45%)
+    let syrMember = parseFloat(db[k.yr]?.[k.mn]?.[k.tk]?.target[1]?.['p_MEMBER']) || 45;
+
+    let html = `<b style="font-size:14px; color:#2c3e50;">👤 REKAP KONTRIBUSI MEMBER PER PERSONIL (MURNI SHIFT)</b><br><br>`;
     
     let arrPersonil = Object.entries(dataPersonil).map(([nama, d]) => {
         let total = d.ritel + d.member;
@@ -3686,8 +3740,8 @@ function renderMemberMonitoringData() {
     }).sort((a,b) => b.pct - a.pct);
 
     arrPersonil.forEach(p => {
-        let statusColor = p.pct >= 45 ? "#27ae60" : "#e74c3c";
-        let statusText = p.pct >= 45 ? "🟢 GACOR (DI ATAS 45%)" : "🚨 KUSUT (DI BAWAH 45%)";
+        let statusColor = p.pct >= syrMember ? "#27ae60" : "#e74c3c";
+        let statusText = p.pct >= syrMember ? `🟢 GACOR (DI ATAS ${syrMember}%)` : `🚨 KUSUT (DI BAWAH ${syrMember}%)`;
         html += `
         <div style="background:white; padding:10px; border-radius:8px; margin-bottom:8px; border-left:5px solid ${statusColor}; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
             <div style="display:flex; justify-content:space-between; font-weight:bold;">
@@ -3695,50 +3749,25 @@ function renderMemberMonitoringData() {
                 <span style="color:${statusColor};">${p.pct}%</span>
             </div>
             <div style="font-size:12px; color:#555; margin-top:4px;">
-                Struk Ritel: <b>${p.ritel}</b> | Struk Member: <b>${p.member}</b> | Total: <b>${p.total}</b>
+                Struk Ritel: <b>${p.ritel}</b> | Struk Member: <b>${p.member}</b> | Total Struk: <b>${p.total}</b>
             </div>
             <div style="font-size:11px; margin-top:2px; font-weight:bold; color:${statusColor};">${statusText}</div>
         </div>`;
     });
 
     if(filterVal === 'all') {
-        html += `<br><b style="font-size:14px; color:#2c3e50;">📅 EVALUASI HARIAN (TANGGAL 1 - ${dM})</b><br><br>`;
+        html += `<br><b style="font-size:14px; color:#2c3e50;">📅 EVALUASI HARIAN TOKO (KLOP SIS KOMPUTER)</b><br><br>`;
         for(let tgl = 1; tgl <= dM; tgl++) {
             let d = dataHarianTable[tgl] || { ritel: 0, member: 0 };
             let total = d.ritel + d.member;
             if(total === 0) continue; 
             let pct = Math.round((d.member / total) * 100);
-            let color = pct >= 45 ? "#27ae60" : "#e74c3c";
+            let color = pct >= syrMember ? "#27ae60" : "#e74c3c";
             html += `
             <div style="background:white; padding:8px 12px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd;">
-                <div><b>Tanggal ${tgl}</b><br><span style="font-size:11px; color:#666;">Ritel: ${d.ritel} | Member: ${d.member}</span></div>
-                <div style="font-weight:bold; color:${color}; font-size:14px;">${pct}% ${pct < 45 ? '🚨 KUSUT' : '✅'}</div>
+                <div><b>Tanggal ${tgl}</b><br><span style="font-size:11px; color:#666;">Ritel Total: ${d.ritel} | Member Total: ${d.member}</span></div>
+                <div style="font-weight:bold; color:${color}; font-size:14px;">${pct}% ${pct < syrMember ? '🚨 KUSUT' : '✅ GACOR'}</div>
             </div>`;
-        }
-    } else {
-        html += `<br><b style="font-size:14px; color:#2c3e50;">🔍 RINCIAN SHIFT DI TANGGAL ${filterVal} (KENAPA KUSUT?)</b><br><br>`;
-        const h = harianData[filterVal] || {};
-        let adaShift = false;
-        Object.keys(h).forEach(key => {
-            if(key.endsWith('_nama')) {
-                adaShift = true;
-                let nama = h[key];
-                let shfKey = key.replace('_nama', '');
-                let row = h[shfKey] || {};
-                let ritel = parseFloat(row.ritel) || 0;
-                let member = parseFloat(row.member) || 0;
-                let total = ritel + member;
-                let pct = total > 0 ? Math.round((member / total) * 100) : 0;
-                let color = pct >= 45 ? "#27ae60" : "#e74c3c";
-                html += `
-                <div style="background:white; padding:8px 12px; border-radius:6px; margin-bottom:6px; border-left:4px solid ${color};">
-                    <b>Shift: ${shfKey.toUpperCase()} (${nama})</b><br>
-                    <span style="font-size:12px; color:#555;">Struk Ritel: ${ritel} | Struk Member: ${member} | % Member: <b style="color:${color};">${pct}%</b></span>
-                </div>`;
-            }
-        });
-        if(!adaShift) {
-            html += `<div style="text-align:center; color:#777; font-style:italic;">Belum ada data shift di tanggal ini.</div>`;
         }
     }
 
