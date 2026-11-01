@@ -582,7 +582,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwgSmmVMZE3AO-v1pkLZYZy601ZDSNDRlpeUv1lIUWFVPEchHHIQAd3_ngwJ41_gk3aOw/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwKXuqnotp-PZLF8B6azEg-1xJ1Bn3XpUFcgsHDJ-MTuF30Fh1XB_HtNGum_3SkT6Lv3Q/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -1270,11 +1270,18 @@ function getLogic(tgl, it, yr, mn) {
     function switchWeek() {
         const k = getK(); const wkBaru = document.getElementById('wkTarget').value;
         const tgt = db[k.yr][k.mn][k.tk].target[wkBaru] || {};
+        
         items.forEach(it => { 
             const el = document.getElementById(`t_${it}`); if(el) el.value = tgt[it] || ""; 
-            // BARU: Munculkan Target Syarat %
+            // Munculkan Target Syarat %
             const elP = document.getElementById(`p_${it}`); if(elP) elP.value = tgt[`p_${it}`] || ""; 
         });
+
+        // 👉 TAMBAHKAN INI: Agar Syarat Ceban & Member ikut muncul saat form dimuat/ganti minggu
+        const elPCeban = document.getElementById('p_CEBAN'); if(elPCeban) elPCeban.value = tgt['p_CEBAN'] || "";
+        const elTMember = document.getElementById('t_MEMBER'); if(elTMember) elTMember.value = tgt['MEMBER'] || "";
+        const elPMember = document.getElementById('p_MEMBER'); if(elPMember) elPMember.value = tgt['p_MEMBER'] || "";
+
         const show = (wkBaru == 1 || wkBaru == 3);
         ['boxPWP','boxSERBA','boxSUGER','boxCEBAN'].forEach(id => document.getElementById(id).style.display = show ? 'block' : 'none');
     }
@@ -1289,9 +1296,9 @@ function simpanTarget() {
         });
 
         // TAMBAHAN: Tangkap input Target & Syarat Member dari form HTML
+        db[k.yr][k.mn][k.tk].target[wk]['p_CEBAN'] = parseFloat(document.getElementById('p_CEBAN')?.value) || 0;
         db[k.yr][k.mn][k.tk].target[wk]['MEMBER'] = parseFloat(document.getElementById('t_MEMBER')?.value) || 0;
         db[k.yr][k.mn][k.tk].target[wk]['p_MEMBER'] = parseFloat(document.getElementById('p_MEMBER')?.value) || 0;
-
         saveDisk(); 
         
         showLoading("Menyimpan Target & Syarat ke Cloud..."); 
