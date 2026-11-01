@@ -582,7 +582,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbzzmRhPZyTOUvl5jL4vXkZ2iZkI_f12coxTd6a3LVij4eMKLKjLWBDYCqe9BTW4qBkx6A/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbziygxISd_48LTg6EVc2jFuJnCW0otNHwF75IKTCzeRKBg1NLI8a8PjGKvri3DCSTuWfw/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -1279,30 +1279,42 @@ function getLogic(tgl, it, yr, mn) {
         ['boxPWP','boxSERBA','boxSUGER','boxCEBAN'].forEach(id => document.getElementById(id).style.display = show ? 'block' : 'none');
     }
 
-    function simpanTarget() {
+function simpanTarget() {
         const k = getK(); const wk = document.getElementById('wkTarget').value;
         if(!k.tk) return alert("Kode Toko Kosong!");
         
         items.forEach(it => { 
             const el = document.getElementById(`t_${it}`); if(el) db[k.yr][k.mn][k.tk].target[wk][it] = parseFloat(el.value) || 0; 
-            // BARU: Simpan Target Syarat %
             const elP = document.getElementById(`p_${it}`); if(elP) db[k.yr][k.mn][k.tk].target[wk][`p_${it}`] = parseFloat(elP.value) || 0; 
         });
+
+        // TAMBAHAN: Tangkap input Target & Syarat Member dari form HTML
+        db[k.yr][k.mn][k.tk].target[wk]['MEMBER'] = parseFloat(document.getElementById('t_MEMBER')?.value) || 0;
+        db[k.yr][k.mn][k.tk].target[wk]['p_MEMBER'] = parseFloat(document.getElementById('p_MEMBER')?.value) || 0;
+
         saveDisk(); 
         
         showLoading("Menyimpan Target & Syarat ke Cloud..."); 
         
-        const payload = { toko: k.tk, yr: k.yr, mn: k.mn, wk: wk, targets: db[k.yr][k.mn][k.tk].target[wk], kru: db[k.yr][k.mn][k.tk].kru, tipe: db[k.yr][k.mn][k.tk].tipe, tipeData: "PPS_TARGET" };
+        const payload = { 
+            toko: k.tk, yr: k.yr, mn: k.mn, wk: wk, 
+            targets: db[k.yr][k.mn][k.tk].target[wk], 
+            kru: db[k.yr][k.mn][k.tk].kru, 
+            tipe: db[k.yr][k.mn][k.tk].tipe, 
+            tipeData: "PPS_TARGET" 
+        };
         
         fetch(urlRaportGlobal, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
         .then(() => {
             hideLoading();
-            alert("Target QTY & Syarat % Disimpan & Sinkron Cloud! 📊");
+            alert("Target QTY, Syarat %, & Member Disimpan & Sinkron Cloud! 📊");
         }).catch(() => {
             hideLoading();
             alert("Gagal koneksi ke cloud!");
         });
     }
+
+
     function loadReal() {
         const k = getK(); if(!k.tk) return;
         const tgl = document.getElementById('tglInput').value; 
