@@ -582,7 +582,7 @@
     // --- 1. VARIABEL UTAMA (TETAP ASLI) ---
     const items = ['PWP', 'PSM', 'SERBA_GRATIS', 'SUGER', 'CEBAN'];
     const blnNama = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwKXuqnotp-PZLF8B6azEg-1xJ1Bn3XpUFcgsHDJ-MTuF30Fh1XB_HtNGum_3SkT6Lv3Q/exec";
+    const urlRaportGlobal = "https://script.google.com/macros/s/AKfycbwoOqE2v2UvVKWEVVlCBPqLV7TTOHcGvHQqfrQ9TJryZyAafLY2uefAtt2p6z3Kx58NiA/exec";
     
     let db = JSON.parse(localStorage.getItem('dbPPS_v30')) || {};
 
@@ -3632,66 +3632,230 @@ function hitungMemberShift() {
     }
 }
 
-// --- POP-UP MONITORING KONTRIBUSI MEMBER & FILTER HARIAN ---
+// ==========================================
+// 🎫 KONTROL DASHBOARD MEMBER (BERSIH DARI KUNCI TANGGAL)
+// ==========================================
+
+function bukaMemberMonitoring() {
+    const k = getK();
+    window.selectedTglMember = 'all';
+    
+    // Hapus dulu kalau modalnya sudah ada biar tidak numpuk
+    const existing = document.getElementById('modalMemberMonitoring');
+    if(existing) existing.remove();
+
+    let html = `
+    <div class="modal-rapor" id="modalMemberMonitoring" style="display:block;">
+        <div class="modal-content" style="max-width:650px;">
+            
+            <!-- HEADER STANDAR YANG BERSIH & AMAN -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <b style="font-size:16px; color:#8e44ad;">🎫 MONITORING KONTRIBUSI MEMBER</b>
+                <span class="btn-tutup" onclick="tutupMemberMonitoring()">×</span>
+            </div>
+            
+            <!-- KOTAK KONTROL: BULAN, TAHUN, & MODE TAMPILAN -->
+            <div style="display:flex; gap:8px; margin-bottom:10px; background:#f4f7f6; padding:10px; border-radius:8px; border:1px solid #ddd; flex-wrap:wrap; align-items:center;">
+                <div style="flex:1; min-width:110px;">
+                    <label style="font-size:10px; margin-bottom:2px; font-weight:bold; display:block;">Bulan</label>
+                    <select id="memberBulan" onchange="gantiBulanTahunMember()" style="padding:6px; font-weight:bold; border-radius:5px; width:100%; cursor:pointer;">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="flex:1; min-width:90px;">
+                    <label style="font-size:10px; margin-bottom:2px; font-weight:bold; display:block;">Tahun</label>
+                    <select id="memberTahun" onchange="gantiBulanTahunMember()" style="padding:6px; font-weight:bold; border-radius:5px; width:100%; cursor:pointer;">
+                        <option value="2025">2025</option><option value="2026" selected>2026</option>
+                    </select>
+                </div>
+                <div style="flex:2; min-width:160px;">
+                    <label style="font-size:10px; margin-bottom:2px; font-weight:bold; display:block;">Tampilan Data</label>
+                    <select id="memberModeTampil" onchange="toggleFilterMember()" style="padding:6px; font-weight:bold; border-radius:5px; width:100%; background:#fff3cd; color:#856404; cursor:pointer;">
+                        <option value="rekap" selected>📊 Rekap Bulan Ini (Full)</option>
+                        <option value="kalender">📅 Pilih Tanggal (Model Kalender)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- WADAH KALENDER TANGGAL -->
+            <div id="wadahKalenderMember" style="display:none; margin-bottom:10px; background:#fff; padding:10px; border-radius:8px; border:1px solid #b3d4fc;">
+                <div style="font-size:11px; font-weight:bold; color:#2980b9; margin-bottom:6px; text-align:center;">👆 KLIK TANGGAL DI BAWAH INI:</div>
+                <div id="gridKalenderTanggal" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:4px;"></div>
+            </div>
+
+            <!-- WADAH HASIL REKAP -->
+            <div style="max-height:50vh; overflow-y:auto; background:#e9ecef; padding:10px; border-radius:8px; border:1px solid #ccc;" id="kontenMemberMonitoring">
+                <!-- Hasil rekap render di sini -->
+            </div>
+        </div>
+    </div>`;
+    
+    document.body.insertAdjacentHTML('beforeend', html);
+    document.getElementById('memberBulan').value = k.mn;
+    document.getElementById('memberTahun').value = k.yr;
+    buildGridKalender();
+    renderMemberMonitoringData();
+}
+
 function tutupMemberMonitoring() {
     const m = document.getElementById('modalMemberMonitoring');
     if(m) m.remove();
 }
 
-function bukaMemberMonitoring() {
-    const k = getK();
-    const dM = new Date(k.yr, k.mn, 0).getDate();
-    let tglOptions = `<option value="all">📅 SEMUA TANGGAL (01 - ${dM})</option>`;
-    for(let i=1; i<=dM; i++) {
-        tglOptions += `<option value="${i}">Tanggal ${i}</option>`;
+function toggleFilterMember() {
+    const modeSelect = document.getElementById('memberModeTampil');
+    if (!modeSelect) return;
+    
+    const mode = modeSelect.value;
+    const wadahKalender = document.getElementById('wadahKalenderMember');
+    
+    if (mode === 'kalender') {
+        if (wadahKalender) wadahKalender.style.display = 'block';
+    } else {
+        if (wadahKalender) wadahKalender.style.display = 'none';
+        
+        // 🟢 RESET TOTAL KUNCI TANGGAL JADI 'all' (FULL 1 BULAN)
+        window.selectedTglMember = 'all';
+        
+        const bln = parseInt(document.getElementById('memberBulan').value);
+        const thn = parseInt(document.getElementById('memberTahun').value);
+        const tokoAktif = getK().tk;
+        
+        pullDataBulanLainMember(thn, bln, tokoAktif);
     }
+}
 
-    const html = `
-    <div class="modal-rapor" id="modalMemberMonitoring" style="display:block;">
-        <div class="modal-content" style="max-width: 95%; max-height:90vh; display:flex; flex-direction:column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h3 style="margin:0; font-size:16px; color:#8e44ad;">🎫 MONITORING KONTRIBUSI MEMBER</h3>
-                <span class="btn-tutup" onclick="tutupMemberMonitoring()">×</span>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-bottom:10px; background:#f4f7f6; padding:10px; border-radius:8px; border:1px solid #ddd;">
-                <select id="filterTglMember" onchange="renderMemberMonitoringData()" style="flex:1; padding:8px; font-weight:bold; border-radius:5px;">
-                    ${tglOptions}
-                </select>
-            </div>
+function gantiBulanTahunMember() {
+    // Setiap ganti bulan/tahun, reset paksa ke rekap full 1 bulan agar tidak nyangkut tanggal
+    window.selectedTglMember = 'all';
+    const modeSelect = document.getElementById('memberModeTampil');
+    if(modeSelect) modeSelect.value = 'rekap';
+    const wadahKalender = document.getElementById('wadahKalenderMember');
+    if(wadahKalender) wadahKalender.style.display = 'none';
 
-            <div style="overflow-y:auto; flex:1; background:#e9ecef; padding:10px; border-radius:8px;" id="kontenMemberMonitoring">
-                <!-- Rendered here -->
-            </div>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', html);
-    renderMemberMonitoringData();
+    buildGridKalender();
+    
+    const bln = parseInt(document.getElementById('memberBulan').value);
+    const thn = parseInt(document.getElementById('memberTahun').value);
+    const tokoAktif = getK().tk;
+    
+    pullDataBulanLainMember(thn, bln, tokoAktif);
+}
+
+function buildGridKalender() {
+    const bln = parseInt(document.getElementById('memberBulan').value);
+    const thn = parseInt(document.getElementById('memberTahun').value);
+    const dM = new Date(thn, bln, 0).getDate();
+    
+    let gridHtml = `<button type="button" onclick="pilihTglKalender('all')" id="btnTgl_all" style="grid-column: span 7; background:#2980b9; color:white; border:none; padding:8px; border-radius:4px; font-weight:bold; font-size:11px; cursor:pointer; position:relative; z-index:5;">REKAP FULL 1 BULAN</button>`;
+    
+    for(let i=1; i<=dM; i++) {
+        gridHtml += `<button type="button" onclick="pilihTglKalender(${i})" id="btnTgl_${i}" style="background:#fff; border:1px solid #ccc; padding:8px 0; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer; position:relative; z-index:5;">${i}</button>`;
+    }
+    
+    const gridEl = document.getElementById('gridKalenderTanggal');
+    if(gridEl) gridEl.innerHTML = gridHtml;
+}
+
+function pilihTglKalender(tgl) {
+    window.selectedTglMember = tgl; // Set tanggal spesifik yang diklik
+    
+    // Tutup kalender setelah diklik
+    const wadahKalender = document.getElementById('wadahKalenderMember');
+    if(wadahKalender) wadahKalender.style.display = 'none';
+    
+    const bln = parseInt(document.getElementById('memberBulan').value);
+    const thn = parseInt(document.getElementById('memberTahun').value);
+    const tokoAktif = getK().tk;
+    
+    // Tarik data cloud dengan loading untuk tanggal tersebut
+    pullDataBulanLainMember(thn, bln, tokoAktif);
 }
 
 function renderMemberMonitoringData() {
+    const bln = parseInt(document.getElementById('memberBulan').value);
+    const thn = parseInt(document.getElementById('memberTahun').value);
     const k = getK();
-    const filterVal = document.getElementById('filterTglMember').value;
-    const harianData = db[k.yr]?.[k.mn]?.[k.tk]?.harian || {};
-    const kru = (document.getElementById('listKru').value || '').split(',').map(x=>x.trim()).filter(Boolean);
+    const tokoAktif = k.tk;
+
+    // 🔒 PASTIKAN STRUKTUR MEMORI LOKAL TERKUNCI AMAN
+    if(!db[thn]) db[thn] = {};
+    if(!db[thn][bln]) db[thn][bln] = {};
+    
+    // Jika data bulan/tahun tersebut belum lengkap di memori HP, WAJIB tarik dari cloud
+    if(!db[thn][bln][tokoAktif] || !db[thn][bln][tokoAktif].harian || Object.keys(db[thn][bln][tokoAktif].harian).length === 0) {
+        pullDataBulanLainMember(thn, bln, tokoAktif);
+        return;
+    }
+
+    // Jika sudah ada, langsung eksekusi render tanpa ragu
+    eksekusiRenderMemberFull(thn, bln, tokoAktif);
+}
+
+function pullDataBulanLainMember(yr, mn, toko) {
+    showLoading(`Menarik Data Member ${blnNama[mn-1]} ${yr} dari Cloud...`);
+    const targetUrl = `${urlRaportGlobal}?toko=${toko}&yr=${yr}&mn=${mn}&t=${new Date().getTime()}`;
+
+    fetch(targetUrl)
+    .then(res => res.json())
+    .then(data => {
+        hideLoading();
+        if(data && data.status !== "error") {
+            // 🔒 KUNCI & SIMPAN PERMANEN KE STRUKTUR MEMORI LOKAL
+            if(!db[yr]) db[yr] = {};
+            if(!db[yr][mn]) db[yr][mn] = {};
+            if(!db[yr][mn][toko]) db[yr][mn][toko] = {};
+
+            db[yr][mn][toko].harian = data.harian || {};
+            db[yr][mn][toko].target = data.target || {};
+            db[yr][mn][toko].kru = data.kru || "";
+            db[yr][mn][toko].tipe = data.tipe || "3";
+            
+            // Simpan ke localStorage agar tidak hilang saat direfresh
+            localStorage.setItem('dbPPS_v30', JSON.stringify(db));
+            
+            // Eksekusi tampilkan data
+            eksekusiRenderMemberFull(yr, mn, toko);
+        } else {
+            alert(`⚠️ Belum ada data arsip untuk bulan ${blnNama[mn-1]} ${yr} di cloud.`);
+            eksekusiRenderMemerKosong(yr, mn, toko);
+        }
+    }).catch(e => {
+        hideLoading();
+        console.error("Gagal tarik data cloud:", e);
+        alert("Gagal koneksi ke cloud, periksa internet Anda!");
+    });
+}
+
+function eksekusiRenderMemerKosong(yr, mn, toko) {
+    // Pengaman jika data kosong total agar tidak error
+    if(!db[yr]) db[yr] = {};
+    if(!db[yr][mn]) db[yr][mn] = {};
+    if(!db[yr][mn][toko]) db[yr][mn][toko] = { harian: {}, target: {}, kru: "", tipe: "3" };
+    eksekusiRenderMemberFull(yr, mn, toko);
+}
+
+function eksekusiRenderMemberFull(thn, bln, tokoAktif) {
+    const harianData = db[thn]?.[bln]?.[tokoAktif]?.harian || {};
+    let kruStr = db[thn]?.[bln]?.[tokoAktif]?.kru || document.getElementById('listKru')?.value || "";
+    let kru = kruStr.split(',').map(x=>x.trim()).filter(Boolean);
 
     let dataPersonil = {};
     kru.forEach(n => { dataPersonil[n] = { ritel: 0, member: 0 }; });
 
     let dataHarianTable = {};
-    const dM = new Date(k.yr, k.mn, 0).getDate();
+    const dM = new Date(thn, bln, 0).getDate();
+    const filterTgl = window.selectedTglMember || 'all';
 
-    let startTgl = (filterVal === 'all') ? 1 : parseInt(filterVal);
-    let endTgl = (filterVal === 'all') ? dM : parseInt(filterVal);
+    let startTgl = (filterTgl === 'all') ? 1 : parseInt(filterTgl);
+    let endTgl = (filterTgl === 'all') ? dM : parseInt(filterTgl);
 
     for(let tgl = startTgl; tgl <= endTgl; tgl++) {
         const h = harianData[tgl] || {};
-        
-        // --- MESIN PEMISAH SELISIH ELEGAN (SIS KOMPUTER TOKO) ---
-        let cumS3 = { ritel: 0, member: 0 };
-        let cumS1 = { ritel: 0, member: 0 };
-        let cumS2 = { ritel: 0, member: 0 };
-        
+        let cumS3 = { ritel: 0, member: 0 }, cumS1 = { ritel: 0, member: 0 }, cumS2 = { ritel: 0, member: 0 };
         let namaS3 = "", namaS1 = "", namaS2 = "";
 
         Object.keys(h).forEach(key => {
@@ -3703,43 +3867,28 @@ function renderMemberMonitoringData() {
                 let r = parseFloat(row.ritel) || 0;
                 let m = parseFloat(row.member) || 0;
 
+                if(!dataPersonil[nama]) dataPersonil[nama] = { ritel: 0, member: 0 };
+
                 if(shf === 's3') { cumS3 = {ritel: r, member: m}; namaS3 = nama; }
                 if(shf === 's1') { cumS1 = {ritel: r, member: m}; namaS1 = nama; }
                 if(shf === 's2') { cumS2 = {ritel: r, member: m}; namaS2 = nama; }
             }
         });
 
-        // HITUNG REKAP MURNI MANDIRI PER SHIFT:
-        // S3 = Murni S3
-        // S1 = S1 - S3 (Jika S1 diisi)
-        // S2 = S2 - S1 (atau S2 - S3 jika S1 kosong)
         let murniShift = [];
-
-        if(namaS3) {
-            murniShift.push({ nama: namaS3, ritel: cumS3.ritel, member: cumS3.member, shf: 'S3' });
-        }
+        if(namaS3) murniShift.push({ nama: namaS3, ritel: cumS3.ritel, member: cumS3.member });
         if(namaS1) {
-            let rMurni1 = Math.max(0, cumS1.ritel - cumS3.ritel);
-            let mMurni1 = Math.max(0, cumS1.member - cumS3.member);
-            murniShift.push({ nama: namaS1, ritel: rMurni1, member: mMurni1, shf: 'S1' });
+            murniShift.push({ nama: namaS1, ritel: Math.max(0, cumS1.ritel - cumS3.ritel), member: Math.max(0, cumS1.member - cumS3.member) });
         }
         if(namaS2) {
-            let prevRitel = cumS1.ritel > 0 ? cumS1.ritel : cumS3.ritel;
-            let prevMember = cumS1.member > 0 ? cumS1.member : cumS3.member;
-            let rMurni2 = Math.max(0, cumS2.ritel - prevRitel);
-            let mMurni2 = Math.max(0, cumS2.member - prevMember);
-            murniShift.push({ nama: namaS2, ritel: rMurni2, member: mMurni2, shf: 'S2' });
+            let prevR = cumS1.ritel > 0 ? cumS1.ritel : cumS3.ritel;
+            let prevM = cumS1.member > 0 ? cumS1.member : cumS3.member;
+            murniShift.push({ nama: namaS2, ritel: Math.max(0, cumS2.ritel - prevR), member: Math.max(0, cumS2.member - prevM) });
         }
 
-        // AKUMULASI HARIAN TOKO MENGGUNAKAN ANCHOR SHIFT TERAKHIR (CLOSING S2)
-        let totalHariIni = { ritel: 0, member: 0 };
-        if(cumS2.ritel > 0 || cumS2.member > 0) totalHariIni = cumS2;
-        else if(cumS1.ritel > 0 || cumS1.member > 0) totalHariIni = cumS1;
-        else totalHariIni = cumS3;
-
+        let totalHariIni = cumS2.ritel > 0 ? cumS2 : (cumS1.ritel > 0 ? cumS1 : cumS3);
         dataHarianTable[tgl] = totalHariIni;
 
-        // MASUKKAN HASIL MURNI KE PERSONIL
         murniShift.forEach(m => {
             if(!dataPersonil[m.nama]) dataPersonil[m.nama] = { ritel: 0, member: 0 };
             dataPersonil[m.nama].ritel += m.ritel;
@@ -3747,10 +3896,12 @@ function renderMemberMonitoringData() {
         });
     }
 
-    // AMBIL TARGET MEMBER DARI SETUP ADMIN (DEFAULT 45%)
-    let syrMember = parseFloat(db[k.yr]?.[k.mn]?.[k.tk]?.target[1]?.['p_MEMBER']) || 45;
-
-    let html = `<b style="font-size:14px; color:#2c3e50;">👤 REKAP KONTRIBUSI MEMBER PER PERSONIL (MURNI SHIFT)</b><br><br>`;
+    let syrMember = 45; 
+    let html = `<div style="background:#34495e; color:white; padding:8px; border-radius:6px; font-size:12px; margin-bottom:10px; text-align:center;">
+        Periode Aktif: <b>${filterTgl === 'all' ? 'Full Sebulan (01 - ' + dM + ')' : 'Tanggal ' + filterTgl + ' ' + blnNama[bln-1] + ' ' + thn}</b>
+    </div>`;
+    
+    html += `<b style="font-size:13px; color:#2c3e50;">👤 REKAP KONTRIBUSI MEMBER PER PERSONIL</b><br><br>`;
     
     let arrPersonil = Object.entries(dataPersonil).map(([nama, d]) => {
         let total = d.ritel + d.member;
@@ -3760,7 +3911,7 @@ function renderMemberMonitoringData() {
 
     arrPersonil.forEach(p => {
         let statusColor = p.pct >= syrMember ? "#27ae60" : "#e74c3c";
-        let statusText = p.pct >= syrMember ? `🟢 GACOR (DI ATAS ${syrMember}%)` : `🚨 KUSUT (DI BAWAH ${syrMember}%)`;
+        let statusText = p.pct >= syrMember ? `🟢 GACOR (Diatas ${syrMember}%)` : `🚨 KUSUT (Dibawah ${syrMember}%)`;
         html += `
         <div style="background:white; padding:10px; border-radius:8px; margin-bottom:8px; border-left:5px solid ${statusColor}; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
             <div style="display:flex; justify-content:space-between; font-weight:bold;">
@@ -3768,14 +3919,14 @@ function renderMemberMonitoringData() {
                 <span style="color:${statusColor};">${p.pct}%</span>
             </div>
             <div style="font-size:12px; color:#555; margin-top:4px;">
-                Struk Ritel: <b>${p.ritel}</b> | Struk Member: <b>${p.member}</b> | Total Struk: <b>${p.total}</b>
+                Struk Ritel: <b>${p.ritel}</b> | Struk Member: <b>${p.member}</b> | Total: <b>${p.total}</b>
             </div>
             <div style="font-size:11px; margin-top:2px; font-weight:bold; color:${statusColor};">${statusText}</div>
         </div>`;
     });
 
-    if(filterVal === 'all') {
-        html += `<br><b style="font-size:14px; color:#2c3e50;">📅 EVALUASI HARIAN TOKO (KLOP SIS KOMPUTER)</b><br><br>`;
+    if(filterTgl === 'all') {
+        html += `<br><b style="font-size:13px; color:#2c3e50;">📅 EVALUASI HARIAN TOKO</b><br><br>`;
         for(let tgl = 1; tgl <= dM; tgl++) {
             let d = dataHarianTable[tgl] || { ritel: 0, member: 0 };
             let total = d.ritel + d.member;
@@ -3784,13 +3935,14 @@ function renderMemberMonitoringData() {
             let color = pct >= syrMember ? "#27ae60" : "#e74c3c";
             html += `
             <div style="background:white; padding:8px 12px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd;">
-                <div><b>Tanggal ${tgl}</b><br><span style="font-size:11px; color:#666;">Ritel Total: ${d.ritel} | Member Total: ${d.member}</span></div>
-                <div style="font-weight:bold; color:${color}; font-size:14px;">${pct}% ${pct < syrMember ? '🚨 KUSUT' : '✅ GACOR'}</div>
+                <div><b>Tanggal ${tgl}</b><br><span style="font-size:11px; color:#666;">Ritel: ${d.ritel} | Member: ${d.member}</span></div>
+                <div style="font-weight:bold; color:${color}; font-size:13px;">${pct}% ${pct < syrMember ? '🚨' : '✅'}</div>
             </div>`;
         }
     }
 
-    document.getElementById('kontenMemberMonitoring').innerHTML = html;
+    const kontenEl = document.getElementById('kontenMemberMonitoring');
+    if(kontenEl) kontenEl.innerHTML = html;
 }
 
 </script>
