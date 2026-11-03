@@ -2272,13 +2272,16 @@ async function kirimWA() {
             const stdValCum = parseFloat(document.getElementById('r_STD').value) || 0;
             const stdMurni = getStdMurni(harianSkrg, shf, stdValCum, tipe);
             
-            // --- VARIABEL KONTRIBUSI MEMBER YANG TADI KURANG ---
+            // --- VARIABEL KONTRIBUSI MEMBER ---
             const ritelVal = parseFloat(document.getElementById('r_Ritel').value) || 0;
             const memberVal = parseFloat(document.getElementById('r_Member').value) || 0;
-            // ---------------------------------------------------
+            const totalStrukShift = ritelVal + memberVal;
+            const pctMemberShift = totalStrukShift > 0 ? Math.round((memberVal / totalStrukShift) * 100) : 0;
+            // -----------------------------------
             
             pDetail += `🧾 QTY STD (Kumulatif): *${stdValCum}*\n`;
-            pDetail += `🔥 QTY STD (Murni Shift Ini): *${stdMurni}*\n\n`;
+            pDetail += `🔥 QTY STD (Murni Shift Ini): *${stdMurni}*\n`;
+            pDetail += `🎫 Kontribusi Member: *${memberVal}/${totalStrukShift}* (${pctMemberShift}%)\n\n`;
 
             itm.forEach(it => {
                 tTokoBulat[it] = (parseFloat(db[k.yr][k.mn][k.tk].target[p*2-1]?.[it]) || 0) + (parseFloat(db[k.yr][k.mn][k.tk].target[p*2]?.[it]) || 0);
@@ -2347,11 +2350,8 @@ async function kirimWA() {
                 const dh = db[k.yr][k.mn][k.tk].harian[i] || {};
                 Object.keys(dh).forEach(key => {
                     if(key.includes('_nama')){
-                        const namaK = dh[key].trim().toUpperCase();
                         const kUtama = key.replace('_nama', '');
-                        if(!rekapIndiv[namaK]) rekapIndiv[namaK] = {PWP:0, PSM:0, SERBA:0, SUGER:0, CEBAN:0};
                         let rPWP = parseFloat(dh[kUtama]?.PWP || 0), rPSM = parseFloat(dh[kUtama]?.PSM || 0), rSERBA = parseFloat(dh[kUtama]?.SERBA_GRATIS || 0), rSUGER = parseFloat(dh[kUtama]?.SUGER || 0), rCEBAN = parseFloat(dh[kUtama]?.CEBAN || 0);
-                        rekapIndiv[namaK].PWP += rPWP; rekapIndiv[namaK].PSM += rPSM; rekapIndiv[namaK].SERBA += rSERBA; rekapIndiv[namaK].SUGER += rSUGER; rekapIndiv[namaK].CEBAN += rCEBAN;
                         if((p === 1 && i <= 15) || (p === 2 && i > 15)){
                             akumulasiToko.PWP += rPWP; akumulasiToko.PSM += rPSM; akumulasiToko.SERBA += rSERBA; akumulasiToko.SUGER += rSUGER; akumulasiToko.CEBAN += rCEBAN;
                         }
@@ -2368,18 +2368,8 @@ async function kirimWA() {
                 dashToko += `${emo} ${it}: ${getTextBar(pctT)} ${akumulasiToko[kR]}/${tTokoBulat[kT]} (${Math.round(pctT)}%)\n`;
             });
 
-            let personilWA = "🏆 *KONTRIBUSI PERSONIL (PERIODE):*\n";
-            for (let n in rekapIndiv) {
-                personilWA += `👤 *${n}*\n`;
-                ['PWP','PSM','SERBA','SUGER','CEBAN'].forEach(it => {
-                    let rI = rekapIndiv[n][it] || 0;
-                    let tI = tTokoBulat[it === 'SERBA' ? 'SERBA_GRATIS' : it] || 0;
-                    let pctI = tI > 0 ? (rI/tI)*100 : 0;
-                    let emo = pctI < 50 ? "🔴" : (pctI < 100 ? "🟡" : "🟢");
-                    personilWA += `  ${emo} ${it}: ${getTextBar(pctI)} ${rI}/${tI}\n`;
-                });
-                personilWA += `\n`;
-            }
+            // --- PERSONIL DIKOSONGKAN AGAR TIDAK PANJANG ---
+            let personilWA = "";
 
             const btn = document.getElementById('btnWA');
             const prevText = btn.innerText;
@@ -2393,7 +2383,8 @@ async function kirimWA() {
                 kataSemangat = "🔥 *STATUS: GACOR PARAH!* 🚀\nLuar biasa! Semua target shift ini lunas dibabat habis! Pertahankan ritme sadis ini, jangan kasih kendor sampai closing! Kalian kebanggaan toko! 🏆💰";
             }
 
-            const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA/ALASAN:* ${note || '-'}\n------------------------------------\n${kataSemangat}\n------------------------------------\n${dashToko}\n${personilWA}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
+            // Variabel personilWA sengaja tidak disertakan di bawah dashToko agar format aslinya tetap bersih & ringkas
+            const msg = `*MONITORING PPS [${k.tk}]*\n📅 Tgl: ${tgl} ${blnNama[parseInt(k.mn)-1]}\n🕒 Shift: *${shf.toUpperCase()}*\n👤 Kasir: *${ksr}*\n------------------------------------\n${pDetail}📝 *KENDALA/ALASAN:* ${note || '-'}\n------------------------------------\n${kataSemangat}\n------------------------------------\n${dashToko}------------------------------------\n🚀 *MANTAP JOSS!*\n*#omkopipait*`;
 
             const cnv = document.getElementById('canvasJoin');
             if (cnv) {
